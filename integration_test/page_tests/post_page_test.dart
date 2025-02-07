@@ -262,9 +262,9 @@ Future<void> main() async {
         await tester.tap(gymDD);
         await tester.pumpAndSettle();
         var gymSel = find.descendant(
-        of: gymDD,
-        matching: find.text(gymToString(gyms[1]), findRichText: true)
-      ).last;
+          of: gymDD,
+          matching: find.text(gymToString(gyms[1]), findRichText: true)
+        ).last;
         await tester.tap(gymSel);
         await tester.pumpAndSettle();
       }
