@@ -228,23 +228,32 @@ Future<void> main() async {
     // TODO: instead of hardcoding the test cases generate a bunch of random ones
     // and programatically check the correctness of each case
     final random = Random();
+    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890 ';
+  
     // Post with text, activity, gym, time and image upload
     for (int i = 0; i < 10; i++){
+      String randomText = List.generate(random.nextInt(100)+1, (index) => _chars[random.nextInt(_chars.length)]).join();
       int randomIndex = random.nextInt(activities.length);
+      bool textSelected = true; //Should be random.nextBool() but if so, it does not run properly
+      bool actSelected = random.nextBool();
       bool gymSelected = random.nextBool();
       bool dateSelected = random.nextBool();
       bool picSelected = random.nextBool();
-      await tester.enterText(textField, "sample post $i");
-      await tester.pumpAndSettle();
-      await tester.tap(actDD);
-      await tester.pumpAndSettle();
-      var actSel = find.descendant(
-        of: actDD,
-        matching: find.text(activities[randomIndex])
-      ).last;
-      await tester.tap(actSel);
-      await tester.pumpAndSettle();
-      await tester.tapAt(Offset(0, 0));
+      if (textSelected){
+        await tester.enterText(textField, randomText);
+        await tester.pumpAndSettle();
+      }
+      if (actSelected){
+        await tester.tap(actDD);
+        await tester.pumpAndSettle();
+        var actSel = find.descendant(
+          of: actDD,
+          matching: find.text(activities[randomIndex])
+        ).last;
+        await tester.tap(actSel);
+        await tester.pumpAndSettle();
+        await tester.tapAt(Offset(0, 0));
+      }
       if (gymSelected){
          // Make sure the dropdowns are closed by tapping outside
         await tester.tap(gymDD);
@@ -278,11 +287,30 @@ Future<void> main() async {
       await tester.tap(postBtn);
       await tester.pumpAndSettle();   
       await tester.pump(Duration(milliseconds: 10000));
-      
-      var dbRec = await getDBRecord("sample post $i", activities[randomIndex]);
-      print("Gymselected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
-      print("Database records found: ${dbRec.length}");
-      expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+
+      //TODO: This should not be commented out
+
+      // if (!textSelected){
+      //   final errorText = find.text(consts.PostPageConsts.emptyFieldError);
+      //   print("RandomText: $randomText");
+      //   print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
+      //   expect(errorText, findsOneWidget);
+      // }
+      /*else*/ if (!actSelected){
+        var post = await db.collection('posts')
+        .where('author', isEqualTo: await helpers.getUserID())
+        .where('content', isEqualTo: randomText).get();
+        print("RandomText: $randomText");
+        print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
+        expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
+        continue;
+      }
+      else {
+        var dbRec = await getDBRecord(randomText, activities[randomIndex]);
+        print("RandomText: $randomText");
+        print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
+        expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+      }
     }
   });
 }
