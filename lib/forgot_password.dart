@@ -9,19 +9,20 @@ class ForgotPasswordPage extends StatefulWidget {
   @override
   State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
 }
+
 // Forgot password page state
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController _emailController = TextEditingController(); // Email controller
   final FocusNode _emailFocusNode = FocusNode(); // Email focus node
 
-// Send the password to the user's email function
+  // Send the password to the user's email function
   Future<void> _sendPassword() async {
     // TODO: implement password sending feature once we have a server & email address
     final String email = _emailController.text;
   }
 
 
-// Dispose of the controllers and focus nodes
+  // Dispose of the controllers and focus nodes
   @override
   void dispose() {
     _emailController.dispose();
@@ -29,7 +30,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     super.dispose();
   }
 
-// Build the forgot password page
+  // Build the forgot password page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
