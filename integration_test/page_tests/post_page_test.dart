@@ -62,7 +62,6 @@ Future<void> main() async {
 
     await tester.tap(actDD);
     await tester.pumpAndSettle();
-    await tester.pump(Duration(milliseconds: 1000));
     final actScroll = find.byType(Scrollable).first;
     var activities = await helpers.getAllActivitiesWithoutProps(db.collection('activities'));
     activities.sort();
@@ -230,7 +229,8 @@ Future<void> main() async {
 
     // Random posts
     for (int i = 0; i < numOfRandomPosts; i++){
-      String randomText = test_helpers.generateRandomString(random.nextInt(100) + 1);
+      // Random string with a few emojis
+      String randomText = '${test_helpers.generateRandomString(random.nextInt(100) + 1)}${test_helpers.generateEmojis()}';
 
       // Select an activity from the first few ones to avoid scrolling
       int randomIndex = random.nextInt(5);

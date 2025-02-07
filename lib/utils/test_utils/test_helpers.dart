@@ -65,3 +65,26 @@ List<int> randNumOfRandNums(int n) {
   }
   return res;
 }
+
+String getRandomEmoji() {
+  final random = Random();
+  
+  List<List<int>> emojiRanges = [
+    [0x1F600, 0x1F64F], // Smiley faces
+    [0x1F300, 0x1F5FF], // Misc symbols & pictographs
+    [0x1F680, 0x1F6FF], // Transport & map symbols
+    [0x1F700, 0x1F77F], // Alchemical symbols
+    [0x1F900, 0x1F9FF], // Supplemental symbols
+  ];
+  
+  List<int> range = emojiRanges[random.nextInt(emojiRanges.length)];
+  int emojiCode = random.nextInt(range[1] - range[0]) + range[0];
+
+  return String.fromCharCode(emojiCode);
+}
+
+String generateEmojis() {
+  final random = Random();
+  int count = random.nextInt(5) + 1; // Generate between 1 to 5 emojis
+  return List.generate(count, (_) => getRandomEmoji()).join(" ");
+}
