@@ -152,7 +152,7 @@ class _PostPageState extends State<PostPage> {
             case TaskState.success:
               downloadURLs.add(await ref.getDownloadURL());
               if (downloadURLs.length == images.length) {
-                pushToDB();
+                await pushToDB();
               }
               break;
             default:
@@ -162,7 +162,7 @@ class _PostPageState extends State<PostPage> {
         filenames.add(filename);
       }
     } else {
-      pushToDB();
+      await pushToDB();
     }
   }
   // Build the post page

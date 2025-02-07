@@ -30,6 +30,7 @@ Future<void> main() async {
     // User with the given ID, its username is 'test' and can be found in the test database
     test_helpers.logInUser('b727fd96-f618-4121-b875-e5fb74539034');
     await tester.pumpWidget(MaterialApp(home: PostPage()));
+    await tester.pumpAndSettle();
 
     // First check the existance of widgets
     final titleFinder = find.text(consts.PostPageConsts.appBarText);
