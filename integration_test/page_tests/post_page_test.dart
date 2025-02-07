@@ -62,19 +62,16 @@ Future<void> main() async {
 
     await tester.tap(actDD);
     await tester.pumpAndSettle();
-    await tester.pump(Duration(milliseconds: 1000));
     final actScroll = find.byType(Scrollable).first;
     var activities = await helpers.getAllActivitiesWithoutProps(db.collection('activities'));
     activities.sort();
 
-    /*
     for (final el in activities) {
       final itemFinder = find.text(el);
       await tester.scrollUntilVisible(itemFinder, 500, scrollable: actScroll);
       expect(itemFinder, findsOneWidget);
       await tester.pumpAndSettle();
     }
-    */
 
     await tester.tap(actDD);
     await tester.pumpAndSettle();
@@ -86,7 +83,6 @@ Future<void> main() async {
     helpers.sortGymsByName(gyms);
 
     // NOTE: this takes a lot of time to run since it scrolls through thousands of gyms in a dropdown
-    /*
     for (final el in gyms) {
       final itemFinder = find.text(
         gymToString(el),
@@ -227,14 +223,14 @@ Future<void> main() async {
     await tester.pumpAndSettle();
     await tester.tap(postBtn);
     await tester.pumpAndSettle();   
-
+    await tester.pump(Duration(milliseconds: 10000));
     dbRec = await getDBRecord('sample post 5', activities[2]);
     expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
-    */
 
     // Random posts
     for (int i = 0; i < numOfRandomPosts; i++){
-      String randomText = test_helpers.generateRandomString(random.nextInt(100) + 1);
+      // Random string with a few emojis
+      String randomText = '${test_helpers.generateRandomString(random.nextInt(100) + 1)}${test_helpers.generateEmojis()}';
 
       // Select an activity from the first few ones to avoid scrolling
       int randomIndex = random.nextInt(5);
@@ -244,25 +240,6 @@ Future<void> main() async {
       bool gymSelected = random.nextBool();
       bool dateSelected = random.nextBool();
       bool picSelected = random.nextBool();
-      print(activities[randomIndex]);
-
-    final textField = find.byKey(const Key('textField'));
-    expect(textField, findsOneWidget);
-
-    final actDD = find.byKey(const Key('activityField'));
-    expect(actDD, findsOneWidget);
-
-    final gymDD = find.byKey(const Key('gymField'));
-    expect(gymDD, findsOneWidget);
-
-    final timeField = find.byKey(const Key('timeField'));
-    expect(timeField, findsOneWidget);
-
-    final uploadField = find.byKey(const Key('uploadField'));
-    expect(uploadField, findsOneWidget);
-
-    final postBtn = find.byKey(const Key('postBtn'));
-    expect(postBtn, findsOneWidget);
 
       if (textSelected) {
         await tester.enterText(textField, randomText);
@@ -278,6 +255,7 @@ Future<void> main() async {
         ).last;
         await tester.tap(actSel);
         await tester.pumpAndSettle();
+        await tester.tapAt(Offset(0, 0));
       }
 
       if (gymSelected) {
