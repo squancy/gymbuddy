@@ -15,22 +15,21 @@ class LoginPage extends StatefulWidget {
 
 // Login page state
 class _LoginPageState extends State<LoginPage> {
-  final TextEditingController _emailController = TextEditingController(); // Email controller
-  final TextEditingController _passwordController = TextEditingController(); // Password controller
-  final FocusNode _emailFocusNode = FocusNode(); // Email focus node
-  final FocusNode _passwordFocusNode = FocusNode(); // Password focus node
+  final TextEditingController _emailController = TextEditingController(); 
+  final TextEditingController _passwordController = TextEditingController(); 
+  final FocusNode _emailFocusNode = FocusNode(); 
+  final FocusNode _passwordFocusNode = FocusNode();
 
-  final ValueNotifier<String> _loginStatus = ValueNotifier<String>(""); // Login status notifier (for error messages)
+  final ValueNotifier<String> _loginStatus = ValueNotifier<String>(""); 
 
-  /// Login function, validates the login and redirects the user to the home page, else shows an error message
   Future<void> _login() async {
-    final String email = _emailController.text.trim(); // Get the email from the email controller (trimmed)
-    final String password = _passwordController.text.trim(); // Get the password from the password controller (trimmed)
+    final String email = _emailController.text.trim(); 
+    final String password = _passwordController.text.trim();
 
-    _loginStatus.value = ''; // Reset the login status
+    _loginStatus.value = '';
 
-    final loginValidator = CheckLogin(email, password); // Function found in handlers.handle_login.dart
-    final (bool isValid, String errorMsg, String userID) = await loginValidator.validateLogin(); // Validate the login, function found in handlers.handle_login.dart
+    final loginValidator = CheckLogin(email, password); 
+    final (bool isValid, String errorMsg, String userID) = await loginValidator.validateLogin();
     if (!isValid) {
       setState(() { _loginStatus.value = errorMsg; });
       return;
@@ -52,7 +51,6 @@ class _LoginPageState extends State<LoginPage> {
     });
   }
 
-  // Dispose controllers and focus nodes
   @override
   void dispose() {
     _emailController.dispose();

@@ -50,3 +50,18 @@ Future<void> deleteAllDocsFromCollection(CollectionReference collection, Firebas
   }
   await batch.commit();
 }
+
+List<int> randNumOfRandNums(int n) {
+  final random = Random();
+  List<int> res = [];
+  for (int i = 0; i < random.nextInt(n); i++) {
+    if (random.nextBool()) {
+      int randNum = random.nextInt(n);
+      while (res.contains(randNum)) {
+        randNum = random.nextInt(n);
+      }
+      res.add(randNum);
+    }
+  }
+  return res;
+}
