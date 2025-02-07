@@ -6,7 +6,8 @@ import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/post_page.dart';
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
-import "dart:math";
+import 'dart:math';
+
 String gymToString(Map<String, dynamic> gym) {
   return "${gym[gym.keys.toList()[0]]['name']}\t|\t${gym[gym.keys.toList()[0]]['address']}";
 }
@@ -22,6 +23,8 @@ Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await helpers.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final random = Random();
+  final numOfRandomPosts = 10;
 
   testWidgets('Post page testing', (tester) async {
     // Necessary for being able to enterText when not in debug mode 
@@ -29,8 +32,10 @@ Future<void> main() async {
 
     // User with the given ID, its username is 'test' and can be found in the test database
     test_helpers.logInUser('b727fd96-f618-4121-b875-e5fb74539034');
-    await tester.pumpWidget(MaterialApp(home: PostPage()));
-    await tester.pumpAndSettle();   // First check the existance of widgets
+    await tester.pumpWidget(MaterialApp(home: PostPage(key: const Key('postPage1'),)));
+    await tester.pumpAndSettle();
+    
+    // First check the existance of widgets
     final titleFinder = find.text(consts.PostPageConsts.appBarText);
     expect(titleFinder, findsOneWidget);
 
@@ -54,8 +59,6 @@ Future<void> main() async {
 
     // Make sure the dropdown menus have the correct content
     // TODO: silence warnings
-    // Wait a second for the content to be loaded
-    await tester.pump(Duration(milliseconds: 1000));
 
     await tester.tap(actDD);
     await tester.pumpAndSettle();
@@ -81,15 +84,15 @@ Future<void> main() async {
     helpers.sortGymsByName(gyms);
 
     // NOTE: this takes a lot of time to run since it scrolls through thousands of gyms in a dropdown
-    // for (final el in gyms) {
-    //   final itemFinder = find.text(
-    //     gymToString(el),
-    //     findRichText: true
-    //   );
-    //   await tester.scrollUntilVisible(itemFinder, 500, scrollable: gymsScroll);
-    //   expect(itemFinder, findsOneWidget);
-    //   await tester.pumpAndSettle();
-    // }
+    for (final el in gyms) {
+      final itemFinder = find.text(
+        gymToString(el),
+        findRichText: true
+      );
+      await tester.scrollUntilVisible(itemFinder, 500, scrollable: gymsScroll);
+      expect(itemFinder, findsOneWidget);
+      await tester.pumpAndSettle();
+    }
 
     // Posting without filling the text field is not permitted
     await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
@@ -101,149 +104,149 @@ Future<void> main() async {
     expect(errorText, findsOneWidget);
 
     // // Post with just text
-    // await tester.enterText(textField, 'sample post');
-    // await tester.pumpAndSettle();
-    // await tester.tap(postBtn);
-    // await tester.pumpAndSettle();
+    await tester.enterText(textField, 'sample post');
+    await tester.pumpAndSettle();
+    await tester.tap(postBtn);
+    await tester.pumpAndSettle();
     
-    // // Make sure the new post is pushed to database
-    // var post = await db.collection('posts')
-    //   .where('author', isEqualTo: await helpers.getUserID())
-    //   .where('content', isEqualTo: 'sample post').get();
-    // print(post.docs.map((e) => e.data(),).toList());
-    // expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
+    // Make sure the new post is pushed to database
+    var post = await db.collection('posts')
+      .where('author', isEqualTo: await helpers.getUserID())
+      .where('content', isEqualTo: 'sample post').get();
+    expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
 
-    // // Post with text and activity
-    // await tester.enterText(textField, 'sample post 2');
-    // await tester.pumpAndSettle();
-    // await tester.tap(actDD);
-    // await tester.pumpAndSettle();
-    // var actSel = find.descendant(
-    //   of: actDD,
-    //   matching: find.text(activities[1])
-    // ).last;
-    // await tester.tap(actSel);
-    // await tester.pumpAndSettle();
-    // await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
-    // await tester.tap(postBtn);
-    // await tester.pumpAndSettle();
+    // Post with text and activity
+    await tester.enterText(textField, 'sample post 2');
+    await tester.pumpAndSettle();
+    await tester.tap(actDD);
+    await tester.pumpAndSettle();
+    var actSel = find.descendant(
+      of: actDD,
+      matching: find.text(activities[1])
+    ).last;
+    await tester.tap(actSel);
+    await tester.pumpAndSettle();
+    await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
+    await tester.tap(postBtn);
+    await tester.pumpAndSettle();
 
-    // // Make sure it is pushed to db
-    // var dbRec = await getDBRecord('sample post 2', activities[1]);
-    // expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+    // Make sure it is pushed to db
+    var dbRec = await getDBRecord('sample post 2', activities[1]);
+    expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
 
-    // // Post with text, activity and gym
-    // await tester.enterText(textField, 'sample post 3');
-    // await tester.pumpAndSettle();
-    // await tester.tap(actDD);
-    // await tester.pumpAndSettle();
-    // actSel = find.descendant(
-    //   of: actDD,
-    //   matching: find.text(activities[2])
-    // ).last;
-    // await tester.tap(actSel);
-    // await tester.pumpAndSettle();
-    // await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
-    // await tester.tap(gymDD);
-    // await tester.pumpAndSettle();
-    // var gymSel = find.descendant(
-    //   of: gymDD,
-    //   matching: find.text(gymToString(gyms[2]), findRichText: true)
-    // ).last;
-    // await tester.tap(gymSel);
-    // await tester.pumpAndSettle();
-    // await tester.tap(postBtn);
-    // await tester.pumpAndSettle();
+    // Post with text, activity and gym
+    await tester.enterText(textField, 'sample post 3');
+    await tester.pumpAndSettle();
+    await tester.tap(actDD);
+    await tester.pumpAndSettle();
+    actSel = find.descendant(
+      of: actDD,
+      matching: find.text(activities[2])
+    ).last;
+    await tester.tap(actSel);
+    await tester.pumpAndSettle();
+    await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
+    await tester.tap(gymDD);
+    await tester.pumpAndSettle();
+    var gymSel = find.descendant(
+      of: gymDD,
+      matching: find.text(gymToString(gyms[2]), findRichText: true)
+    ).last;
+    await tester.tap(gymSel);
+    await tester.pumpAndSettle();
+    await tester.tap(postBtn);
+    await tester.pumpAndSettle();
 
-    // // Make sure it is pushed to db
-    // dbRec = await getDBRecord('sample post 3', activities[2]);
-    // expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+    // Make sure it is pushed to db
+    dbRec = await getDBRecord('sample post 3', activities[2]);
+    expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
 
-    // // Post with text, activity, gym and time
-    // await tester.enterText(textField, 'sample post 4');
-    // await tester.pumpAndSettle();
-    // await tester.tap(actDD);
-    // await tester.pumpAndSettle();
-    // actSel = find.descendant(
-    //   of: actDD,
-    //   matching: find.text(activities[2])
-    // ).last;
-    // await tester.tap(actSel);
-    // await tester.pumpAndSettle();
-    // await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
-    // await tester.tap(gymDD);
-    // await tester.pumpAndSettle();
-    // gymSel = find.descendant(
-    //   of: gymDD,
-    //   matching: find.text(gymToString(gyms[1]), findRichText: true)
-    // ).last;
-    // await tester.tap(gymSel);
-    // await tester.pumpAndSettle();
-    // await tester.tap(timeField);
-    // await tester.pumpAndSettle();
-    // await tester.tap(find.text('Done'));
-    // await tester.pumpAndSettle();
-    // await tester.tap(postBtn);
-    // await tester.pumpAndSettle();   
+    // Post with text, activity, gym and time
+    await tester.enterText(textField, 'sample post 4');
+    await tester.pumpAndSettle();
+    await tester.tap(actDD);
+    await tester.pumpAndSettle();
+    actSel = find.descendant(
+      of: actDD,
+      matching: find.text(activities[2])
+    ).last;
+    await tester.tap(actSel);
+    await tester.pumpAndSettle();
+    await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
+    await tester.tap(gymDD);
+    await tester.pumpAndSettle();
+    gymSel = find.descendant(
+      of: gymDD,
+      matching: find.text(gymToString(gyms[1]), findRichText: true)
+    ).last;
+    await tester.tap(gymSel);
+    await tester.pumpAndSettle();
+    await tester.tap(timeField);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    await tester.tap(postBtn);
+    await tester.pumpAndSettle();   
 
-    // // Make sure it is pushed to db
-    // dbRec = await getDBRecord('sample post 4', activities[2]);
-    // expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+    // Make sure it is pushed to db
+    dbRec = await getDBRecord('sample post 4', activities[2]);
+    expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
 
-    // // Post with text, activity, gym, time and image upload
-    // await tester.enterText(textField, 'sample post 5');
-    // await tester.pumpAndSettle();
-    // await tester.tap(actDD);
-    // await tester.pumpAndSettle();
-    // actSel = find.descendant(
-    //   of: actDD,
-    //   matching: find.text(activities[2])
-    // ).last;
-    // await tester.tap(actSel);
-    // await tester.pumpAndSettle();
-    // await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
-    // await tester.tap(gymDD);
-    // await tester.pumpAndSettle();
-    // gymSel = find.descendant(
-    //   of: gymDD,
-    //   matching: find.text(gymToString(gyms[1]), findRichText: true)
-    // ).last;
-    // await tester.tap(gymSel);
-    // await tester.pumpAndSettle();
-    // await tester.tap(timeField);
-    // await tester.pumpAndSettle();
-    // await tester.tap(find.text('Done'));
-    // await tester.pumpAndSettle();
-    // await tester.tap(uploadField);
-    // await tester.pumpAndSettle();
-    // // In test mode the image picker is mocked by using the default profile pic the selected image
-    // await tester.tap(find.text(consts.GlobalConsts.photoGalleryText));
-    // await tester.pumpAndSettle();
-    // await tester.tap(postBtn);
-    // await tester.pumpAndSettle();   
-    // await tester.pump(Duration(milliseconds: 10000));
-    // dbRec = await getDBRecord('sample post 5', activities[2]);
-    // expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
-
-    // TODO: instead of hardcoding the test cases generate a bunch of random ones
-    // and programatically check the correctness of each case
-    final random = Random();
-    const _chars = 'AaBbCcDdEeFfGgHhIiJjKkLlMmNnOoPpQqRrSsTtUuVvWwXxYyZz1234567890 ';
-  
     // Post with text, activity, gym, time and image upload
-    for (int i = 0; i < 10; i++){
-      String randomText = List.generate(random.nextInt(100)+1, (index) => _chars[random.nextInt(_chars.length)]).join();
-      int randomIndex = random.nextInt(activities.length);
-      bool textSelected = true; //Should be random.nextBool() but if so, it does not run properly
+    await tester.enterText(textField, 'sample post 5');
+    await tester.pumpAndSettle();
+    await tester.tap(actDD);
+    await tester.pumpAndSettle();
+    actSel = find.descendant(
+      of: actDD,
+      matching: find.text(activities[2])
+    ).last;
+    await tester.tap(actSel);
+    await tester.pumpAndSettle();
+    await tester.tapAt(Offset(0, 0)); // Make sure the dropdowns are closed by tapping outside
+    await tester.tap(gymDD);
+    await tester.pumpAndSettle();
+    gymSel = find.descendant(
+      of: gymDD,
+      matching: find.text(gymToString(gyms[1]), findRichText: true)
+    ).last;
+    await tester.tap(gymSel);
+    await tester.pumpAndSettle();
+    await tester.tap(timeField);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Done'));
+    await tester.pumpAndSettle();
+    await tester.tap(uploadField);
+    await tester.pumpAndSettle();
+
+    // In test mode the image picker is mocked by using the default profile pic the selected image
+    await tester.tap(find.text(consts.GlobalConsts.photoGalleryText));
+    await tester.pumpAndSettle();
+    await tester.tap(postBtn);
+    await tester.pumpAndSettle();   
+    await tester.pump(Duration(milliseconds: 10000));
+    dbRec = await getDBRecord('sample post 5', activities[2]);
+    expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
+
+    // Random posts
+    for (int i = 0; i < numOfRandomPosts; i++){
+      String randomText = test_helpers.generateRandomString(random.nextInt(100) + 1);
+
+      // Select an activity from the first few ones to avoid scrolling
+      int randomIndex = random.nextInt(5);
+
+      bool textSelected = random.nextBool();
       bool actSelected = random.nextBool();
       bool gymSelected = random.nextBool();
       bool dateSelected = random.nextBool();
       bool picSelected = random.nextBool();
-      if (textSelected){
+
+      if (textSelected) {
         await tester.enterText(textField, randomText);
         await tester.pumpAndSettle();
       }
-      if (actSelected){
+
+      if (actSelected) {
         await tester.tap(actDD);
         await tester.pumpAndSettle();
         var actSel = find.descendant(
@@ -254,8 +257,8 @@ Future<void> main() async {
         await tester.pumpAndSettle();
         await tester.tapAt(Offset(0, 0));
       }
-      if (gymSelected){
-         // Make sure the dropdowns are closed by tapping outside
+
+      if (gymSelected) {
         await tester.tap(gymDD);
         await tester.pumpAndSettle();
         var gymSel = find.descendant(
@@ -266,51 +269,42 @@ Future<void> main() async {
         await tester.pumpAndSettle();
       }
       
-      if (dateSelected){
+      if (dateSelected) {
         await tester.tap(timeField);
         await tester.pumpAndSettle();
         await tester.tap(find.text('Done'));
         await tester.pumpAndSettle();
       }
       
-      // In test mode the image picker is mocked by using the default profile pic the selected image
-      if (picSelected){
+      if (picSelected) {
         await tester.tap(uploadField);
         await tester.pumpAndSettle();
         final photoGallery = find.text(consts.GlobalConsts.photoGalleryText);
-        if (photoGallery.evaluate().isNotEmpty) {
-          await tester.tap(photoGallery);
-          await tester.pumpAndSettle();
-        }
+        await tester.tap(photoGallery);
+        await tester.pumpAndSettle();
       }
 
       await tester.tap(postBtn);
       await tester.pumpAndSettle();   
-      await tester.pump(Duration(milliseconds: 10000));
 
-      //TODO: This should not be commented out
-
-      // if (!textSelected){
-      //   final errorText = find.text(consts.PostPageConsts.emptyFieldError);
-      //   print("RandomText: $randomText");
-      //   print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
-      //   expect(errorText, findsOneWidget);
-      // }
-      /*else*/ if (!actSelected){
-        var post = await db.collection('posts')
-        .where('author', isEqualTo: await helpers.getUserID())
-        .where('content', isEqualTo: randomText).get();
-        print("RandomText: $randomText");
-        print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
+      if (textSelected) {
+        final post = await db.collection('posts')
+          .where('author', isEqualTo: await helpers.getUserID())
+          .where('content', isEqualTo: randomText).get();
         expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
-        continue;
+      } else {
+        final errorText = find.text(consts.PostPageConsts.emptyFieldError);
+        expect(errorText, findsOneWidget);
       }
-      else {
-        var dbRec = await getDBRecord(randomText, activities[randomIndex]);
-        print("RandomText: $randomText");
-        print("Textselected: $textSelected actSelected: $actSelected gymSelected: $gymSelected, DateSelected: $dateSelected, PicSelected: $picSelected");
-        expect(dbRec.length, 1, reason: "Make sure there is exactly one entry in db");
-      }
+
+      /*
+        Pumping a Container first and then the app again with a different key
+        forces Flutter to rebuild the widget tree AND reset the states
+      */ 
+      await tester.pumpWidget(Container());
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(MaterialApp(home: PostPage(key: const Key('postPage2'),)));
+      await tester.pumpAndSettle();
     }
   });
 }

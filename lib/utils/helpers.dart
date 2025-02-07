@@ -276,3 +276,14 @@ Future<void> firebaseInit({required bool test}) async {
     }
   }
 }
+
+/// Fetch all activities and gyms from db
+Future<({List<String> activities, List<Map<String, dynamic>> gyms})> getActivitiesAndGyms() async {
+  final FirebaseFirestore db = FirebaseFirestore.instance;
+  final allGyms = await getAllGymsWithProps(db.collection('gyms/budapest/gyms'));
+  sortGymsByName(allGyms);
+
+  final allActivities = await getAllActivitiesWithoutProps(db.collection('activities'));
+  allActivities.sort();
+  return (activities: allActivities, gyms: allGyms);
+}
