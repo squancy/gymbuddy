@@ -9,7 +9,7 @@ macos/
 web/
 windows/
 .dart_tool/
-.devtools_options.yaml
+devtools_options.yaml
 storage.rules
 
 .firebaserc
@@ -161,3 +161,7 @@ firebase.json
 firepit-log.txt
 lib/firebase_options.dart
 lib/*.code-workspace
+
+#Firestore
+firestore.rules
+firestore.indexes.json
