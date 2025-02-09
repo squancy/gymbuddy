@@ -16,7 +16,7 @@ class SignupConsts {
   static const String passwordText = 'Password';
   static const String passwordConfText = 'Confirm password';
   static const String accountExistsText = 'Already have an account?';
-  static const String passwordLengthText = 'Your password is too short (min ${ValidateSignupConsts.MIN_PASSWORD_LEN} characters)';
+  static const String passwordLengthText = 'Your password is too short (min ${ValidateSignupConsts.maxPasswordLength} characters)';
   static const String allFieldsText = 'Fill all fields';
   static const String usernameTooLongText = 'Username is too long';
   static const String invalidEmailText = 'Email is invalid';
@@ -28,7 +28,7 @@ class SignupConsts {
 
 // Home page [main.dart]
 class HomeConsts {
-  static const String appTitle = 'Gym Buddy App'; // TODO - Change the app title to something better
+  static const String appTitle = 'Gym Buddy App'; 
   static const String loginButtonTitle = 'Log in';
   static const String signupButtonTitle = 'Sign up';
 }
@@ -42,6 +42,7 @@ class ForgotPasswordConsts {
   static const String wrongCredentialsText = 'Your email or password is incorrect';
 }
 
+// Post page [post_page.dart]
 class PostPageConsts {
   static const String appBarText = 'Find a gym buddy';
   static const String textBarText = 'Looking for a buddy?';
@@ -54,25 +55,25 @@ class PostPageConsts {
   static const int maxNumOfImages = 5;
 }
 
-// Signup page validation [validate_signup.dart]
+// Signup page validation 
 class ValidateSignupConsts {
-  static const int MAX_USERNAME_LEN = 100;
-  static const int MIN_PASSWORD_LEN = 6;
+  static const int maxUsernameLength = 100;
+  static const int maxPasswordLength = 6;
 }
 
 // Profile page [profile_page.dart]
 class ProfileConsts {
-  static const int MAX_BIO_LEN = 200;
+  static const int maxBioLength = 200;
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
-  static const int PAGINATION_NUM = 24;
+  static const int paginationNum = 24;
   static const int profilePicSize = 200;
-  static const String BIO_DEFAULT_TEXT = 'Write something about yourself...';
+  static const String bioDefaultText = 'Write something about yourself...';
   static const String emptyDisplayUnameText = 'Edit username...';
 }
 
 class GlobalConsts {
   static const spinkit = CircularProgressIndicator.adaptive();
-  static const bool TEST = true;
+  static const bool test = true;
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
   static const String inputSourcePopupText = 'Select an input source';
   static const String photoGalleryText = 'Photo gallery';
@@ -81,7 +82,7 @@ class GlobalConsts {
 
   // Now the list of potential activities are given here
   // In the future they are going to be fetched from a file or other sources
-  static const List<String> ACTIVITIES = [
+  static const List<String> activities = [
     'Chest',
     'Back',
     'Legs',
@@ -89,3 +90,6 @@ class GlobalConsts {
     'Arms'
   ];
 }
+
+// Typedefs
+typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});

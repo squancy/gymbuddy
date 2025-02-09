@@ -23,7 +23,7 @@ void main() async {
     int batchSize = 200;
     WriteBatch batch = db.batch();
 
-    for (final el in consts.GlobalConsts.ACTIVITIES) {
+    for (final el in consts.GlobalConsts.activities) {
       count++;
       String actID = uuid.v4();
       final acts = actDocRef.doc(actID);

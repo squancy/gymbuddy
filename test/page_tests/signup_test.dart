@@ -35,7 +35,7 @@ void main() {
       }
     });
     test(SignupConsts.usernameTooLongText, () {
-      final t = ValidateSignup('a' * (ValidateSignupConsts.MAX_USERNAME_LEN + 1), 'testemail@test.com', 'password', 'password');
+      final t = ValidateSignup('a' * (ValidateSignupConsts.maxUsernameLength + 1), 'testemail@test.com', 'password', 'password');
       final v = t.isValidParams();
       expect(v, (false, SignupConsts.usernameTooLongText));
     });
@@ -55,7 +55,7 @@ void main() {
       });
     }
 
-    test('Password length < ${ValidateSignupConsts.MIN_PASSWORD_LEN}', () {
+    test('Password length < ${ValidateSignupConsts.maxPasswordLength}', () {
       final t = ValidateSignup('testusername', 'testemail@test.com', 'asd', 'asd');      
       final v = t.isValidParams();
       expect(v, (false, SignupConsts.passwordLengthText));
