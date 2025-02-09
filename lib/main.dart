@@ -99,11 +99,7 @@ class WelcomePage extends StatelessWidget {
       loggedIn = false;
     }
 
-<<<<<<< HEAD
-    final ({List<String> activities, List<Map<String, dynamic>> gyms}) actAndGyms = await helpers.getActivitiesAndGyms();
-=======
     final ActGymRecord actAndGyms = await helpers.getActivitiesAndGyms();
->>>>>>> mark-dev
     return (activities: actAndGyms.activities, gyms: actAndGyms.gyms, loggedIn :loggedIn);
   }
 
