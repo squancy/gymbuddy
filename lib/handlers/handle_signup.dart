@@ -29,13 +29,13 @@ class ValidateSignup {
   (bool isValid, String errorMsg) isValidParams() {
     if (_username.isEmpty || _email.isEmpty || _password.isEmpty || _passwordConf.isEmpty) {
       return (false, SignupConsts.allFieldsText);
-    } else if (_username.length > ValidateSignupConsts.MAX_USERNAME_LEN) {
+    } else if (_username.length > ValidateSignupConsts.maxUsernameLength) {
       return (false, SignupConsts.usernameTooLongText);
     } else if (!EmailValidator.validate(_email)) {
       return (false, SignupConsts.invalidEmailText);
     } else if (_password != _passwordConf) {
       return (false, SignupConsts.passwordMismatchText);
-    } else if (_password.length < ValidateSignupConsts.MIN_PASSWORD_LEN) {
+    } else if (_password.length < ValidateSignupConsts.maxPasswordLength) {
       return (false, SignupConsts.passwordLengthText);
     } else if (!RegExp(r'^[a-zA-Z0-9_\.]+$').hasMatch(_username)) { // TODO - Add more characters
       return (false, SignupConsts.invalidUsernameText); 

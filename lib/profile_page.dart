@@ -112,7 +112,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
     return FutureBuilder<Map<String, String>>(
       future: _getProfilePicFile(),
       builder: (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) {
-        final uploadPopup = PhotoUploadPopup(context, consts.GlobalConsts.TEST ? _selectFromSourceMock : _selectFromSource);
+        final uploadPopup = PhotoUploadPopup(context, consts.GlobalConsts.test ? _selectFromSourceMock : _selectFromSource);
         if (snapshot.hasData) {
           dynamic bgImage;
           if (snapshot.data?['type'] == 'default') {
@@ -197,7 +197,7 @@ class _ProfilePageState extends State<ProfilePage> {
         .where('author', isEqualTo: userID)
         .orderBy('date', descending: true)
         .startAfterDocument(_lastVisible)
-        .limit(consts.ProfileConsts.PAGINATION_NUM).get();
+        .limit(consts.ProfileConsts.paginationNum).get();
       userPostDocs = userPosts.docs;
       if (_isFirst) {
         userPostDocs.insert(0, _lastVisible);
@@ -335,7 +335,7 @@ class _ProfilePageState extends State<ProfilePage> {
                 key: const Key('bioField'),
                 decoration: InputDecoration(
                   border: InputBorder.none,
-                  hintText: ProfileConsts.BIO_DEFAULT_TEXT,
+                  hintText: ProfileConsts.bioDefaultText,
                   hintStyle: TextStyle(
                     color: Colors.grey,
                     fontSize: 14,
@@ -359,7 +359,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   finishEdit(
                     toggle: _toggleEditBio,
                     controller: _bioController,
-                    maxLen: ProfileConsts.MAX_BIO_LEN,
+                    maxLen: ProfileConsts.maxBioLength,
                     fieldName: 'bio',
                     isBio: true
                   );
@@ -368,7 +368,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   finishEdit(
                     toggle: _toggleEditBio,
                     controller: _bioController,
-                    maxLen: ProfileConsts.MAX_BIO_LEN,
+                    maxLen: ProfileConsts.maxBioLength,
                     fieldName: 'bio',
                     isBio: true
                   );
@@ -377,7 +377,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   finishEdit(
                     toggle: _toggleEditBio,
                     controller: _bioController,
-                    maxLen: ProfileConsts.MAX_BIO_LEN,
+                    maxLen: ProfileConsts.maxBioLength,
                     fieldName: 'bio',
                     isBio: true
                   );
@@ -408,7 +408,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                   await resetToTxt(
                                     toggle: _toggleEditDUname,
                                     controller: _controller,
-                                    maxLen: ValidateSignupConsts.MAX_USERNAME_LEN,
+                                    maxLen: ValidateSignupConsts.maxUsernameLength,
                                     fieldName: 'display_username',
                                     isBio: false
                                   );
@@ -462,7 +462,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           finishEdit(
                                             toggle: _toggleEditDUname,
                                             controller: _controller,
-                                            maxLen: ValidateSignupConsts.MAX_USERNAME_LEN,
+                                            maxLen: ValidateSignupConsts.maxUsernameLength,
                                             fieldName: 'display_username',
                                             isBio: false
                                           );
@@ -471,7 +471,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           finishEdit(
                                             toggle: _toggleEditDUname,
                                             controller: _controller,
-                                            maxLen: ValidateSignupConsts.MAX_USERNAME_LEN,
+                                            maxLen: ValidateSignupConsts.maxUsernameLength,
                                             fieldName: 'display_username',
                                             isBio: false
                                           );
@@ -480,7 +480,7 @@ class _ProfilePageState extends State<ProfilePage> {
                                           finishEdit(
                                             toggle: _toggleEditDUname,
                                             controller: _controller,
-                                            maxLen: ValidateSignupConsts.MAX_USERNAME_LEN,
+                                            maxLen: ValidateSignupConsts.maxUsernameLength,
                                             fieldName: 'display_username',
                                             isBio: false
                                           );
@@ -546,7 +546,7 @@ class _ProfilePageState extends State<ProfilePage> {
                             await resetToTxt(
                               toggle: _toggleEditBio,
                               controller: _bioController,
-                              maxLen: ProfileConsts.MAX_BIO_LEN,
+                              maxLen: ProfileConsts.maxBioLength,
                               fieldName: 'bio',
                               isBio: true
                             );

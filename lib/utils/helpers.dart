@@ -266,7 +266,7 @@ Future<void> firebaseInit({required bool test}) async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  if (GlobalConsts.TEST) {
+  if (GlobalConsts.test) {
     try {
       FirebaseFirestore.instance.useFirestoreEmulator('127.0.0.1', 8080);
       FirebaseStorage.instance.useStorageEmulator('127.0.0.1', 9199);
@@ -278,7 +278,7 @@ Future<void> firebaseInit({required bool test}) async {
 }
 
 /// Fetch all activities and gyms from db
-Future<({List<String> activities, List<Map<String, dynamic>> gyms})> getActivitiesAndGyms() async {
+Future<ActGymRecord> getActivitiesAndGyms() async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final allGyms = await getAllGymsWithProps(db.collection('gyms/budapest/gyms'));
   sortGymsByName(allGyms);

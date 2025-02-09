@@ -39,12 +39,17 @@ class _LoginPageState extends State<LoginPage> {
     await prefs.setBool('loggedIn', true);
     await prefs.setString('userID', userID);
 
+    final ActGymRecord actsAndGyms = await helpers.getActivitiesAndGyms();
+
     // On successful login redirect user to the home page
     // Also delete every previous route so that he cannot go back with a right swipe
     setState(() {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(
+            postPageActs: actsAndGyms.activities,
+            postPageGyms: actsAndGyms.gyms,
+          ),
         ),
         (Route<dynamic> route) => false,
       );

@@ -25,6 +25,7 @@ Future<void> main() async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final random = Random();
   final numOfRandomPosts = 10;
+  final consts.ActGymRecord actsAndGyms = await helpers.getActivitiesAndGyms();
 
   testWidgets('Post page testing', (tester) async {
     // Necessary for being able to enterText when not in debug mode 
@@ -32,7 +33,15 @@ Future<void> main() async {
 
     // User with the given ID, its username is 'test' and can be found in the test database
     test_helpers.logInUser('b727fd96-f618-4121-b875-e5fb74539034');
-    await tester.pumpWidget(MaterialApp(home: PostPage(key: const Key('postPage1'),)));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: PostPage(
+          postPageActs: actsAndGyms.activities,
+          postPageGyms: actsAndGyms.gyms,
+          key: const Key('postPage1'),
+        )
+      )
+    );
     await tester.pumpAndSettle();
     
     // First check the existance of widgets
@@ -303,7 +312,15 @@ Future<void> main() async {
       */ 
       await tester.pumpWidget(Container());
       await tester.pumpAndSettle();
-      await tester.pumpWidget(MaterialApp(home: PostPage(key: const Key('postPage2'),)));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PostPage(
+            postPageActs: actsAndGyms.activities,
+            postPageGyms: actsAndGyms.gyms,
+            key: const Key('postPage2'),
+          )
+        )
+      );
       await tester.pumpAndSettle();
     }
   });
