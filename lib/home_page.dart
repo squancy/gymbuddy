@@ -11,7 +11,14 @@ import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 final FirebaseFirestore db = FirebaseFirestore.instance;
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  final List<String> postPageActs;
+  final List<Map<String, dynamic>> postPageGyms;
+
+  const HomePage({
+    required this.postPageActs,
+    required this.postPageGyms,
+    super.key
+  });
   @override
   State<HomePage> createState() => _HomePageState();
 }
@@ -25,13 +32,11 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent> {
   Future<Object> fetchPosts() async {
     // First get the geoloc of the user (if possible) and update it in db
-    Position? geoloc = await helpers.getGeolocation(); // Get the geolocation of the user
-    String? userID = await helpers.getUserID(); // Get the userID
+    Position? geoloc = await helpers.getGeolocation(); 
+    String? userID = await helpers.getUserID(); 
     if (geoloc != null) {
       try {
         final geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
-
-        // Update the user's geolocation in db
         db.collection('users').doc(userID).update({'geoloc': geoPoint.data}); 
       } catch (e) {
         // print(e);
@@ -41,7 +46,6 @@ class _HomePageContentState extends State<HomePageContent> {
     return {};
   }
 
-  // Build the home page content
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +87,7 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView( // Scrollable view for the page content (if it overflows)
+            child: SingleChildScrollView( 
               child: Column(
                 children: [
                 ],
@@ -97,16 +101,15 @@ class _HomePageContentState extends State<HomePageContent> {
 }
 
 class _HomePageState extends State<HomePage> {
-  int _selectedIndex = 0; // Index of the selected tab
+  int _selectedIndex = 0; 
 
   void _onItemTapped(int index) {
     if (_selectedIndex == index) return;
     setState(() {
-      _selectedIndex = index; // Set the selected index to the index of the tab, switch to the corresponding page
+      _selectedIndex = index; 
     });
   } 
 
-  // List of tab items
   final List<TabItem> items = [
     TabItem(
       icon: Icons.home,
@@ -132,13 +135,18 @@ class _HomePageState extends State<HomePage> {
       key: Key('homepage'),
       extendBody: true,
       body: Center(
-        child: [HomePageContent(), PostPage(), Container(), ProfilePage()][_selectedIndex], // Display the corresponding page based on the selected index
+        child: [
+          HomePageContent(),
+          PostPage(postPageActs: widget.postPageActs, postPageGyms: widget.postPageGyms),
+          Container(),
+          ProfilePage()
+        ][_selectedIndex], 
       ),
       bottomNavigationBar: Padding(
-        padding: const EdgeInsets.all(30), // Padding around the bottom bar
+        padding: const EdgeInsets.all(30), 
         child: Container(
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.all(Radius.circular(30)) // Rounded corners for the bottom bar
+            borderRadius: BorderRadius.all(Radius.circular(30)) 
           ),
           clipBehavior: Clip.hardEdge,
           child: BottomBarFloating(
@@ -148,7 +156,7 @@ class _HomePageState extends State<HomePage> {
             colorSelected: Theme.of(context).colorScheme.tertiary,
             indexSelected: _selectedIndex,
             onTap: _onItemTapped,
-            duration: Duration(milliseconds: 200), // Duration of the animation
+            duration: Duration(milliseconds: 200), 
             titleStyle: TextStyle(
               letterSpacing: 0,
             ),

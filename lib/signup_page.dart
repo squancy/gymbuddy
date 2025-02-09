@@ -57,7 +57,7 @@ class _SignupPageState extends State<SignupPage> {
     final String username = _usernameController.text.trim();
 
     _signupStatus.value = '';
-    if (!GlobalConsts.TEST) {
+    if (!GlobalConsts.test) {
       await _requestPosition();
     }
 
@@ -96,12 +96,17 @@ class _SignupPageState extends State<SignupPage> {
     await prefs.setBool('loggedIn', true);
     await prefs.setString('userID', userID);
 
+    final ActGymRecord actsAndGyms = await helpers.getActivitiesAndGyms();
+
     // On successful sign up redirect user to the home page
     // Also delete every previous route so that he cannot go back with a right swipe
     setState(() {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
-          builder: (context) => HomePage(),
+          builder: (context) => HomePage(
+            postPageActs: actsAndGyms.activities,
+            postPageGyms: actsAndGyms.gyms,
+          ),
         ),
         (Route<dynamic> route) => false,
       );

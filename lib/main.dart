@@ -11,6 +11,8 @@ import 'package:flutter_moving_background/enums/animation_types.dart';
 import 'package:flutter_moving_background/flutter_moving_background.dart';
 import 'package:moye/moye.dart';
 
+typedef PreloadedData = ({List<String> activities, List<Map<String, dynamic>> gyms, bool loggedIn});
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Firebase init START
@@ -87,7 +89,8 @@ class MainButton extends StatelessWidget {
 class WelcomePage extends StatelessWidget {
   const WelcomePage({super.key});
 
-  Future<bool> _loggedIn() async {
+  /// Get log in status and preload activities & gyms from db
+  Future<PreloadedData> _getPreloadedData() async {
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
     bool loggedIn = true;
     bool? fi = await prefs.getBool('loggedIn');
@@ -95,16 +98,19 @@ class WelcomePage extends StatelessWidget {
       await prefs.setBool('loggedIn', false);
       loggedIn = false;
     }
-    return loggedIn;
+
+    final ActGymRecord actAndGyms = await helpers.getActivitiesAndGyms();
+    return (activities: actAndGyms.activities, gyms: actAndGyms.gyms, loggedIn :loggedIn);
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
-      future: _loggedIn(),
-      builder: (context, AsyncSnapshot snapshot) {
-        if (snapshot.hasData && snapshot.data) {
-          return HomePage();
+      future: _getPreloadedData(),
+      builder: (context, AsyncSnapshot<PreloadedData> snapshot) {
+        if (snapshot.hasData && (snapshot.data as PreloadedData).loggedIn) {
+          final (:activities, :gyms, :loggedIn) = snapshot.data as PreloadedData;
+          return HomePage(postPageActs: activities, postPageGyms: gyms);
         } else if (!snapshot.hasData) {
           return Scaffold(
             body: Center(
