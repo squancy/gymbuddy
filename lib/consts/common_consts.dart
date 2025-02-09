@@ -28,7 +28,7 @@ class SignupConsts {
 
 // Home page [main.dart]
 class HomeConsts {
-  static const String appTitle = 'Gym Buddy App'; 
+  static const String appTitle = 'Kagur'; 
   static const String loginButtonTitle = 'Log in';
   static const String signupButtonTitle = 'Sign up';
 }
