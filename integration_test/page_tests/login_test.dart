@@ -15,8 +15,7 @@ Future<void> main() async {
   testWidgets('Log in page testing with Firestore', (tester) async {
     await tester.pumpWidget(MaterialApp(home: LoginPage()));
 
-    final loginBtn =
-        find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
+    final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
     List<Finder> fields = [];
     for (final labelName in ['Email', 'Password']) {
       final labelField = find.ancestor(
@@ -39,29 +38,23 @@ Future<void> main() async {
         CheckLogin cp = CheckLogin(emails[i], passwords[j]);
         (bool, String, String) res = await cp.validateLogin();
         if (i == 1 && j == 1) {
-          final user = (await db
-                  .collection('users')
-                  .where('email', isEqualTo: emails[i])
-                  .get())
-              .docs[0]
-              .data();
+          final user = (await db.collection('users').where('email', isEqualTo: emails[i])
+            .get())
+            .docs[0]
+            .data();
           expect(res, (true, '', user['id']));
           expect(find.byKey(Key('homepage')), findsOneWidget);
         } else {
-          expect(res,
-              (false, consts.ForgotPasswordConsts.wrongCredentialsText, ''));
-          expect(find.text(consts.ForgotPasswordConsts.wrongCredentialsText),
-              findsOneWidget);
+          expect(res, (false, consts.ForgotPasswordConsts.wrongCredentialsText, ''));
+          expect(find.text(consts.ForgotPasswordConsts.wrongCredentialsText), findsOneWidget);
         }
       }
     }
   });
   group("Navigation testing", () {
-    testWidgets("Login page test for homepage navigation",
-        (WidgetTester tester) async {
+    testWidgets("Login page test for homepage navigation", (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(home: LoginPage()));
-      final loginBtn =
-          find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
+      final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
       List<Finder> fields = [];
       for (final labelName in ['Email', 'Password']) {
         final labelField = find.ancestor(
@@ -76,14 +69,13 @@ Future<void> main() async {
       await tester.pumpAndSettle();
       expect(find.byKey(Key('homepage')), findsOneWidget);
     });
-    testWidgets("Login page test for forgot password navigation",
-        (WidgetTester tester) async {
+
+    testWidgets("Login page test for forgot password navigation", (WidgetTester tester) async {
       await tester.pumpWidget(Container());
       await tester.pumpAndSettle();
       await tester.pumpWidget(MaterialApp(home: LoginPage()));
       await tester.pumpAndSettle();
-      final forgotPasswordBtn = find.widgetWithText(
-          TextButton, consts.LoginConsts.forgotPasswordText);
+      final forgotPasswordBtn = find.widgetWithText(TextButton, consts.LoginConsts.forgotPasswordText);
       await tester.tap(forgotPasswordBtn);
       await tester.pumpAndSettle();
       expect(find.byKey(Key("forgotPasswordPage")), findsOneWidget);

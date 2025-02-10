@@ -21,7 +21,7 @@ class SignupConsts {
   static const String usernameTooLongText = 'Username is too long';
   static const String invalidEmailText = 'Email is invalid';
   static const String passwordMismatchText = 'Password fields do not match';
-  static const String invalidUsernameText = 'Username can only contain alphanumeric characters and _ and .'; // TODO - Add more characters
+  static const String invalidUsernameText = 'Username can only contain alphanumeric characters and _ and .'; 
   static const String emailAddrTakenText = 'This email address is already taken';
   static const String usernameTakenText = 'This username is already taken';
 }

@@ -44,7 +44,6 @@ Future<void> main() async {
     await tester.tap(signupBtn);
     await tester.pumpAndSettle(); 
     final emailTakenMsg = find.text(consts.SignupConsts.emailAddrTakenText);
-    print(emailTakenMsg);
     expect(emailTakenMsg, findsOneWidget);
 
     // Make sure it is not pushed to db
@@ -62,6 +61,7 @@ Future<void> main() async {
     final homepage = find.byKey(Key('homepage'));
     expect(homepage, findsOneWidget);
   });
+
   testWidgets("Signup page test for login navigation", (WidgetTester tester) async {
     await tester.pumpWidget(MaterialApp(home: SignupPage()));
     final loginBtn = find.widgetWithText(TextButton, consts.SignupConsts.accountExistsText); 
