@@ -57,7 +57,7 @@ Future<void> main() async {
     }
   });
   group("Navigation testing", () {
-    testWidgets("Login page test for login navigation",
+    testWidgets("Login page test for homepage navigation",
         (WidgetTester tester) async {
       await tester.pumpWidget(MaterialApp(home: LoginPage()));
       final loginBtn =
