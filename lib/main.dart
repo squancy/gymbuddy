@@ -133,7 +133,7 @@ class WelcomePage extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [Text(
-                      HomeConsts.appTitle,
+                      WelcomePageConsts.appTitle,
                       style: TextStyle(
                         fontSize: 42,
                         fontWeight: FontWeight.bold,
@@ -142,7 +142,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 60),
                     MainButton(
-                      displayText: HomeConsts.loginButtonTitle,
+                      displayText: WelcomePageConsts.loginButtonTitle,
                       onPressedFunc: () {
                         Navigator.push(
                           context,
@@ -156,7 +156,7 @@ class WelcomePage extends StatelessWidget {
                     ),
                     const SizedBox(height: 30),
                     MainButton(
-                      displayText: HomeConsts.signupButtonTitle,
+                      displayText: WelcomePageConsts.signupButtonTitle,
                       onPressedFunc: () {
                         Navigator.push(
                           context,

@@ -16,7 +16,7 @@ Future<void> main() async {
         pumpAndSettle() cannot be used here since there is a background animation running forever
       */
       await tester.pump(Duration(seconds: 5));
-      final loginBtn = find.text(HomeConsts.loginButtonTitle);
+      final loginBtn = find.text(WelcomePageConsts.loginButtonTitle);
       expect(loginBtn, findsOneWidget);
 
       await tester.tap(loginBtn);
@@ -32,7 +32,7 @@ Future<void> main() async {
       await tester.pumpWidget(MaterialApp(home: WelcomePage(key: const Key("welcomePage2"))));
       await tester.pump(Duration(seconds: 5));
 
-      final signupBtn = find.text(HomeConsts.signupButtonTitle);
+      final signupBtn = find.text(WelcomePageConsts.signupButtonTitle);
       expect(signupBtn, findsOneWidget);
 
       await tester.tap(signupBtn);

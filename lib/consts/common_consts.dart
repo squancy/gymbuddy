@@ -27,7 +27,7 @@ class SignupConsts {
 }
 
 // Home page [main.dart]
-class HomeConsts {
+class WelcomePageConsts {
   static const String appTitle = 'Kagur'; 
   static const String loginButtonTitle = 'Log in';
   static const String signupButtonTitle = 'Sign up';
