@@ -34,6 +34,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      key: Key('forgotPasswordPage'), // Key for testing
       body: Padding(
         padding: const EdgeInsets.all(20.0), // Padding around the page content (20px)
         child: LayoutBuilder(
