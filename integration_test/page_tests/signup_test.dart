@@ -40,14 +40,15 @@ Future<void> main() async {
     QuerySnapshot usersWithUsername = await users.where('username', isEqualTo: 'test').get();
     expect(usersWithUsername.docs.length, 1);
 
-    await tester.enterText(fields[0], "newuser");
+    await tester.enterText(fields[0], "newuser1");
     await tester.tap(signupBtn);
     await tester.pumpAndSettle(); 
     final emailTakenMsg = find.text(consts.SignupConsts.emailAddrTakenText);
+    print(emailTakenMsg);
     expect(emailTakenMsg, findsOneWidget);
 
     // Make sure it is not pushed to db
-    usersWithUsername = await users.where('username', isEqualTo: 'newuser').get();
+    usersWithUsername = await users.where('username', isEqualTo: 'newuser1').get();
     expect(usersWithUsername.docs.isEmpty, true);
 
     await tester.enterText(fields[1], "newemail@newemail.com");
@@ -55,10 +56,17 @@ Future<void> main() async {
     await tester.pumpAndSettle();
 
     // Make sure it is pushed to db
-    usersWithUsername = await users.where('username', isEqualTo: 'newuser').get();
+    usersWithUsername = await users.where('username', isEqualTo: 'newuser1').get();
     expect(usersWithUsername.docs.isEmpty, false);
 
     final homepage = find.byKey(Key('homepage'));
     expect(homepage, findsOneWidget);
+  });
+  testWidgets("Signup page test for login navigation", (WidgetTester tester) async {
+    await tester.pumpWidget(MaterialApp(home: SignupPage()));
+    final loginBtn = find.widgetWithText(TextButton, consts.SignupConsts.accountExistsText); 
+    await tester.tap(loginBtn);
+    await tester.pumpAndSettle();
+    expect(find.text(consts.LoginConsts.mainScreenText), findsOneWidget);
   });
 }
