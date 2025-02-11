@@ -19,7 +19,7 @@ Future<void> main() async {
   await helpers.firebaseInit(test: false);
   // Firebase init END
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-
+  
   runApp(const GymBuddyApp());
 }
 
@@ -99,7 +99,7 @@ class WelcomePage extends StatelessWidget {
       loggedIn = false;
     }
 
-    final ActGymRecord actAndGyms = await helpers.getActivitiesAndGyms();
+    final ActGymRecord actAndGyms =  await helpers.getActivitiesAndGyms();
     return (activities: actAndGyms.activities, gyms: actAndGyms.gyms, loggedIn :loggedIn);
   }
 

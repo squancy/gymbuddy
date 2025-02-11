@@ -67,6 +67,7 @@ dependencies:
   path_provider: ^2.1.5
   geoflutterfire_plus: ^0.0.32
   mockito: ^5.4.4
+  mailer: ^6.4.1
 
 
 dev_dependencies:

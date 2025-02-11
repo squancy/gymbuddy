@@ -93,12 +93,12 @@ class InsertSignup {
     return platform;
   }
 
-  Future<(String salt, String password)> _hashPassword() async {
+  ({String salt, String password}) _hashPassword() {
     // Create a different salt for each user
     // After that, hash the password with the generated salt
     String salt = _dbcrypt.gensaltWithRounds(10);
     var pwh = _dbcrypt.hashpw(_password, salt);
-    return (salt, pwh);
+    return (salt: salt, password: pwh);
   }
 
   Future<(bool success, String errorMsg, String userID)> insertToDB() async {
@@ -107,16 +107,18 @@ class InsertSignup {
     final users = db.collection('users');
     final userSettings = db.collection('user_settings');
 
-    final (String salt, String pwh) = await _hashPassword();
+    final (salt: salt, password: pwh) = _hashPassword();
     final String platform = _getPlatform();
     final Position? geoloc = await helpers.getGeolocation();
 
     final uuid = Uuid();
     String userID = uuid.v4();
     GeoFirePoint? userGeoPoint;
+
     if (geoloc != null) {
       userGeoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
     }
+
     final data = {
       'id': userID,
       'username': _username,
@@ -140,7 +142,6 @@ class InsertSignup {
       await users.doc(userID).set(data);
       await userSettings.doc(userID).set(dataProfile);
     } catch (e) {
-      print(e);
       return (false, consts.GlobalConsts.unknownErrorText, '');
     }
 

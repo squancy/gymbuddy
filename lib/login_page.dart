@@ -13,7 +13,6 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-// Login page state
 class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController(); 
   final TextEditingController _passwordController = TextEditingController(); 
@@ -65,7 +64,6 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  // Build the login page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -96,7 +94,6 @@ class _LoginPageState extends State<LoginPage> {
                       Theme.of(context).colorScheme.primary,
                     ])),
                   ),
-                  // Email textfield
                   Padding( 
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: helpers.BlackTextfield(
@@ -108,7 +105,6 @@ class _LoginPageState extends State<LoginPage> {
                       isEmail: true
                     )
                   ),
-                  // Password textfield
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: helpers.BlackTextfield(
@@ -122,7 +118,6 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Column(
                     children: [
-                      // Login button
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: SizedBox(
@@ -133,7 +128,6 @@ class _LoginPageState extends State<LoginPage> {
                           )
                         ),
                       ),
-                      // Forgot password button
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: TextButton(

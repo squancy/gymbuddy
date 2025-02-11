@@ -1,3 +1,5 @@
+import 'dart:isolate';
+
 import 'package:uuid/uuid.dart';
 import 'package:path/path.dart' as p;
 import 'package:image/image.dart' as img;
@@ -30,8 +32,8 @@ class UploadImageFirestorage {
   /// Uploads an image to Firebase Storage and returns the download URL and filename
   Future<(String downloadURL, String filename)> uploadImage(File image, int size, String pathPrefix) async {
     final [metadata, filename as String, pathname] = getImageData(image, pathPrefix);
-    await resizeImage(image, size);
-    await storageRef.child(pathname).putFile(image, metadata);
+    await Isolate.run(() => resizeImage(image, size)) ;
+    await Isolate.run(() => storageRef.child(pathname).putFile(image, metadata));
     final downloadURL = await storageRef.child(pathname).getDownloadURL();
     return (downloadURL, filename);
   }
@@ -39,7 +41,7 @@ class UploadImageFirestorage {
   /// Uploads an image to Firebase Storage and returns the upload task, storage reference and filename
   Future<List<dynamic>> uploadImageProgess(File image, int size, String pathPrefix) async {
     final [metadata, filename as String, pathname] = getImageData(image, pathPrefix);
-    await resizeImage(image, size);
+    await Isolate.run(() => resizeImage(image, size)); 
     return [storageRef.child(pathname).putFile(image, metadata), storageRef.child(pathname), filename];
   }
 }

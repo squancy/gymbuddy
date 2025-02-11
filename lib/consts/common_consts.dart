@@ -40,6 +40,21 @@ class ForgotPasswordConsts {
   static const String infoText = 'We will send a temporary password to your email';
   static const String redBtnText = 'Send password';
   static const String wrongCredentialsText = 'Your email or password is incorrect';
+  static const String userNotExistsText = 'Incorrect email';
+  static const String tempPassSucessText = 'Success!';
+  static Widget tempPassSubText(String email, BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        text: 'We have sent you an email to ',
+        style: DefaultTextStyle.of(context).style,
+        children: [
+          TextSpan(text: email, style: TextStyle(fontWeight: FontWeight.bold)),
+          TextSpan(text: ' containing your temporary password'),
+        ],
+      ),
+      textAlign: TextAlign.center,
+    );
+  }
 }
 
 // Post page [post_page.dart]
@@ -89,6 +104,8 @@ class GlobalConsts {
     'Cardio',
     'Arms'
   ];
+
+  static const String infoEmail = 'info@kagur.com';
 }
 
 // Typedefs

@@ -1,44 +1,25 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/main.dart';
 import 'consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'utils/helpers.dart' as helpers;
+import 'package:gym_buddy/utils/email.dart' as email_send;
+import 'package:gym_buddy/consts/email_templates.dart';
+import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
+import 'package:dbcrypt/dbcrypt.dart';
 
-// Forgot password page
-class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
-  @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
-}
+class SuccessBox extends StatelessWidget {
+  final String email;
+  const SuccessBox({required this.email, super.key});
 
-// Forgot password page state
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  final TextEditingController _emailController = TextEditingController(); // Email controller
-  final FocusNode _emailFocusNode = FocusNode(); // Email focus node
-
-  // Send the password to the user's email function
-  Future<void> _sendPassword() async {
-    // TODO: implement password sending feature once we have a server & email address
-    final String email = _emailController.text;
-  }
-
-
-  // Dispose of the controllers and focus nodes
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _emailFocusNode.dispose();
-    super.dispose();
-  }
-
-  // Build the forgot password page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: Key('forgotPasswordPage'), // Key for testing
       body: Padding(
-        padding: const EdgeInsets.all(20.0), // Padding around the page content (20px)
+        padding: const EdgeInsets.all(20.0),
         child: LayoutBuilder(
-          builder: (context, constraints) => SingleChildScrollView( // Scrollable view for the page content (if it overflows)
+          builder: (context, constraints) => SingleChildScrollView(
             child: Container(
               constraints: BoxConstraints(
                 minHeight: constraints.maxHeight
@@ -49,7 +30,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: Text(
-                      ForgotPasswordConsts.mainScreenText, // 'New password' text
+                      ForgotPasswordConsts.tempPassSucessText,
                       style: TextStyle(
                         fontSize: 34,
                         color: Theme.of(context).colorScheme.primary,
@@ -62,39 +43,191 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ])),
                   ),
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
-                    child: Text(
-                      ForgotPasswordConsts.infoText, // 'We will send a temporary password to your email' text
-                      style: TextStyle(color: Theme.of(context).colorScheme.onSurface)
-                    ),
+                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                    child: ForgotPasswordConsts.tempPassSubText(email, context),
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: helpers.BlackTextfield( // Email textfield
-                      context,
-                      'Email',
-                      _emailController,
-                      _emailFocusNode,
-                      isPassword: false,
-                      isEmail: true
+                    child: helpers.ProgressBtn(
+                      // Here the function is intentionally async since it expects a Future 
+                      onPressedFn: () async {
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => WelcomePage(),
+                          ),
+                          (Route<dynamic> route) => false,
+                        );
+                      },
+                      child: Text('Back to home')
                     )
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: SizedBox(
-                      height: 45,
-                      child: helpers.ProgressBtn( // Send password button
-                        onPressedFn: _sendPassword,
-                        child: Text('Send password')
-                      )
-                    ),
                   ),
                 ],
               ),
             ),
-          )
+          ),
         ),
       ),
     );
+  }
+}
+
+class ForgotPasswordPage extends StatefulWidget {
+  const ForgotPasswordPage({super.key});
+  @override
+  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+}
+
+class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
+  final TextEditingController _emailController = TextEditingController();
+  final FocusNode _emailFocusNode = FocusNode();
+  final ValueNotifier<String> _forgotPassStatus = ValueNotifier<String>("");
+  bool _showSuccessBox = false;
+
+  Future<void> _sendPassword() async {
+    final String email = _emailController.text;
+    final FirebaseFirestore db = FirebaseFirestore.instance;
+
+    // Make sure the email is in db
+    final userData = (
+      await db.collection('users')
+        .where('email', isEqualTo: email)
+        .get())
+      .docs
+      .toList();
+    if (userData.isEmpty) {
+      setState(() {
+        _forgotPassStatus.value = ForgotPasswordConsts.userNotExistsText;
+      });
+    } else {
+      setState(() {
+        _forgotPassStatus.value = '';
+      });
+
+      // Generate a temporary password: user can change it later in their profile
+      final tempPass = test_helpers.generateRandomString(10);
+
+      final username = userData[0].data()['username'];
+      final userID = userData[0].reference.id;
+      final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
+        username: username,
+        tempPass: tempPass
+      );
+
+      // Update user's password in db
+      final dbcrypt = DBCrypt();
+      String salt = dbcrypt.gensaltWithRounds(10);
+      var pwh = dbcrypt.hashpw(tempPass, salt);
+      await db.collection('users').doc(userID).update({
+        'password': pwh,
+        'salt': salt
+      });
+
+      // Send temporary password to user's email address
+      // Do not wait for the email to be sent, display success message as soon as possible
+      email_send.sendEmail(
+        from: GlobalConsts.infoEmail,
+        to: email,
+        subject: tempPassEmail.subject,
+        content: tempPassEmail.generateEmail()
+      );
+
+      // Display success message
+      setState(() {
+        _showSuccessBox = true;
+      });  
+    }
+  }
+
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _emailFocusNode.dispose();
+    super.dispose();
+  }
+
+  // Build the forgot password page
+  @override
+  Widget build(BuildContext context) {
+    if (_showSuccessBox) {
+      return SuccessBox(email: _emailController.text);
+    } else {
+      return Scaffold(
+        key: Key('forgotPasswordPage'), // Key for testing
+        body: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: LayoutBuilder(
+            builder: (context, constraints) => SingleChildScrollView(
+              child: Container(
+                constraints: BoxConstraints(
+                  minHeight: constraints.maxHeight
+                ),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                      child: Text(
+                        ForgotPasswordConsts.mainScreenText, // 'New password'
+                        style: TextStyle(
+                          fontSize: 34,
+                          color: Theme.of(context).colorScheme.primary,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ).withGradientOverlay(gradient: LinearGradient(colors: [
+                        Theme.of(context).colorScheme.primary,
+                        Theme.of(context).colorScheme.tertiary,
+                        Theme.of(context).colorScheme.primary,
+                      ])),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      child: Text(
+                        ForgotPasswordConsts.infoText, // 'We will send a temporary password to your email'
+                        style: TextStyle(color: Theme.of(context).colorScheme.onSurface)
+                      ),
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                      child: helpers.BlackTextfield(
+                        context,
+                        'Email',
+                        _emailController,
+                        _emailFocusNode,
+                        isPassword: false,
+                        isEmail: true
+                      )
+                    ),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                      child: SizedBox(
+                        height: 45,
+                        child: helpers.ProgressBtn(
+                          onPressedFn: _sendPassword,
+                          child: Text('Send password')
+                        )
+                      ),
+                    ),
+                    ValueListenableBuilder<String>(
+                      valueListenable: _forgotPassStatus,
+                      builder: (BuildContext context, String value, Widget? child) {
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                          child: Text(
+                            value,
+                            textAlign: TextAlign.center,
+                            style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                          ),
+                        );
+                      },
+                    ),
+                  ],
+                ),
+              ),
+            )
+          ),
+        ),
+      );
+    }
   }
 }
