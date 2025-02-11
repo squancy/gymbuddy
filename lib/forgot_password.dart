@@ -123,13 +123,19 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       });
 
       // Send temporary password to user's email address
-      // Do not wait for the email to be sent, display success message as soon as possible
-      email_send.sendEmail(
-        from: GlobalConsts.infoEmail,
-        to: email,
-        subject: tempPassEmail.subject,
-        content: tempPassEmail.generateEmail()
-      );
+      try {
+        await email_send.sendEmail(
+          from: GlobalConsts.infoEmail,
+          to: email,
+          subject: tempPassEmail.subject,
+          content: tempPassEmail.generateEmail()
+        );
+      } catch (e) {
+        setState(() {
+          _forgotPassStatus.value = GlobalConsts.unknownErrorText;
+        });
+        return;
+      }
 
       // Display success message
       setState(() {
@@ -143,10 +149,12 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   void dispose() {
     _emailController.dispose();
     _emailFocusNode.dispose();
+    _forgotPassStatus.dispose();
     super.dispose();
   }
 
   // Build the forgot password page
+  // TODO: nice animation when showing the SuccessBox
   @override
   Widget build(BuildContext context) {
     if (_showSuccessBox) {
