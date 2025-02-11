@@ -32,11 +32,6 @@ Future<void> sendEmail ({
     ..subject = subject
     ..html = content;
 
-  try {
-    await send(message, smtpServer);
-  } on MailerException catch (e) {
-    for (var p in e.problems) {
-      print('Email sent unsuccessfully: ${p.code}: ${p.msg}');
-    }
-  }
+  // The caller is responsible for catching any error that might happen at this point
+  await send(message, smtpServer);
 }
