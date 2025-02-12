@@ -3,91 +3,72 @@ import 'package:flutter/material.dart';
 import 'consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'utils/helpers.dart' as helpers;
-import 'package:gym_buddy/utils/email.dart' as email_send;
-import 'package:gym_buddy/consts/email_templates.dart';
-import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
-import 'package:gym_buddy/enter_code_page.dart' as enter_code_page;
 
-class ForgotPasswordPage extends StatefulWidget {
-  const ForgotPasswordPage({super.key});
+class EnterCodePage extends StatefulWidget {
+  final String email;
+
+  const EnterCodePage({required this.email, super.key});
+
   @override
-  State<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
+  State<EnterCodePage> createState() => _EnterCodePageState();
 }
 
-class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
-  final TextEditingController _emailController = TextEditingController();
-  final FocusNode _emailFocusNode = FocusNode();
-  final ValueNotifier<String> _forgotPassStatus = ValueNotifier<String>("");
+class _EnterCodePageState extends State<EnterCodePage> {
+  final TextEditingController _codeController = TextEditingController();
+  final FocusNode _codeFocusNode = FocusNode();
+  final ValueNotifier<String> _codeStatus = ValueNotifier<String>("");
+  final FirebaseFirestore db = FirebaseFirestore.instance;
 
-  Future<void> _sendPassword() async {
-    final String email = _emailController.text;
-    final FirebaseFirestore db = FirebaseFirestore.instance;
+  /// Make sure the user enters the correct code (=temporary password) received in email
+  Future<void> _checkCode() async {
+    final String code = _codeController.text;
+    final String email = widget.email; 
 
-    // Make sure the email is in db
-    final userData = (
-      await db.collection('users')
-        .where('email', isEqualTo: email)
-        .get())
-      .docs
-      .toList();
-    if (userData.isEmpty) {
+    // Get the ID of the potential user
+    final userDocs = (await db.collection('users')
+      .where('email', isEqualTo: email)
+      .where('temp_pass', isEqualTo: code)
+      .get())
+      .docs;
+    
+    if (userDocs.isEmpty) {
       setState(() {
-        _forgotPassStatus.value = ForgotPasswordConsts.userNotExistsText;
+        _codeStatus.value = ForgotPasswordConsts.codePageErrorText;
       });
-    } else {
+      return;
+    } else if (userDocs.length == 1) {
+      final String userID = userDocs.toList()[0].reference.id;
+
+      // If the entered code is correct redirect user to the next page
+      // There they can change their password
       setState(() {
-        _forgotPassStatus.value = '';
-      });
-
-      // Generate a temporary password: user can change it later in their profile
-      final tempPass = test_helpers.generateRandomString(10);
-
-      final username = userData[0].data()['username'];
-      final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
-        username: username,
-        tempPass: tempPass
-      );
-
-      // Send temporary password to user's email address
-      try {
-        await email_send.sendEmail(
-          from: GlobalConsts.infoEmail,
-          to: email,
-          subject: tempPassEmail.subject,
-          content: tempPassEmail.generateEmail()
-        );
-      } catch (e) {
-        setState(() {
-          _forgotPassStatus.value = GlobalConsts.unknownErrorText;
-        });
-        return;
-      }
-
-      // Redirect to a new page when user has to enter the code in the email
-      setState(() {
+        /*
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) => enter_code_page.EnterCodePage(email: email)
           ),
         );
+        */
+      });
+    } else {
+      setState(() {
+        _codeStatus.value = GlobalConsts.unknownErrorText;
       });
     }
   }
 
-
   @override
   void dispose() {
-    _emailController.dispose();
-    _emailFocusNode.dispose();
-    _forgotPassStatus.dispose();
+    _codeController.dispose();
+    _codeFocusNode.dispose();
+    _codeStatus.dispose();
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      key: Key('forgotPasswordPage'), // Key for testing
       body: Padding(
         padding: const EdgeInsets.all(20.0),
         child: LayoutBuilder(
@@ -102,7 +83,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: Text(
-                      ForgotPasswordConsts.mainScreenText, // 'New password'
+                      ForgotPasswordConsts.codePageMainText, 
                       style: TextStyle(
                         fontSize: 34,
                         color: Theme.of(context).colorScheme.primary,
@@ -117,7 +98,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                     child: Text(
-                      ForgotPasswordConsts.infoText, // 'We will send a temporary password to your email'
+                      ForgotPasswordConsts.codePageInfoText,
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface)
                     ),
                   ),
@@ -125,9 +106,9 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: helpers.BlackTextfield(
                       context,
-                      'Email',
-                      _emailController,
-                      _emailFocusNode,
+                      'Code',
+                      _codeController,
+                      _codeFocusNode,
                       isPassword: false,
                       isEmail: true
                     )
@@ -137,13 +118,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     child: SizedBox(
                       height: 45,
                       child: helpers.ProgressBtn(
-                        onPressedFn: _sendPassword,
-                        child: Text('Send password')
+                        onPressedFn: _checkCode,
+                        child: Text('Confirm')
                       )
                     ),
                   ),
                   ValueListenableBuilder<String>(
-                    valueListenable: _forgotPassStatus,
+                    valueListenable: _codeStatus,
                     builder: (BuildContext context, String value, Widget? child) {
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),

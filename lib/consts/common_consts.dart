@@ -55,6 +55,9 @@ class ForgotPasswordConsts {
       textAlign: TextAlign.center,
     );
   }
+  static const String codePageMainText = 'Enter code';
+  static const String codePageInfoText = 'Type in the 10 digit code you received in email';
+  static const String codePageErrorText = 'Incorrect code given';
 }
 
 // Post page [post_page.dart]
