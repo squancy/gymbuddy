@@ -7,6 +7,8 @@ import 'package:moye/widgets/gradient_overlay.dart';
 import 'utils/helpers.dart' as helpers;
 import 'package:geolocator/geolocator.dart';
 import 'login_page.dart';
+import 'package:gym_buddy/utils/email.dart' as email_send;
+import 'package:gym_buddy/consts/email_templates.dart' as email_templates;
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -15,14 +17,14 @@ class SignupPage extends StatefulWidget {
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final TextEditingController _emailController = TextEditingController(); // Email controller
-  final TextEditingController _passwordController = TextEditingController(); // Password controller
-  final TextEditingController _passwordConfController = TextEditingController(); // Password confirmation controller
-  final TextEditingController _usernameController = TextEditingController(); // Username controller
-  final FocusNode _emailFocusNode = FocusNode(); // Email focus node
-  final FocusNode _passwordFocusNode = FocusNode(); // Password focus node
-  final FocusNode _passwordConfFocusNode = FocusNode(); // Password confirmation focus node
-  final FocusNode _usernameFocusNode = FocusNode(); // Username focus node
+  final TextEditingController _emailController = TextEditingController(); 
+  final TextEditingController _passwordController = TextEditingController(); 
+  final TextEditingController _passwordConfController = TextEditingController();
+  final TextEditingController _usernameController = TextEditingController(); 
+  final FocusNode _emailFocusNode = FocusNode();
+  final FocusNode _passwordFocusNode = FocusNode();
+  final FocusNode _passwordConfFocusNode = FocusNode();
+  final FocusNode _usernameFocusNode = FocusNode();
 
   final ValueNotifier<String> _signupStatus = ValueNotifier<String>("");
 
@@ -49,7 +51,6 @@ class _SignupPageState extends State<SignupPage> {
     }
   }
 
-  /// Signs up the user
   Future<void> _signup() async {
     final String email = _emailController.text.trim();
     final String password = _passwordController.text;
@@ -90,7 +91,14 @@ class _SignupPageState extends State<SignupPage> {
       return;
     }
 
-    // TODO: send email to user about successful signup (when we have a domain name)
+    // Send email to user about successful sign up
+    final signUpEmail = email_templates.SignUpEmail(username: username);
+    await email_send.sendEmail(
+      from: GlobalConsts.infoEmail,
+      to: email,
+      subject: signUpEmail.subject,
+      content: signUpEmail.generateEmail()
+    );
 
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
     await prefs.setBool('loggedIn', true);
@@ -113,7 +121,6 @@ class _SignupPageState extends State<SignupPage> {
     });
   }
 
-  /// Dispose of the controllers and focus nodes
   @override
   void dispose() {
     _emailController.dispose();
@@ -128,7 +135,6 @@ class _SignupPageState extends State<SignupPage> {
     super.dispose();
   }
 
-  // Build the signup page
   @override
   Widget build(BuildContext context) {
     return Scaffold(

@@ -42,7 +42,7 @@ class ForgotPasswordConsts {
   static const String wrongCredentialsText = 'Your email or password is incorrect';
   static const String userNotExistsText = 'Incorrect email';
   static const String tempPassSucessText = 'Success!';
-  static const String createNewPassText = 'Create a new password';  
+  static const String createNewPassText = 'Set a new password';  
   static const String updatePassText = 'Update password';
   static const String failureText = "Failed to update password. Please try again.";
   static Widget tempPassSubText(String email, BuildContext context) {
