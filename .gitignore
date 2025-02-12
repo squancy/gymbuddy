@@ -165,3 +165,6 @@ lib/*.code-workspace
 #Firestore
 firestore.rules
 firestore.indexes.json
+
+#Vscode
+.vscode/settings.json
