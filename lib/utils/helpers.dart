@@ -287,3 +287,23 @@ Future<ActGymRecord> getActivitiesAndGyms() async {
   allActivities.sort();
   return (activities: allActivities, gyms: allGyms);
 }
+
+class ValidatePassword {
+  ValidatePassword(
+    this._password,
+    this._passwordConf,
+  );
+  final String _password;
+  final String _passwordConf;
+
+  (bool isValid, String errorMsg) isValidPassword() {
+    if (_password.isEmpty || _passwordConf.isEmpty) {
+      return (false, SignupConsts.allFieldsText);
+    } else if (_password != _passwordConf) {
+      return (false, SignupConsts.passwordMismatchText);
+    } else if (_password.length < ValidateSignupConsts.maxPasswordLength) {
+      return (false, SignupConsts.passwordLengthText);
+    }
+    return (true, '');
+  }
+}

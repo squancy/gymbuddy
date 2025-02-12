@@ -2,7 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:dbcrypt/dbcrypt.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 
-/// Class to check if the login credentials are valid
 class CheckLogin {
   CheckLogin(
     this._email,
@@ -22,7 +21,6 @@ class CheckLogin {
     String passwordDB = user['password'];
     var bcrypt = DBCrypt();
 
-    // Verify if the provided password matches the stored hash
     return bcrypt.checkpw(_password, passwordDB);
   }
 
@@ -39,6 +37,8 @@ class CheckLogin {
 
     var user = userWithEmail.docs[0].data() as Map<String, dynamic>;
     bool valid = await _isPasswordValid(user);
-    return valid ? (true, '', user['id'] as String) : (false, ForgotPasswordConsts.wrongCredentialsText, '');
+    return valid ?
+      (true, '', user['id'] as String) :
+      (false, ForgotPasswordConsts.wrongCredentialsText, '');
   }
 }

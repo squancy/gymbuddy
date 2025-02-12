@@ -43,6 +43,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       final tempPass = test_helpers.generateRandomString(10);
 
       final username = userData[0].data()['username'];
+      final userID = userData[0].reference.id;
       final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
         username: username,
         tempPass: tempPass
@@ -62,6 +63,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         });
         return;
       }
+
+      // Set temporary password in db
+      await db.collection('users')
+        .doc(userID)
+        .update({'temp_pass': tempPass});
 
       // Redirect to a new page when user has to enter the code in the email
       setState(() {

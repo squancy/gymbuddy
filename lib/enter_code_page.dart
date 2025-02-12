@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/renew_password.dart';
 import 'consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'utils/helpers.dart' as helpers;
@@ -42,14 +43,12 @@ class _EnterCodePageState extends State<EnterCodePage> {
       // If the entered code is correct redirect user to the next page
       // There they can change their password
       setState(() {
-        /*
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => enter_code_page.EnterCodePage(email: email)
+            builder: (context) => RenewPasswordPage(userID: userID,)
           ),
         );
-        */
       });
     } else {
       setState(() {
