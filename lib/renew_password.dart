@@ -87,11 +87,9 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: Text(
-                          ForgotPasswordConsts
-                              .createNewPassText, // "Create account"
+                          ForgotPasswordConsts.createNewPassText, // "Create account"
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 34,
@@ -109,8 +107,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.passwordText, // "Password"
@@ -122,8 +119,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                       ),
                       // Password confirmation textfield
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.passwordConfText, // "Confirm password"
@@ -135,16 +131,15 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                       ),
                       // Signup button
                       Padding(
-                        padding: const EdgeInsets.symmetric(
-                            vertical: 10, horizontal: 0),
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: Column(
                           children: [
                             SizedBox(
                               height: 45,
                               child: helpers.ProgressBtn(
                                 onPressedFn: _renewpassword,
-                                child: Text(ForgotPasswordConsts
-                                    .updatePassText), // "Update password"
+                                child:
+                                    Text(ForgotPasswordConsts.updatePassText), // "Update password"
                               ),
                             ),
                           ],
@@ -153,17 +148,13 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
 
                       ValueListenableBuilder<String>(
                         valueListenable: _passwordsStatus,
-                        builder: (BuildContext context, String value,
-                            Widget? child) {
+                        builder: (BuildContext context, String value, Widget? child) {
                           return Padding(
-                            padding: const EdgeInsets.symmetric(
-                                vertical: 10, horizontal: 0),
+                            padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                             child: Text(
                               value,
                               textAlign: TextAlign.center,
-                              style: TextStyle(
-                                  color:
-                                      Theme.of(context).colorScheme.onSurface),
+                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
                             ),
                           );
                         },
