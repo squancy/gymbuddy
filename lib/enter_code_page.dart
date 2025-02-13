@@ -11,8 +11,9 @@ import 'package:timer_button/timer_button.dart';
 
 class EnterCodePage extends StatefulWidget {
   final String email;
+  final userdata;
 
-  const EnterCodePage({required this.email, super.key});
+  const EnterCodePage({required this.email, required this.userdata, super.key});
 
   @override
   State<EnterCodePage> createState() => _EnterCodePageState();
@@ -49,7 +50,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
       // If the entered code is correct redirect user to the next page
       // There they can change their password
       setState(() {
-        Navigator.push(
+        Navigator.pushReplacement(
           context,
           MaterialPageRoute(
               builder: (context) => RenewPasswordPage(
@@ -66,11 +67,10 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
   Future<void> _sendPassword() async {
     final String email = widget.email;
+    final userData = widget.userdata;
     final FirebaseFirestore db = FirebaseFirestore.instance;
 
     // Make sure the email is in db
-    final userData =
-        (await db.collection('users').where('email', isEqualTo: email).get()).docs.toList();
 
     // Generate a temporary password: user can change it later in their profile
     final tempPass = test_helpers.generateRandomString(10);
@@ -172,7 +172,8 @@ class _EnterCodePageState extends State<EnterCodePage> {
                             onPressed: _sendPassword,
                             disabledColor: Theme.of(context).colorScheme.surface,
                             color: Theme.of(context).colorScheme.secondary,
-                            disabledTextStyle: TextStyle(color: const Color.fromARGB(255, 145, 144, 144)),
+                            disabledTextStyle:
+                                TextStyle(color: const Color.fromARGB(255, 145, 144, 144)),
                             activeTextStyle: TextStyle(color: Colors.white),
                           ),
                         ),
