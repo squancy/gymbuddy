@@ -74,7 +74,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => enter_code_page.EnterCodePage(email: email)
+            builder: (context) => enter_code_page.EnterCodePage(email: email, userdata: userData) 
           ),
         );
       });

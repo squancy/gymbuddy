@@ -68,6 +68,7 @@ dependencies:
   geoflutterfire_plus: ^0.0.32
   mockito: ^5.4.4
   mailer: ^6.4.1
+  timer_button: ^2.3.0
 
 
 dev_dependencies:
