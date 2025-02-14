@@ -1,4 +1,3 @@
-import 'package:get_time_ago/get_time_ago.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:image_fade/image_fade.dart';
 import 'package:intl/intl.dart';
@@ -6,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'helpers.dart' as helpers;
 import 'time_ago_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:timeago/timeago.dart' as timeago;
 
 IconData getPostIcon(String field) {
   switch (field) {
@@ -66,7 +66,7 @@ Future<List<Map<String, dynamic>>> createDataForPosts(List<QueryDocumentSnapshot
 }
 
 Widget postBuilder(post, displayUsername, context) {
-  GetTimeAgo.setCustomLocaleMessages('en', CustomMessages());
+  timeago.setLocaleMessages('en', CustomMessages());
   return Column(
     key: Key(post['post_id']),
     children: [
@@ -130,7 +130,7 @@ Widget postBuilder(post, displayUsername, context) {
                           ),
                         ),
                         Text(
-                          GetTimeAgo.parse(post['date'].toDate()),
+                          timeago.format(post['date'].toDate()),
                           style: TextStyle(
                             color: Theme.of(context).colorScheme.secondary
                           ),

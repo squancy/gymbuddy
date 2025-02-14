@@ -11,7 +11,9 @@ Future<void> sendEmail ({
   required String subject,
   required String content}) async {
   // First get email credentials from db
-  final Map<String, dynamic> emailCreds = (await db.collection('email').doc('email_settings').get())
+  final Map<String, dynamic> emailCreds = (await db.collection('email')
+    .doc('email_settings')
+    .get())
     .data() as Map<String, dynamic>; 
   final String username = emailCreds['username']; 
   final String password = emailCreds['password']; 

@@ -13,14 +13,52 @@ import 'package:image_fade/image_fade.dart';
 import 'consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/mocks.dart';
 
-final FirebaseFirestore db = FirebaseFirestore.instance; // Get Firestore instance
-final storageRef = FirebaseStorage.instance.ref(); // Get Firebase Storage instance
+final FirebaseFirestore db = FirebaseFirestore.instance; 
+final storageRef = FirebaseStorage.instance.ref();
 
-class ProfilePage extends StatefulWidget {
-  const ProfilePage({super.key});
+/// Save the new data to the db
+Future<void> _saveNewData(String newData, int maxLen, String fieldName, {required bool isBio}) async {
+  if (Characters(newData).length > maxLen) {
+    return;
+  }
 
-  @override
-  State<ProfilePage> createState() => _ProfilePageState();
+  final userID = await helpers.getUserID();
+  final settingsDocRef = db.collection('user_settings').doc(userID);
+
+  try {
+    await settingsDocRef.update({fieldName: newData});
+  } catch (e) {
+    // ...
+    print(e);
+  }
+}
+
+Future<void> resetToTxt({
+  required Toggle toggle,
+  required TextEditingController controller,
+  required int maxLen,
+  required String fieldName,
+  required bool isBio}) async {
+  if (toggle.showEdit.value) {
+    if (controller.text.isNotEmpty) toggle.makeUneditable();
+    await _saveNewData(controller.text, maxLen, fieldName, isBio: isBio);
+  }
+}
+
+Future<void> finishEdit({
+  required Toggle toggle,
+  required TextEditingController controller,
+  required int maxLen,
+  required String fieldName,
+  required bool isBio}) async {
+  resetToTxt(
+    toggle: toggle,
+    controller: controller,
+    maxLen: maxLen,
+    fieldName: fieldName,
+    isBio: isBio
+  );
+  await _saveNewData(controller.text, maxLen, fieldName, isBio: isBio);
 }
 
 class Toggle {
@@ -32,6 +70,148 @@ class Toggle {
 
   void makeUneditable() {
     showEdit.value = false;
+  }
+}
+
+abstract class EditableField {
+  final TextEditingController _controller;
+  final Function _finishEdit;
+  final Toggle _toggleEdit;
+  final FocusNode _focusNode;
+
+  const EditableField({
+    required controller,
+    required finishEdit,
+    required toggleEdit,
+    required focusNode,
+  }) :
+  _controller = controller,
+  _finishEdit = finishEdit,
+  _toggleEdit = toggleEdit,
+  _focusNode = focusNode;
+
+  void _finish();
+  Widget buildField({required bool autofocus});
+}
+
+class Bio extends EditableField {
+  static String bio = '';
+
+  const Bio({
+    required super.controller,
+    required super.finishEdit,
+    required super.toggleEdit,
+    required super.focusNode
+  });
+
+  @override
+  void _finish() {
+    _finishEdit(
+      toggle: _toggleEdit,
+      controller: _controller,
+      maxLen: ProfileConsts.maxBioLength,
+      fieldName: 'bio',
+      isBio: true
+    );
+  }
+
+  @override
+  Widget buildField({required bool autofocus}) {
+    return TextField(
+      key: const Key('bioField'),
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        hintText: ProfileConsts.bioDefaultText,
+        hintStyle: TextStyle(
+          color: Colors.grey,
+          fontSize: 14,
+        ),
+        counterText: '',
+        isDense: true,
+        contentPadding: EdgeInsets.zero,
+      ),
+      autofocus: autofocus,
+      style: TextStyle(
+        fontSize: 14,
+        letterSpacing: 0,
+        height: 1.4
+      ),
+      onChanged: (value) {
+        Bio.bio = _controller.text;
+      },
+      controller: _controller,
+      maxLines: null,
+      onEditingComplete: () {
+        _finish();
+      },
+      onSubmitted: (context) {
+        _finish();
+      },
+      onTapOutside: (event) {
+        _finish();
+      },
+      focusNode: _focusNode,
+    );
+  }
+}
+
+class DisplayUsername extends EditableField {
+  static String uname = '';
+
+  DisplayUsername({
+    required super.controller,
+    required super.finishEdit,
+    required super.toggleEdit,
+    required super.focusNode
+  });
+
+  @override
+  void _finish() {
+    finishEdit(
+      toggle: _toggleEdit,
+      controller: _controller,
+      maxLen: ValidateSignupConsts.maxUsernameLength,
+      fieldName: 'display_username',
+      isBio: false
+    );
+  }
+
+  @override
+  Widget buildField({required bool autofocus}) {
+    return TextField(
+      key: const Key('displayUnameField'),
+      decoration: InputDecoration(
+        border: InputBorder.none,
+        counterText: '',
+        isDense: true,
+        contentPadding: EdgeInsets.zero,
+        hintText: ProfileConsts.emptyDisplayUnameText,
+        hintStyle: TextStyle(
+          color: Colors.grey,
+        )
+      ),
+      controller: _controller,
+      focusNode: _focusNode,
+      autofocus: autofocus,
+      maxLength: 100,
+      style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 0,
+      ),
+      onChanged: (value) {
+        DisplayUsername.uname = _controller.text;
+      },
+      onEditingComplete: () {
+        _finish();
+      },
+      onSubmitted: (context) {
+        _finish();
+      },
+      onTapOutside: (event) {
+        _finish();
+      },
+    );
   }
 }
 
@@ -50,7 +230,8 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
 
   /// Upload the profile picture to Firebase Storage
   Future<void> _uploadPic(File file, String? userID) async {
-    var (String downloadURL, String filename) = await UploadImageFirestorage(storageRef).uploadImage(file, ProfileConsts.profilePicSize, "profile_pics/$userID"); 
+    var (String downloadURL, String filename) = await UploadImageFirestorage(storageRef)
+      .uploadImage(file, ProfileConsts.profilePicSize, "profile_pics/$userID"); 
     final settingsDocRef = db.collection('user_settings').doc(userID);
     try {
       await settingsDocRef.update({
@@ -154,6 +335,13 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   }
 }
 
+class ProfilePage extends StatefulWidget {
+  const ProfilePage({super.key});
+
+  @override
+  State<ProfilePage> createState() => _ProfilePageState();
+}
+
 class _ProfilePageState extends State<ProfilePage> {
   final _toggleEditDUname = Toggle();
   final _toggleEditBio = Toggle();
@@ -229,7 +417,11 @@ class _ProfilePageState extends State<ProfilePage> {
     final userID = await helpers.getUserID();
     final users = db.collection('users');
     final settingsDocRef = db.collection('user_settings').doc(userID);
-    _totalNumberOfPosts = (await db.collection('posts').where('author', isEqualTo: userID).count().get()).count as int;
+    _totalNumberOfPosts = (await db.collection('posts')
+      .where('author', isEqualTo: userID)
+      .count()
+      .get())
+      .count as int;
 
     final QuerySnapshot userWithUID = await users.where('id', isEqualTo: userID).get();
 
@@ -254,23 +446,6 @@ class _ProfilePageState extends State<ProfilePage> {
     };
   }
 
-  /// Save the new data to the db
-  Future<void> _saveNewData(String newData, int maxLen, String fieldName, {required bool isBio}) async {
-    if (Characters(newData).length > maxLen) {
-      return;
-    }
-
-    final userID = await helpers.getUserID();
-    final settingsDocRef = db.collection('user_settings').doc(userID);
-
-    try {
-      await settingsDocRef.update({fieldName: newData});
-    } catch (e) {
-      // ...
-      print(e);
-    }
-  }
-
   // Dispose the controllers & focus nodes
   @override
   void dispose() {
@@ -281,7 +456,6 @@ class _ProfilePageState extends State<ProfilePage> {
     super.dispose();
   } 
 
-  // Build the profile page
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -298,93 +472,21 @@ class _ProfilePageState extends State<ProfilePage> {
           if (snapshot.hasData && snapshot.data != null && snapshot.connectionState == ConnectionState.done) {
             final Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
             final String username = data['username'];
-            var displayUsername = data['displayUsername'] as String;
-            var bio = data['bio'] as String;
-            bool emptyUname = displayUsername.isEmpty;
+            final Bio bioWrapper = Bio(
+              controller: _bioController,
+              finishEdit: finishEdit,
+              toggleEdit: _toggleEditBio,
+              focusNode: _bioFocusNode
+            );
+            Bio.bio = data['bio'] as String;
 
-            Future<void> resetToTxt({
-              required Toggle toggle,
-              required TextEditingController controller,
-              required int maxLen,
-              required String fieldName,
-              required bool isBio}) async {
-              if (toggle.showEdit.value) {
-                if (controller.text.isNotEmpty) toggle.makeUneditable();
-                await _saveNewData(controller.text, maxLen, fieldName, isBio: isBio);
-              }
-            }
-
-            Future<void> finishEdit({
-              required Toggle toggle,
-              required TextEditingController controller,
-              required int maxLen,
-              required String fieldName,
-              required bool isBio}) async {
-              resetToTxt(
-                toggle: toggle,
-                controller: controller,
-                maxLen: maxLen,
-                fieldName: fieldName,
-                isBio: isBio
-              );
-              await _saveNewData(controller.text, maxLen, fieldName, isBio: isBio);
-            }
-
-            Widget buildBioField({required bool autofocus}) {
-              return TextField(
-                key: const Key('bioField'),
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: ProfileConsts.bioDefaultText,
-                  hintStyle: TextStyle(
-                    color: Colors.grey,
-                    fontSize: 14,
-                  ),
-                  counterText: '',
-                  isDense: true,
-                  contentPadding: EdgeInsets.zero,
-                ),
-                autofocus: autofocus,
-                style: TextStyle(
-                  fontSize: 14,
-                  letterSpacing: 0,
-                  height: 1.4
-                ),
-                controller: _bioController,
-                maxLines: null,
-                onChanged: (value) {
-                  bio = _bioController.text;
-                },
-                onEditingComplete: () {
-                  finishEdit(
-                    toggle: _toggleEditBio,
-                    controller: _bioController,
-                    maxLen: ProfileConsts.maxBioLength,
-                    fieldName: 'bio',
-                    isBio: true
-                  );
-                },
-                onSubmitted: (context) {
-                  finishEdit(
-                    toggle: _toggleEditBio,
-                    controller: _bioController,
-                    maxLen: ProfileConsts.maxBioLength,
-                    fieldName: 'bio',
-                    isBio: true
-                  );
-                },
-                onTapOutside: (event) {
-                  finishEdit(
-                    toggle: _toggleEditBio,
-                    controller: _bioController,
-                    maxLen: ProfileConsts.maxBioLength,
-                    fieldName: 'bio',
-                    isBio: true
-                  );
-                },
-                focusNode: _bioFocusNode,
-              );
-            }
+            final DisplayUsername displayUsernameWrapper = DisplayUsername(
+              controller: _controller,
+              finishEdit: finishEdit,
+              toggleEdit: _toggleEditDUname,
+              focusNode: _displayUnameFocusNode
+            );
+            DisplayUsername.uname = data['displayUsername'] as String; 
 
             return ListView(
               controller: _bottomScrollController,
@@ -404,7 +506,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                 if (_controller.text.isEmpty) {
                                   _displayUnameFocusNode.unfocus();      
                                 } else {
-                                  if (_toggleEditDUname.showEdit.value) displayUsername = _controller.text;
+                                  if (_toggleEditDUname.showEdit.value) {
+                                    DisplayUsername.uname = _controller.text;
+                                  }
                                   await resetToTxt(
                                     toggle: _toggleEditDUname,
                                     controller: _controller,
@@ -413,7 +517,6 @@ class _ProfilePageState extends State<ProfilePage> {
                                     isBio: false
                                   );
                                 }
-                                emptyUname = _controller.text.isEmpty;
                                 /*
                                 setState(() {
                                   _getUserDataFuture = _getUserData();
@@ -425,72 +528,23 @@ class _ProfilePageState extends State<ProfilePage> {
                               child: GestureDetector(
                                 onDoubleTap: () {
                                   _toggleEditDUname.makeEditable();
-                                  _controller.text = displayUsername;
+                                  _controller.text = DisplayUsername.uname;
                                 },
                                 child: ValueListenableBuilder<bool>(
                                   valueListenable: _toggleEditDUname.showEdit,
                                   builder: (context, value, child) {
-                                    if (displayUsername.isEmpty) {
+                                    if (DisplayUsername.uname.isEmpty) {
                                       _toggleEditDUname.makeEditable();
                                     }
                                     if (_toggleEditDUname.showEdit.value) {
-                                      return TextField(
-                                        key: const Key('displayUnameField'),
-                                        decoration: InputDecoration(
-                                          border: InputBorder.none,
-                                          counterText: '',
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.zero,
-                                          hintText: ProfileConsts.emptyDisplayUnameText,
-                                          hintStyle: TextStyle(
-                                            color: Colors.grey,
-                                          )
-                                        ),
-                                        controller: _controller,
-                                        focusNode: _displayUnameFocusNode,
-                                        autofocus: !emptyUname,
-                                        maxLength: 100,
-                                        style: TextStyle(
-                                          fontSize: 24,
-                                          fontWeight: FontWeight.bold,
-                                          letterSpacing: 0,
-                                        ),
-                                        onChanged: (value) {
-                                          displayUsername = _controller.text;
-                                        },
-                                        onEditingComplete: () {
-                                          finishEdit(
-                                            toggle: _toggleEditDUname,
-                                            controller: _controller,
-                                            maxLen: ValidateSignupConsts.maxUsernameLength,
-                                            fieldName: 'display_username',
-                                            isBio: false
-                                          );
-                                        },
-                                        onSubmitted: (context) {
-                                          finishEdit(
-                                            toggle: _toggleEditDUname,
-                                            controller: _controller,
-                                            maxLen: ValidateSignupConsts.maxUsernameLength,
-                                            fieldName: 'display_username',
-                                            isBio: false
-                                          );
-                                        },
-                                        onTapOutside: (event) {
-                                          finishEdit(
-                                            toggle: _toggleEditDUname,
-                                            controller: _controller,
-                                            maxLen: ValidateSignupConsts.maxUsernameLength,
-                                            fieldName: 'display_username',
-                                            isBio: false
-                                          );
-                                        },
+                                      return displayUsernameWrapper.buildField(
+                                        autofocus: DisplayUsername.uname.isNotEmpty
                                       );
                                     } else {
                                       // Username display
                                       return Padding(
                                         padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                                        child: Text(displayUsername, style: TextStyle(
+                                        child: Text(DisplayUsername.uname, style: TextStyle(
                                           fontSize: 24,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 0,
@@ -520,7 +574,11 @@ class _ProfilePageState extends State<ProfilePage> {
                                     );
                                   });
                                 },
-                                child: Icon(Icons.logout_rounded, size: 20, color: Theme.of(context).colorScheme.primary,),
+                                child: Icon(
+                                  Icons.logout_rounded,
+                                  size: 20,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
                               )
                             ],
                           )
@@ -534,7 +592,7 @@ class _ProfilePageState extends State<ProfilePage> {
                   padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
                   child: Builder(
                     builder: (context) {
-                      if (bio.isEmpty) {
+                      if (Bio.bio.isEmpty) {
                         _toggleEditBio.makeEditable();
                       }
                       return TapRegion(
@@ -542,7 +600,7 @@ class _ProfilePageState extends State<ProfilePage> {
                           if (_bioController.text.isEmpty) {
                             _bioFocusNode.unfocus();      
                           } else {
-                            if (_toggleEditBio.showEdit.value) bio = _bioController.text;
+                            if (_toggleEditBio.showEdit.value) Bio.bio = _bioController.text;
                             await resetToTxt(
                               toggle: _toggleEditBio,
                               controller: _bioController,
@@ -554,18 +612,18 @@ class _ProfilePageState extends State<ProfilePage> {
                         },
                         child: GestureDetector(
                           onDoubleTap: () {
-                            if (bio.isEmpty) return;
+                            if (Bio.bio.isEmpty) return;
                             _toggleEditBio.makeEditable();
-                            _bioController.text = bio;
+                            _bioController.text = Bio.bio;
                           },
                           child: ValueListenableBuilder<bool>(
                             valueListenable: _toggleEditBio.showEdit,
                             builder: (context, value, child) {
                               if (_toggleEditBio.showEdit.value) {
-                                return buildBioField(autofocus: bio.isNotEmpty);
+                                return bioWrapper.buildField(autofocus: Bio.bio.isNotEmpty);
                               } else {
                                 return Text(
-                                  bio,
+                                  Bio.bio,
                                   style: TextStyle(letterSpacing: 0, height: null),
                                 );
                               }
@@ -586,7 +644,7 @@ class _ProfilePageState extends State<ProfilePage> {
                     if (snapshot.hasData && snapshot.data != null) {
                       for (final post in snapshot.data!) {
                         posts.add(
-                          post_builder.postBuilder(post, displayUsername, context)
+                          post_builder.postBuilder(post, DisplayUsername.uname, context)
                         );
                       }
                       return Column(

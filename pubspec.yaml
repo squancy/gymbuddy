@@ -69,6 +69,7 @@ dependencies:
   mockito: ^5.4.4
   mailer: ^6.4.1
   timer_button: ^2.3.0
+  timeago: ^3.7.0
 
 
 dev_dependencies:

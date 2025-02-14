@@ -1,7 +1,6 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
-import 'package:get_time_ago/get_time_ago.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
@@ -12,6 +11,8 @@ import 'package:image_fade/image_fade.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gym_buddy/utils/post_builder.dart' as post_builder;
+import 'package:timeago/timeago.dart' as timeago;
+import 'package:gym_buddy/utils/time_ago_format.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -56,6 +57,7 @@ Future<void> main() async {
 
   testWidgets('Profile page testing', (tester) async {
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+    timeago.setLocaleMessages('en', CustomMessages());
 
     // Necessary for being able to enterText when not in debug mode 
     test_helpers.registerTextInput();
@@ -252,6 +254,8 @@ Future<void> main() async {
 
     // This user has a lot of posts so post pagination can also be tested 
     test_helpers.logInUser('4f307ff7-f201-4732-93a9-72810a52e194');
+    await tester.pumpWidget(Container());
+    await tester.pumpAndSettle();
     await tester.pumpWidget(MaterialApp(home: ProfilePage()));
     await tester.pumpAndSettle();
     final postDUname = await getDisplayUname();
@@ -285,7 +289,7 @@ Future<void> main() async {
 
       final agoText = find.descendant(
         of: postToFind,
-        matching: find.text(GetTimeAgo.parse(post['date'].toDate()))
+        matching: find.text(timeago.format(post['date'].toDate()))
       );
       expect(agoText, findsOneWidget);
 
