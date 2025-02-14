@@ -105,10 +105,10 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
   @override
   void dispose() {
-    super.dispose();
     _codeController.dispose();
     _codeFocusNode.dispose();
     _codeStatus.dispose();
+    super.dispose();
   }
 
   @override
