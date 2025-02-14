@@ -190,7 +190,8 @@ class _EnterCodePageState extends State<EnterCodePage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: TimerButton(
-                      label: "Resend code",
+                      key: const Key('resendBtn'), // key for testing
+                      label: 'Resend code',
                       timeOutInSeconds: 60,
                       onPressed: _sendPassword,
                       disabledColor: Theme.of(context).colorScheme.surface,

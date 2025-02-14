@@ -12,7 +12,7 @@ void main() {
     final infoTxt = find.text(ForgotPasswordConsts.infoText);
     expect(infoTxt, findsOneWidget);
 
-    final sendPwdBtn = find.widgetWithText(FilledButton, ForgotPasswordConsts.redBtnText);
+    final sendPwdBtn = find.widgetWithText(FilledButton, ForgotPasswordConsts.sendBtnText);
     expect(sendPwdBtn, findsOneWidget);
 
     final field = find.ancestor(

@@ -38,26 +38,13 @@ class ForgotPasswordConsts {
   static const String appBarText = 'Forgot password';
   static const String mainScreenText = 'New password';
   static const String infoText = 'We will send a temporary password to your email';
-  static const String redBtnText = 'Send password';
+  static const String sendBtnText = 'Send password';
   static const String wrongCredentialsText = 'Your email or password is incorrect';
   static const String userNotExistsText = 'Incorrect email';
   static const String tempPassSucessText = 'Success!';
   static const String createNewPassText = 'Set a new password';  
   static const String updatePassText = 'Update password';
-  static const String failureText = "Failed to update password. Please try again.";
-  static Widget tempPassSubText(String email, BuildContext context) {
-    return RichText(
-      text: TextSpan(
-        text: 'We have sent you an email to ',
-        style: DefaultTextStyle.of(context).style,
-        children: [
-          TextSpan(text: email, style: TextStyle(fontWeight: FontWeight.bold)),
-          TextSpan(text: ' containing your temporary password'),
-        ],
-      ),
-      textAlign: TextAlign.center,
-    );
-  }
+  static const String failureText = 'Failed to update password. Please try again.';
   static const String codePageMainText = 'Enter code';
   static const String codePageInfoText = 'Type in the 10 digit code you received in email';
   static const String codePageErrorText = 'Incorrect code given';
