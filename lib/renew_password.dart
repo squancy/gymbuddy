@@ -61,15 +61,16 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
         'salt': salt,
       });
 
-      // Navigate to the LoginPage after successful password update
+      // Navigate to LoginPage after successful password update
       setState(() {
         Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(builder: (context) => LoginPage()),
+          MaterialPageRoute(
+            builder: (context) => LoginPage(),
+          ),
           (Route<dynamic> route) => false,
         );
       });
     } catch (e) {
-      // Handle Firestore update errors
       setState(() {
         _passwordsStatus.value = ForgotPasswordConsts.failureText;
       });
@@ -95,7 +96,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: Text(
-                          ForgotPasswordConsts.createNewPassText, // "Create account"
+                          ForgotPasswordConsts.createNewPassText, 
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 34,
@@ -110,6 +111,13 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                               Theme.of(context).colorScheme.primary,
                             ],
                           ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
+                        child: Text(
+                          ForgotPasswordConsts.renewPasswordInfoText,
+                          style: TextStyle(color: Theme.of(context).colorScheme.onSurface)
                         ),
                       ),
                       Padding(

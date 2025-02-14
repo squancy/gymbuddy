@@ -28,8 +28,8 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
       await db.collection('users')
         .where('email', isEqualTo: email)
         .get())
-      .docs
-      .toList();
+        .docs
+        .toList();
     if (userData.isEmpty) {
       setState(() {
         _forgotPassStatus.value = ForgotPasswordConsts.userNotExistsText;

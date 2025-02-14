@@ -54,13 +54,13 @@ class _EnterCodePageState extends State<EnterCodePage> {
       // If the entered code is correct redirect user to the next page
       // There they can change their password
       setState(() {
-        Navigator.pushReplacement(
-          context,
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => RenewPasswordPage(
               userID: userID,
-            )
+            ),
           ),
+          (Route<dynamic> route) => false,
         );
       });
     } else {
@@ -80,8 +80,10 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
     final username = userData[0].data()['username'];
     final userID = userData[0].reference.id;
-    final TemporaryPassEmail tempPassEmail =
-      TemporaryPassEmail(username: username, tempPass: tempPass);
+    final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
+      username: username,
+      tempPass: tempPass
+    );
 
     // Send temporary password to user's email address
     try {
