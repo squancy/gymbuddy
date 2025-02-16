@@ -30,14 +30,29 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
+  GeoFirePoint? geoPoint;
+  List<String> nearbyGyms = [];
+
+  @override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+    await fetchPosts();
+    await fetchNearbyGyms();
+  });
+}
+
+
+
+
   Future<Object> fetchPosts() async {
     // First get the geoloc of the user (if possible) and update it in db
     Position? geoloc = await helpers.getGeolocation(); 
     String? userID = await helpers.getUserID(); 
     if (geoloc != null) {
       try {
-        final geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
-        db.collection('users').doc(userID).update({'geoloc': geoPoint.data}); 
+        geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
+        await db.collection('users').doc(userID).update({'geoloc': geoPoint!.data}); 
       } catch (e) {
         // print(e);
       }
@@ -45,6 +60,56 @@ class _HomePageContentState extends State<HomePageContent> {
 
     return {};
   }
+  Future<void> fetchNearbyGyms() async {
+  Position? geoloc = await helpers.getGeolocation();
+  print("-----------------------------$geoloc");
+  
+  if (geoloc != null) {
+    print("User location: ${geoloc.latitude}, ${geoloc.longitude}");
+    
+    // Create a new geoPoint from user's current location
+    GeoFirePoint userGeoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
+
+    final radius = 10.0; // Radius in kilometers
+    final collectionReference = db.collection('gyms').doc('budapest').collection('gyms');
+    const String field = 'geoloc';  // Ensure this matches Firestore field
+
+    // Correct field reference inside Firestore document
+    GeoPoint geopointFrom(Map<String, dynamic> data) =>
+        (data['geoloc'] as Map<String, dynamic>)['geopoint'] as GeoPoint;
+
+    final Stream<List<DocumentSnapshot<Map<String, dynamic>>>> gyms =
+        GeoCollectionReference<Map<String, dynamic>>(collectionReference).subscribeWithin(
+      center: userGeoPoint,  // Use the new geoPoint instead of possibly null geoPoint
+      radiusInKm: radius,
+      field: field,
+      geopointFrom: geopointFrom,
+    );
+    print("🔥 GeoQuery Stream created!");
+    gyms.listen(
+      (List<DocumentSnapshot<Map<String, dynamic>>> snapshots) {
+        print("📡 GeoQuery Stream Triggered! Received ${snapshots.length} gyms.");
+
+        if (snapshots.isEmpty) {
+          print("⚠️ No gyms found within ${radius}km.");
+        } else {
+          for (var doc in snapshots) {
+            final data = doc.data();
+            if (data != null) {
+              print("Gym ID: ${doc.id}, Data: $data");
+            } else {
+              print("Gym ID: ${doc.id}, but data is null");
+            }
+          }
+        }
+      },
+      onError: (e) {
+        print("❌ Error fetching gyms from GeoQuery: $e");
+      },
+    );
+  } 
+}
+
 
   @override
   Widget build(BuildContext context) {
@@ -87,12 +152,12 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView( 
-              child: Column(
-                children: [
-                ],
-              ),
-            )
+            child: ListView.builder(
+              itemCount: nearbyGyms.length,
+              itemBuilder: (context, index) {
+                return ListTile(title: Text(nearbyGyms[index]));
+              },
+            ),
           )
         ],
       )

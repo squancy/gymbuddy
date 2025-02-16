@@ -6,6 +6,7 @@ import 'package:integration_test/integration_test.dart';
 import 'package:flutter/services.dart' show rootBundle;
 import 'package:uuid/uuid.dart';
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
+import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 
 // Import the web scraped csv files containing gyms in Hungary to the database
 
@@ -17,7 +18,7 @@ void main() async {
     final gymCollRef = db.collection('gyms').doc('budapest').collection('gyms');
 
     // First delete all documents in gyms/budapest/gyms
-    test_helpers.deleteAllDocsFromCollection(gymCollRef, db);
+    await test_helpers.deleteAllDocsFromCollection(gymCollRef, db);
 
     final csvString = await rootBundle.loadString('assets/budapest_gyms.csv');
     final fields = CsvToListConverter().convert(csvString);
@@ -41,8 +42,7 @@ void main() async {
         'id': gymID,
         'name': row[0],
         'address': row[1],
-        'lat': row[3],
-        'lon': row[4]
+        'geoloc': GeoFirePoint(GeoPoint(row[3], row[4])).data
       };
       batch.set(gyms, data);
 

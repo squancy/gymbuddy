@@ -24,7 +24,7 @@ void main() async {
     */
 
     // First delete all users from db
-    test_helpers.deleteAllDocsFromCollection(db.collection('users'), db);
+    await test_helpers.deleteAllDocsFromCollection(db.collection('users'), db);
 
     // Add these two users to the db
     for (final user in [test_consts.user1, test_consts.user2]) {

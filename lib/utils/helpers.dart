@@ -101,20 +101,26 @@ class BlackTextfield extends StatelessWidget {
 }
 
 Future<Position?> getGeolocation() async { 
-  // Get geolocation data, if available
-  try {
-    Position? geoloc;
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (serviceEnabled && permission != LocationPermission.denied) {
-      geoloc = await Geolocator.getCurrentPosition();
-    } else {
-      geoloc = await Geolocator.getLastKnownPosition();
-    }
-    return geoloc;
-  } catch (e) {
-    return null;
+  bool serviceEnabled;
+  LocationPermission permission;
+  serviceEnabled = await Geolocator.isLocationServiceEnabled();
+  if (!serviceEnabled) {
+    return Future.error('Location services are disabled.');
   }
+
+  permission = await Geolocator.checkPermission();
+  if (permission == LocationPermission.denied) {
+    permission = await Geolocator.requestPermission();
+    if (permission == LocationPermission.denied) {
+      return Future.error('Location permissions are denied');
+    }
+  }
+  
+  if (permission == LocationPermission.deniedForever) { 
+    return Future.error(
+      'Location permissions are permanently denied, we cannot request permissions.');
+  } 
+  return await Geolocator.getCurrentPosition();
 }
 
 class ImageBig {
