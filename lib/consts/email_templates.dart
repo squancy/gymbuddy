@@ -1,5 +1,3 @@
-// TODO: change email content to something better
-
 abstract class EmailTemplate {
   String get subject;
   String generateEmail();
@@ -12,9 +10,10 @@ mixin CommonContent {
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Temporary Password</title>
         <style>
-            body {
+            body, .container {
                 font-family: Arial, sans-serif;
-                background-color: #f4f4f4;
+                background-color: #15202b !important;
+                color: #ffffff !important;
                 margin: 0;
                 padding: 0;
             }
@@ -26,26 +25,29 @@ mixin CommonContent {
                 border-radius: 8px;
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
                 text-align: center;
-                color: #ffffff;
                 font-size: 16px;
             }
             .button {
-                display: inline-block;
+                display: block;
                 padding: 10px 20px;
                 margin-top: 20px;
-                color: #ffffff;
+                color: black;
                 background: linear-gradient(90deg, #e0bbdd, #b0c6ff);
                 text-decoration: none;
                 border-radius: 5px;
                 font-size: 16px;
-              color: black;
+                width: max-content;
+                text-align: center;
             }
             .highlight {
                 font-size: 20px;
                 font-weight: bold;
-                background: linear-gradient(90deg, #e0bbdd, #b0c6ff);
-                -webkit-background-clip: text;
-                -webkit-text-fill-color: transparent;
+                color: #e0bbdd; /* Special color for the username */
+            }
+            .temp-password {
+                font-size: 20px;
+                font-weight: bold;
+                color: #b0c6ff; /* Special color for the temporary password */
             }
             .footer {
                 margin-top: 20px;
@@ -77,7 +79,7 @@ class SignUpEmail extends EmailTemplate with CommonContent {
           <div class="container">
               <h2>Welcome to Kagur!</h2>
               <p>
-                Hello, <span class="highlight" style="font-size: 16px;">$username</span>
+                Hello, <span class="highlight">$username</span>
               </p>
               <p>
                 We're excited to have you on board and hope you will have a lot of exciting
@@ -118,12 +120,12 @@ class TemporaryPassEmail extends EmailTemplate with CommonContent {
           <div class="container">
               <h2>Temporary Password</h2>
               <p>
-                Hello, <span class="highlight" style="font-size: 16px;">$username</span>
+                Hello, <span class="highlight">$username</span>
               </p>
               <p>
-                We have generated a temporary password for your account that you can find below.
+                We have generated a temporary code for your account that you can find below.
               </p>
-              <p class="highlight">$tempPass</p>
+              <p class="temp-password">$tempPass</p>
               <p>
                 You will need this code to authenticate yourself in Kagur.
                 After that, you can set a new password.
