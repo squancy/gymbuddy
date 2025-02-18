@@ -76,6 +76,7 @@ Widget postBuilder(Map<String, dynamic> post, String displayUsername, BuildConte
   final when = post['when'] != null ? DateFormat('MM-dd hh:mm a').format(post['when'].toDate()).toString() : '';
   final dayType = post['day_type'] ?? '';
   final downloadUrlList = post['download_url_list'] ?? [];
+  final displayUsername = post['displayUsername'] ?? '';
 
   return Column(
     key: Key(postId),
