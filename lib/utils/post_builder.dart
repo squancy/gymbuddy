@@ -65,42 +65,54 @@ Future<List<Map<String, dynamic>>> createDataForPosts(List<QueryDocumentSnapshot
   return res;
 }
 
-Widget postBuilder(post, displayUsername, context) {
+Widget postBuilder(Map<String, dynamic> post, String displayUsername, BuildContext context) {
   timeago.setLocaleMessages('en', CustomMessages());
+
+  final authorProfilePicUrl = post['author_profile_pic_url'] ?? '';
+  final postId = post['post_id'] ?? '';
+  final date = post['date'] != null ? timeago.format(post['date'].toDate()) : '';
+  final content = post['content'] ?? '';
+  final gymName = post['gymName'] ?? '';
+  final when = post['when'] != null ? DateFormat('MM-dd hh:mm a').format(post['when'].toDate()).toString() : '';
+  final dayType = post['day_type'] ?? '';
+  final downloadUrlList = post['download_url_list'] ?? [];
+
   return Column(
-    key: Key(post['post_id']),
+    key: Key(postId),
     children: [
       Padding(
         padding: const EdgeInsets.all(20.0),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            post['author_profile_pic_url'].isEmpty ? Image.asset(
-              ProfileConsts.defaultProfilePicPath,
-              fit: BoxFit.cover,
-              width: 40,
-              height: 40,
-              frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
-                if (wasSynchronouslyLoaded) {
-                  return child;
-                }
-                return AnimatedOpacity(
-                  duration: const Duration(milliseconds: 100),
-                  opacity: frame == null ? 0 : 1,
-                  child: child,
-                );
-              },
-            ) : ClipOval(
-              child: ImageFade(
-                placeholder: helpers.ProfilePicPlaceholder(radius: 20,),
-                image: NetworkImage(post['author_profile_pic_url']),
-                height: 40,
-                width: 40,
-                fit: BoxFit.cover,
-                duration: Duration(milliseconds: 100),
-                syncDuration: Duration(milliseconds: 100),
-              )      
-            ),
+            authorProfilePicUrl.isEmpty
+                ? Image.asset(
+                    ProfileConsts.defaultProfilePicPath,
+                    fit: BoxFit.cover,
+                    width: 40,
+                    height: 40,
+                    frameBuilder: (context, child, frame, wasSynchronouslyLoaded) {
+                      if (wasSynchronouslyLoaded) {
+                        return child;
+                      }
+                      return AnimatedOpacity(
+                        duration: const Duration(milliseconds: 100),
+                        opacity: frame == null ? 0 : 1,
+                        child: child,
+                      );
+                    },
+                  )
+                : ClipOval(
+                    child: ImageFade(
+                      placeholder: helpers.ProfilePicPlaceholder(radius: 20),
+                      image: NetworkImage(authorProfilePicUrl),
+                      height: 40,
+                      width: 40,
+                      fit: BoxFit.cover,
+                      duration: Duration(milliseconds: 100),
+                      syncDuration: Duration(milliseconds: 100),
+                    ),
+                  ),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,56 +124,58 @@ Widget postBuilder(post, displayUsername, context) {
                         Flexible(
                           child: Text(
                             displayUsername,
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold
-                            ),
+                            style: TextStyle(fontWeight: FontWeight.bold),
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsets.fromLTRB(8, 2, 8, 0),
-                          child: Container( 
+                          child: Container(
                             decoration: BoxDecoration(
                               shape: BoxShape.circle,
-                              color: Theme.of(context).colorScheme.secondary
+                              color: Theme.of(context).colorScheme.secondary,
                             ),
                             width: 5,
                             height: 5,
                           ),
                         ),
                         Text(
-                          timeago.format(post['date'].toDate()),
-                          style: TextStyle(
-                            color: Theme.of(context).colorScheme.secondary
-                          ),
-                        )
-                      ]
+                          date,
+                          style: TextStyle(color: Theme.of(context).colorScheme.secondary),
+                        ),
+                      ],
                     ),
                   ),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-                    child: Text(post['content'], overflow: TextOverflow.ellipsis, maxLines: 10,),
+                    child: Text(
+                      content,
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 10,
+                    ),
                   ),
-                  post['gym'] == null ? Container() : buildInfoPart('gymName', post, context),
-                  post['when'] == null ? Container() : buildInfoPart('when', post, context),
-                  post['day_type'] == null ? Container() : buildInfoPart('day_type', post, context),
+                  gymName.isEmpty ? Container() : buildInfoPart('gymName', post, context),
+                  when.isEmpty ? Container() : buildInfoPart('when', post, context),
+                  dayType.isEmpty ? Container() : buildInfoPart('day_type', post, context),
                 ],
               ),
-            )
-          ]
+            ),
+          ],
         ),
       ),
-      post['download_url_list'].isEmpty ? Container() : Padding(
-        padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-        child: helpers.HorizontalImageViewer(
-          showImages: true,
-          images: post['download_url_list'],
-          isPost: false,
-          context: context
-        ),
-      ),
+      downloadUrlList.isEmpty
+          ? Container()
+          : Padding(
+              padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
+              child: helpers.HorizontalImageViewer(
+                showImages: true,
+                images: downloadUrlList,
+                isPost: false,
+                context: context,
+              ),
+            ),
       Divider(
-        color: Colors.white12
+        color: Colors.white12,
       ),
     ],
   );
