@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'profile_page.dart';
 import 'post_page.dart';
 import 'utils/helpers.dart' as helpers;
@@ -6,6 +7,7 @@ import 'package:geolocator/geolocator.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
+import 'utils/post_builder.dart' as post_builder;
 
 // Get the Firestore instance
 final FirebaseFirestore db = FirebaseFirestore.instance;
@@ -32,82 +34,118 @@ class HomePageContent extends StatefulWidget {
 class _HomePageContentState extends State<HomePageContent> {
   GeoFirePoint? geoPoint;
   List<String> nearbyGyms = [];
+  List<Map<String, dynamic>> nearbyPosts = [];
+  late Future<void> _fetchDataFuture;
 
   @override
-void initState() {
-  super.initState();
-  WidgetsBinding.instance.addPostFrameCallback((_) async {
-    await fetchPosts();
-    await fetchNearbyGyms();
-  });
+  void initState() {
+    super.initState();
+    _fetchDataFuture = _fetchData();
+  }
+
+  Future<void> _fetchData() async {
+  Position? geoloc = await helpers.getGeolocation();
+  if (geoloc == null) return;
+
+  await fetchPosts(geoloc);
+  await fetchNearbyGyms(geoloc);
+}
+  Future<void> fetchPosts(Position geoloc) async {
+  String? userID = await helpers.getUserID();
+  if (userID == null) return;
+
+  try {
+    geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
+    await db.collection('users').doc(userID).update({'geoloc': geoPoint!.data});
+  } catch (e) {
+    print("Error updating user location: $e");
+  }
 }
 
 
+  Future<void> fetchNearbyGyms(Position geoloc) async {
+  print("User location: ${geoloc.latitude}, ${geoloc.longitude}");
+  GeoFirePoint userGeoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
+
+  final radius = 10.0; 
+  final collectionReference = db.collection('gyms').doc('budapest').collection('gyms');
+
+  GeoPoint geopointFrom(Map<String, dynamic> data) =>
+      (data['geoloc'] as Map<String, dynamic>?)?['geopoint'] as GeoPoint? ?? GeoPoint(0, 0);
+
+  final Stream<List<DocumentSnapshot<Map<String, dynamic>>>> gyms =
+      GeoCollectionReference<Map<String, dynamic>>(collectionReference).subscribeWithin(
+    center: userGeoPoint,
+    radiusInKm: radius,
+    field: 'geoloc',
+    geopointFrom: geopointFrom,
+  );
+
+  gyms.listen(
+    (List<DocumentSnapshot<Map<String, dynamic>>> snapshots) async {
+      if (snapshots.isEmpty) {
+        print("No gyms found within ${radius}km.");
+        return;
+      }
+
+      nearbyGyms = snapshots.map((doc) => doc.id).toList();
+      print("Nearby gyms: $nearbyGyms");
+
+      await fetchPostsForNearbyGyms();
+      await _getUserDataForPostById();
+    },
+    onError: (e) {
+      print("Error fetching gyms: $e");
+    },
+  );
+}
 
 
-  Future<Object> fetchPosts() async {
-    // First get the geoloc of the user (if possible) and update it in db
-    Position? geoloc = await helpers.getGeolocation(); 
-    String? userID = await helpers.getUserID(); 
-    if (geoloc != null) {
-      try {
-        geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
-        await db.collection('users').doc(userID).update({'geoloc': geoPoint!.data}); 
-      } catch (e) {
-        // print(e);
+  Future<void> fetchPostsForNearbyGyms() async {
+    if (nearbyGyms.isNotEmpty) {
+      List<Map<String, dynamic>> allPosts = [];
+      for (int i = 0; i < nearbyGyms.length; i += 10) {
+        final batch = nearbyGyms.sublist(i, i + 10 > nearbyGyms.length ? nearbyGyms.length : i + 10);
+        final postsQuery = db.collection('posts').where('gym', whereIn: batch);
+        final postsSnapshot = await postsQuery.get();
+        allPosts.addAll(postsSnapshot.docs.map((doc) {
+          final data = doc.data();
+          data['id'] = doc.id; // Add the document ID to the data
+          return data;
+        }).toList());
+      }
+      nearbyPosts = allPosts;
+    }
+  }
+
+  Future<void> _getUserDataForPostById() async {
+  Set<String> userIDs = {for (var post in nearbyPosts) post['author'] as String};
+
+  if (userIDs.isEmpty) return;
+
+  try {
+    final usersSnapshot = await db
+        .collection('user_settings')
+        .where(FieldPath.documentId, whereIn: userIDs.toList())
+        .get();
+
+    Map<String, Map<String, dynamic>> userSettingsMap = {
+      for (var doc in usersSnapshot.docs) doc.id: doc.data()
+    };
+
+    for (var post in nearbyPosts) {
+      final userID = post['author'];
+      final userSettings = userSettingsMap[userID];
+      if (userSettings != null) {
+        post['displayUsername'] = userSettings['display_username'];
+        post['profilePic'] = userSettings['profile_pic_url'];
       }
     }
 
-    return {};
+    setState(() {}); 
+  } catch (e) {
+    print("Error fetching user data: $e");
   }
-  Future<void> fetchNearbyGyms() async {
-  Position? geoloc = await helpers.getGeolocation();
-  print("-----------------------------$geoloc");
-  
-  if (geoloc != null) {
-    print("User location: ${geoloc.latitude}, ${geoloc.longitude}");
-    
-    // Create a new geoPoint from user's current location
-    GeoFirePoint userGeoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
-
-    final radius = 10.0; // Radius in kilometers
-    final collectionReference = db.collection('gyms').doc('budapest').collection('gyms');
-    const String field = 'geoloc';  // Ensure this matches Firestore field
-
-    // Correct field reference inside Firestore document
-    GeoPoint geopointFrom(Map<String, dynamic> data) =>
-        (data['geoloc'] as Map<String, dynamic>)['geopoint'] as GeoPoint;
-
-    final Stream<List<DocumentSnapshot<Map<String, dynamic>>>> gyms =
-        GeoCollectionReference<Map<String, dynamic>>(collectionReference).subscribeWithin(
-      center: userGeoPoint,  // Use the new geoPoint instead of possibly null geoPoint
-      radiusInKm: radius,
-      field: field,
-      geopointFrom: geopointFrom,
-    );
-    print("🔥 GeoQuery Stream created!");
-    gyms.listen(
-      (List<DocumentSnapshot<Map<String, dynamic>>> snapshots) {
-        print("📡 GeoQuery Stream Triggered! Received ${snapshots.length} gyms.");
-
-        if (snapshots.isEmpty) {
-          print("⚠️ No gyms found within ${radius}km.");
-        } else {
-          for (var doc in snapshots) {
-            final data = doc.data();
-            if (data != null) {
-              print("Gym ID: ${doc.id}, Data: $data");
-            } else {
-              print("Gym ID: ${doc.id}, but data is null");
-            }
-          }
-        }
-      },
-      onError: (e) {
-        print("❌ Error fetching gyms from GeoQuery: $e");
-      },
-    );
-  } 
 }
 
 
@@ -125,7 +163,7 @@ void initState() {
           Padding(
             padding: const EdgeInsets.fromLTRB(20, 20, 20, 0),
             // Search bar
-            child: SearchAnchor( 
+            child: SearchAnchor(
               builder: (BuildContext context, SearchController controller) {
                 return SearchBar(
                   controller: controller,
@@ -136,9 +174,9 @@ void initState() {
                     RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(12)))
                   ),
                   onTapOutside: (event) {
-                    FocusScope.of(context).unfocus();      
+                    FocusScope.of(context).unfocus();
                   },
-                  hintText: 'Search', 
+                  hintText: 'Search',
                   hintStyle: WidgetStatePropertyAll(
                     TextStyle(
                       color: Theme.of(context).colorScheme.secondary
@@ -152,15 +190,31 @@ void initState() {
             ),
           ),
           Expanded(
-            child: ListView.builder(
-              itemCount: nearbyGyms.length,
-              itemBuilder: (context, index) {
-                return ListTile(title: Text(nearbyGyms[index]));
+            child: FutureBuilder<void>(
+              future: _fetchDataFuture,
+              builder: (BuildContext context, AsyncSnapshot<void> snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(child: GlobalConsts.spinkit);
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                } else {
+                  return ListView.builder(
+                    itemCount: nearbyPosts.length,
+                    itemBuilder: (context, index) {
+                      final post = nearbyPosts[index];
+                      return Column(
+                        children: [
+                          post_builder.postBuilder(post, DisplayUsername.uname, context),
+                        ],
+                      );
+                    },
+                  );
+                }
               },
             ),
-          )
+          ),
         ],
-      )
+      ),
     );
   }
 }
