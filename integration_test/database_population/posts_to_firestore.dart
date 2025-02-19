@@ -39,7 +39,7 @@ void main() async {
     };
 
     // First delete all posts from db
-    test_helpers.deleteAllDocsFromCollection(db.collection('users'), db);
+    test_helpers.deleteAllDocsFromCollection(db.collection('posts'), db);
 
     /*
       There are two users who are used throughout most of the tests
@@ -95,6 +95,7 @@ void main() async {
     for (final el in [post1, post2, post3, post4]) {
       await db.collection('posts').doc(uuid.v4()).set(el);
     } 
+    final nearby_gyms = ["93b15e60-0a20-45f1-a41c-e7c4a7ee6c6f", "ac308b1d-8d9f-408c-bda3-55ae700dd719", "dc80b715-ccb3-4c0e-bada-68b62808f53c", "880b6743-370f-4ac8-b907-2bb5a568367f"];
 
     // Add random posts
     for (int i = 0; i < numOfRandomUsers; i++) {
@@ -109,7 +110,7 @@ void main() async {
       final post = {
         ...commonFields,
         if (isActivity) 'day_type': allActivities[random.nextInt(allActivities.length)] else 'day_type': '',
-        if (isGym) 'gym': allGyms[random.nextInt(allGyms.length)] else 'gym': '',
+        if (isGym) 'gym': nearby_gyms[random.nextInt(nearby_gyms.length)],
         if (isTime) 'when': DateTime(
           DateTime.now().year,
           random.nextInt(13) + 1,
