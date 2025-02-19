@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'profile_page.dart';
@@ -50,73 +52,114 @@ class _HomePageContentState extends State<HomePageContent> {
   await fetchPosts(geoloc);
   await fetchNearbyGyms(geoloc);
 }
-  Future<void> fetchPosts(Position geoloc) async {
+Future<void> _onRefresh() async {
+  Position? geoloc = await helpers.getGeolocation();
+  if (geoloc == null) return;
+
+  await fetchPosts(geoloc);
+  await fetchNearbyGyms(geoloc);
+  await _getUserDataForPostById();
+  setState(() {});
+}
+
+Position? _lastKnownPosition; // Store last known location
+
+Future<void> fetchPosts(Position geoloc) async {
   String? userID = await helpers.getUserID();
   if (userID == null) return;
+
+  // Check if the user has moved significantly before updating Firestore
+  if (_lastKnownPosition != null) {
+    double distance = Geolocator.distanceBetween(
+      _lastKnownPosition!.latitude, _lastKnownPosition!.longitude,
+      geoloc.latitude, geoloc.longitude,
+    );
+
+    if (distance < 100) { // Only update if user moved more than 100m
+      return;
+    }
+  }
 
   try {
     geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
     await db.collection('users').doc(userID).update({'geoloc': geoPoint!.data});
+    _lastKnownPosition = geoloc; // Update last known location
   } catch (e) {
     print("Error updating user location: $e");
   }
 }
 
 
-  Future<void> fetchNearbyGyms(Position geoloc) async {
+
+StreamSubscription<List<DocumentSnapshot<Map<String, dynamic>>>>? gymSubscription;
+
+Future<void> fetchNearbyGyms(Position geoloc) async {
   print("User location: ${geoloc.latitude}, ${geoloc.longitude}");
   GeoFirePoint userGeoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
 
-  final radius = 10.0; 
+  final radius = 100.0;
   final collectionReference = db.collection('gyms').doc('budapest').collection('gyms');
 
   GeoPoint geopointFrom(Map<String, dynamic> data) =>
       (data['geoloc'] as Map<String, dynamic>?)?['geopoint'] as GeoPoint? ?? GeoPoint(0, 0);
 
-  final Stream<List<DocumentSnapshot<Map<String, dynamic>>>> gyms =
-      GeoCollectionReference<Map<String, dynamic>>(collectionReference).subscribeWithin(
-    center: userGeoPoint,
-    radiusInKm: radius,
-    field: 'geoloc',
-    geopointFrom: geopointFrom,
-  );
+  gymSubscription?.cancel(); // Cancel any existing subscription before starting a new one
 
-  gyms.listen(
-    (List<DocumentSnapshot<Map<String, dynamic>>> snapshots) async {
-      if (snapshots.isEmpty) {
-        print("No gyms found within ${radius}km.");
-        return;
-      }
+  gymSubscription = GeoCollectionReference<Map<String, dynamic>>(collectionReference)
+      .subscribeWithin(
+        center: userGeoPoint,
+        radiusInKm: radius,
+        field: 'geoloc',
+        geopointFrom: geopointFrom,
+      )
+      .listen(
+        (List<DocumentSnapshot<Map<String, dynamic>>> snapshots) async {
+          if (snapshots.isEmpty) {
+            print("No gyms found within ${radius}km.");
+            return;
+          }
 
-      nearbyGyms = snapshots.map((doc) => doc.id).toList();
-      print("Nearby gyms: $nearbyGyms");
+          nearbyGyms = snapshots.map((doc) => doc.id).toList();
+          print("Nearby gyms: $nearbyGyms");
 
-      await fetchPostsForNearbyGyms();
-      await _getUserDataForPostById();
-    },
-    onError: (e) {
-      print("Error fetching gyms: $e");
-    },
-  );
+          await fetchPostsForNearbyGyms();
+          await _getUserDataForPostById();
+        },
+        onError: (e) {
+          print("Error fetching gyms: $e");
+        },
+      );
 }
 
 
   Future<void> fetchPostsForNearbyGyms() async {
-    if (nearbyGyms.isNotEmpty) {
-      List<Map<String, dynamic>> allPosts = [];
-      for (int i = 0; i < nearbyGyms.length; i += 10) {
-        final batch = nearbyGyms.sublist(i, i + 10 > nearbyGyms.length ? nearbyGyms.length : i + 10);
-        final postsQuery = db.collection('posts').where('gym', whereIn: batch);
-        final postsSnapshot = await postsQuery.get();
-        allPosts.addAll(postsSnapshot.docs.map((doc) {
-          final data = doc.data();
-          data['id'] = doc.id; // Add the document ID to the data
-          return data;
-        }).toList());
-      }
-      nearbyPosts = allPosts;
+  if (nearbyGyms.isEmpty) return;
+
+  List<Map<String, dynamic>> allPosts = [];
+
+  for (int i = 0; i < nearbyGyms.length; i += 10) {
+    final batch = nearbyGyms.sublist(i, i + 10 > nearbyGyms.length ? nearbyGyms.length : i + 10);
+    
+    try {
+      final postsQuery = db.collection('posts')
+        .where('gym', whereIn: batch)
+        .orderBy('date', descending: true) // Fetch most recent posts first
+        .limit(50); // Limit number of posts
+
+      final postsSnapshot = await postsQuery.get();
+      allPosts.addAll(postsSnapshot.docs.map((doc) {
+        final data = doc.data();
+        data['id'] = doc.id; // Add the document ID to the data
+        return data;
+      }).toList());
+    } catch (e) {
+      print("Error fetching posts: $e");
     }
   }
+
+  nearbyPosts = allPosts;
+}
+
 
   Future<void> _getUserDataForPostById() async {
   Set<String> userIDs = {for (var post in nearbyPosts) post['author'] as String};
@@ -198,16 +241,21 @@ class _HomePageContentState extends State<HomePageContent> {
                 } else if (snapshot.hasError) {
                   return Center(child: Text('Error: ${snapshot.error}'));
                 } else {
-                  return ListView.builder(
-                    itemCount: nearbyPosts.length,
-                    itemBuilder: (context, index) {
-                      final post = nearbyPosts[index];
-                      return Column(
-                        children: [
-                          post_builder.postBuilder(post, DisplayUsername.uname, context),
-                        ],
-                      );
-                    },
+                  return RefreshIndicator(
+                    elevation: 10,
+                    color: Theme.of(context).colorScheme.primary,
+                    onRefresh: _onRefresh,
+                    child: ListView.builder(
+                      itemCount: nearbyPosts.length,
+                      itemBuilder: (context, index) {
+                        final post = nearbyPosts[index];
+                        return Column(
+                          children: [
+                            post_builder.postBuilder(post, DisplayUsername.uname, context),
+                          ],
+                        );
+                      },
+                    ),
                   );
                 }
               },
