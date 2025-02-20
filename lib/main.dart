@@ -19,7 +19,7 @@ Future<void> main() async {
   await helpers.firebaseInit(test: false);
   // Firebase init END
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
-  
+
   runApp(const GymBuddyApp());
 }
 

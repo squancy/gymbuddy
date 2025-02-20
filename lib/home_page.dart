@@ -53,6 +53,13 @@ class _HomePageContentState extends State<HomePageContent> {
   final FocusNode _searchFocus = FocusNode();
 
   @override
+  void dispose() {
+    super.dispose();
+    _searchController.dispose();
+    _searchFocus.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: PreferredSize(

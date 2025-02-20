@@ -9,9 +9,10 @@ import '../firebase_options.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../consts/common_consts.dart';
+import 'package:gym_buddy/firestore_cache/cache.dart';
 
 Future<List<String>> getAllActivitiesWithoutProps(CollectionReference collection) async {
-  QuerySnapshot querySnapshot = await collection.get();
+  QuerySnapshot querySnapshot = await collection.getCached();
   return querySnapshot.docs
     .map((doc) => (doc.data() as Map<String, dynamic>?)?['name'] as String? ?? 'Unknown')
     .toList()..sort();
@@ -25,7 +26,7 @@ void sortGymsByName(List<Map<String, dynamic>> gyms) {
 }
 
 Future<List<Map<String, dynamic>>> getAllGymsWithProps(CollectionReference collection) async {
-  QuerySnapshot querySnapshot = await collection.get();
+  QuerySnapshot querySnapshot = await collection.getCached();
   return querySnapshot.docs
     .map((doc) {
       String docID = doc.reference.id;

@@ -7,6 +7,7 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:image_fade/image_fade.dart';
 import 'dart:async';
+import 'package:gym_buddy/firestore_cache/cache.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -329,14 +330,12 @@ class _DefaultSearchState extends State<DefaultSearch> {
   void initState() {
     super.initState();
     widget.searchController.addListener(_setPrevTime);
-    _timer = Timer.periodic(Duration(milliseconds: 100), (Timer t) => _query());
+    _timer = Timer.periodic(Duration(milliseconds: 10), (Timer t) => _query());
   }
   
   @override
   void dispose() {
     super.dispose();
-    widget.searchController.dispose();
-    widget.searchFocus.dispose();
     widget.searchController.removeListener(_setPrevTime);
     _timer?.cancel();
   }
