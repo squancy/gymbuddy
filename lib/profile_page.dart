@@ -293,7 +293,9 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
     return FutureBuilder<Map<String, String>>(
       future: _getProfilePicFile(),
       builder: (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) {
-        final uploadPopup = PhotoUploadPopup(context, consts.GlobalConsts.test ? _selectFromSourceMock : _selectFromSource);
+        final uploadPopup = PhotoUploadPopup(
+          context,
+          consts.GlobalConsts.test ? _selectFromSourceMock : _selectFromSource);
         if (snapshot.hasData) {
           dynamic bgImage;
           if (snapshot.data?['type'] == 'default') {

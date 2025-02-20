@@ -25,6 +25,7 @@ void main() async {
 
     // First delete all users from db
     await test_helpers.deleteAllDocsFromCollection(db.collection('users'), db);
+    await test_helpers.deleteAllDocsFromCollection(db.collection('user_settings'), db);
 
     // Add these two users to the db
     for (final user in [test_consts.user1, test_consts.user2]) {
@@ -40,7 +41,15 @@ void main() async {
         'platform': 'iOS', // it doesn't really matter for now, may be changed later
         'salt': salt,
         'signup_date': FieldValue.serverTimestamp(),
-        'username': user.username
+        'username': user.username,
+      });
+
+      // Add further settings for each user
+      await db.collection('user_settings').doc(user.userID).set({
+        'bio': user.bio,
+        'display_username': user.displayUsername,
+        'profile_pic_path': user.profilePicPath,
+        'profile_pic_url': user.profilePicUrl
       });
     }
 
@@ -59,6 +68,7 @@ void main() async {
       final String userID = uuid.v4();
       String salt = dbcrypt.gensaltWithRounds(10);
       var pwh = dbcrypt.hashpw('asdasd', salt);
+      String username = test_helpers.generateRandomString(12);
 
       await db.collection('users').doc(userID).set({
         'email': '${test_helpers.generateRandomString(10)}@gmail.com',
@@ -68,8 +78,16 @@ void main() async {
         'platform': 'iOS', 
         'salt': salt,
         'signup_date': FieldValue.serverTimestamp(),
-        'username': test_helpers.generateRandomString(12)
+        'username': username
       });     
+
+      // Add further settings for each user
+      await db.collection('user_settings').doc(userID).set({
+        'bio': '',
+        'display_username': username,
+        'profile_pic_path': '',
+        'profile_pic_url': ''
+      });
     }
   });  
 }

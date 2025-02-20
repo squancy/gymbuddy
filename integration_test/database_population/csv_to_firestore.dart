@@ -19,7 +19,7 @@ void main() async {
 
     // First delete all documents in gyms/budapest/gyms
     await test_helpers.deleteAllDocsFromCollection(gymCollRef, db);
-
+    print("del");
     final csvString = await rootBundle.loadString('assets/budapest_gyms.csv');
     final fields = CsvToListConverter().convert(csvString);
 
