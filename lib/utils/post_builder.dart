@@ -52,7 +52,7 @@ Future<List<Map<String, dynamic>>> createDataForPosts(List<QueryDocumentSnapshot
   for (final post in userPostDocs) {
     Map<String, dynamic> data = post.data();
     data['author_display_username'] = userData!['display_username'];
-    data['author_profile_pic_url'] = userData!['profile_pic_url'];
+    data['author_profile_pic_url'] = userData['profile_pic_url'];
     data['post_id'] = post.reference.id;
     List<String> gymNames = (await db.collection('gyms/budapest/gyms')
       .where('id', isEqualTo: data['gym']).get())

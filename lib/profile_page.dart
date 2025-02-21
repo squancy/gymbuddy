@@ -90,7 +90,6 @@ abstract class EditableField {
   _toggleEdit = toggleEdit,
   _focusNode = focusNode;
 
-  void _finish();
   Widget buildField({required bool autofocus});
 }
 
@@ -104,7 +103,6 @@ class Bio extends EditableField {
     required super.focusNode
   });
 
-  @override
   void _finish() {
     _finishEdit(
       toggle: _toggleEdit,
@@ -165,7 +163,6 @@ class DisplayUsername extends EditableField {
     required super.focusNode
   });
 
-  @override
   void _finish() {
     finishEdit(
       toggle: _toggleEdit,

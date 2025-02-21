@@ -7,7 +7,6 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:image_fade/image_fade.dart';
 import 'dart:async';
-import 'package:gym_buddy/firestore_cache/cache.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance;
 
@@ -114,6 +113,7 @@ class SearchRowUser extends StatelessWidget {
       record['profile_pic_url'] = profilePicUrl;
       record['display_username'] = displayUsername;
       record['username'] = username;
+      record['cached'] = true;
     }
     return (
       profilePicUrl: profilePicUrl,
@@ -169,7 +169,7 @@ class SearchRowUser extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    if (cached) {
+    if (hit['cached'] != null && hit['cached']) {
       final (profilePicUrl, displayUsername, username) = (
         hit['profile_pic_url'],
         hit['display_username'],
@@ -218,14 +218,14 @@ class SearchContent extends StatelessWidget {
     return res;
   }
 
-  Widget _generateColumns(Iterable hits, {required bool cached}) {
+  Widget _generateColumns(Iterable hits, {required bool shouldCache}) {
     return Column(
       children: [
         for (final hit in hits) Padding(
           padding: const EdgeInsets.all(20),
           child: Row(
             children: [
-              SearchRowUser.fromHit(hit, cached)
+              SearchRowUser.fromHit(hit, shouldCache)
             ],
           ),
         )
@@ -238,7 +238,7 @@ class SearchContent extends StatelessWidget {
     final (:isHit, :hit) = cache.get(latestQuery);
     cacheHit = isHit;
     return isHit ?
-    _generateColumns(hit![latestQuery], cached: true)
+    _generateColumns(hit![latestQuery], shouldCache: true)
     :
     StreamBuilder(
       stream: combinedUserStream,
@@ -248,7 +248,7 @@ class SearchContent extends StatelessWidget {
           snapshot.connectionState == ConnectionState.active) {
           List<Map<String, dynamic>> filteredData = _filterUnique(snapshot.data!);
           cache.add({latestQuery: filteredData});
-          return _generateColumns(filteredData, cached: false);
+          return _generateColumns(filteredData, shouldCache: false);
         } else {
           return Padding(
             padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
