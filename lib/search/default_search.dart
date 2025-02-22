@@ -202,6 +202,37 @@ class SearchRowUser extends StatelessWidget {
   }
 }
 
+class AlwaysOnSearchBar extends StatelessWidget {
+  const AlwaysOnSearchBar({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+      child: Row(
+        children: [
+          CircleAvatar(
+            radius: 22.5,
+            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+            child: IconButton(
+              icon: Icon(
+                Icons.saved_search_rounded,
+                color: Theme.of(context).colorScheme.secondary,
+              ),
+              onPressed: () {
+              },
+            ),
+          ),
+          Padding(
+            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+            child: Text(latestQuery),
+          )
+        ],
+      ),
+    );
+  }
+}
+
 class SearchContent extends StatelessWidget {
   const SearchContent({
     super.key
@@ -218,11 +249,13 @@ class SearchContent extends StatelessWidget {
     return res;
   }
 
-  Widget _generateColumns(Iterable hits, {required bool shouldCache}) {
+  Widget _generateColumns(Iterable hits,
+    {required bool shouldCache,
+    required BuildContext context}) {
     return Column(
       children: [
         for (final hit in hits) Padding(
-          padding: const EdgeInsets.all(20),
+          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
           child: Row(
             children: [
               SearchRowUser.fromHit(hit, shouldCache)
@@ -238,24 +271,34 @@ class SearchContent extends StatelessWidget {
     final (:isHit, :hit) = cache.get(latestQuery);
     cacheHit = isHit;
     return isHit ?
-    _generateColumns(hit![latestQuery], shouldCache: true)
+    Column(
+      children: [
+        AlwaysOnSearchBar(),
+        _generateColumns(hit![latestQuery], shouldCache: true, context: context)
+      ],
+    )
     :
-    StreamBuilder(
-      stream: combinedUserStream,
-      builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
-        if (snapshot.hasData &&
-          snapshot.data != null &&
-          snapshot.connectionState == ConnectionState.active) {
-          List<Map<String, dynamic>> filteredData = _filterUnique(snapshot.data!);
-          cache.add({latestQuery: filteredData});
-          return _generateColumns(filteredData, shouldCache: false);
-        } else {
-          return Padding(
-            padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
-            child: GlobalConsts.spinkit,
-          );
-        }
-      }
+    Column(
+      children: [
+        AlwaysOnSearchBar(),
+        StreamBuilder(
+          stream: combinedUserStream,
+          builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
+            if (snapshot.hasData &&
+              snapshot.data != null &&
+              snapshot.connectionState == ConnectionState.active) {
+              List<Map<String, dynamic>> filteredData = _filterUnique(snapshot.data!);
+              cache.add({latestQuery: filteredData});
+              return _generateColumns(filteredData, shouldCache: false, context: context);
+            } else {
+              return Padding(
+                padding: const EdgeInsets.fromLTRB(0, 20, 0, 0),
+                child: GlobalConsts.spinkit,
+              );
+            }
+          }
+        ),
+      ],
     );
   }
 }

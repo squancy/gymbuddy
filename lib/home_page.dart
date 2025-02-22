@@ -88,6 +88,19 @@ class _HomePageContentState extends State<HomePageContent> {
                   onTapOutside: (event) {
                     _searchFocus.unfocus();      
                   },
+                  trailing: <Widget>[
+                    IconButton(
+                      onPressed: () {
+                        setState(() {
+                          _searchController.text = '';
+                        });
+                      },
+                      icon: Icon(
+                        Icons.clear_rounded,
+                        color: Theme.of(context).colorScheme.secondary,
+                      )
+                    )
+                  ],
                   focusNode: _searchFocus,
                   hintText: 'Search', 
                   hintStyle: WidgetStatePropertyAll(
