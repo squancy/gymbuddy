@@ -1,10 +1,19 @@
 import 'package:gym_buddy/handlers/handle_signup.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_buddy/signup_page.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
+import 'package:gym_buddy/data/repository/signup_repository.dart';
+import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/ui/signup/widgets/signup_screen.dart';
 
 void main() {
+  final SignupViewModel signupViewModel = SignupViewModel(
+    signupRepository: SignupRepository(commononService: CommonService()),
+    emailRepository: EmailRepository()
+  );
+
   /// Sign up logic test START
   group('Test the validity of username, email and password fields on the sign up page', () {
     group('If any field is empty return false', () {
@@ -83,7 +92,7 @@ void main() {
   
   /// Sign up UI test START
   testWidgets('Sign up page UI testing', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: SignupPage()));
+    await tester.pumpWidget(MaterialApp(home: SignupPage(viewModel: signupViewModel,)));
 
     final createAccountTxt = find.text(SignupConsts.mainScreenText);
     final signupBtn = find.widgetWithText(FilledButton, SignupConsts.appBarText);

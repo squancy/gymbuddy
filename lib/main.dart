@@ -1,8 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/data/repository/signup_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
 import 'theme.dart';
 import 'login_page.dart';
-import 'signup_page.dart';
+import 'package:gym_buddy/ui/signup/widgets/signup_screen.dart';
 import 'home_page.dart';
 import 'consts/common_consts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,12 +15,15 @@ import 'package:flutter_moving_background/enums/animation_types.dart';
 import 'package:flutter_moving_background/flutter_moving_background.dart';
 import 'package:moye/moye.dart';
 
-typedef PreloadedData = ({List<String> activities, List<Map<String, dynamic>> gyms, bool loggedIn});
+typedef PreloadedData = ({
+  List<String> activities,
+  List<Map<String, dynamic>> gyms, bool loggedIn
+});
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // Firebase init START
-  await helpers.firebaseInit(test: false);
+  await helpers.firebaseInit(test: true);
   // Firebase init END
   SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
 
@@ -38,7 +45,7 @@ class GymBuddyApp extends StatelessWidget {
         useMaterial3: true,
         colorSchemeSeed: Colors.blue.shade900
       ),
-      home: const WelcomePage(),
+      home: WelcomePage(),
     );
   }
 }
@@ -87,7 +94,7 @@ class MainButton extends StatelessWidget {
 }
 
 class WelcomePage extends StatelessWidget {
-  const WelcomePage({super.key});
+  WelcomePage({super.key});
 
   /// Get log in status and preload activities & gyms from db
   Future<PreloadedData> _getPreloadedData() async {
@@ -102,6 +109,11 @@ class WelcomePage extends StatelessWidget {
     final ActGymRecord actAndGyms =  await helpers.getActivitiesAndGyms();
     return (activities: actAndGyms.activities, gyms: actAndGyms.gyms, loggedIn :loggedIn);
   }
+
+  final SignupViewModel signupViewModel = SignupViewModel(
+    signupRepository: SignupRepository(commononService: CommonService()),
+    emailRepository: EmailRepository()
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -160,7 +172,7 @@ class WelcomePage extends StatelessWidget {
                       onPressedFunc: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const SignupPage()),
+                          MaterialPageRoute(builder: (context) => SignupPage(viewModel: signupViewModel)),
                         );
                       },
                       fontSize: 18,

@@ -82,7 +82,7 @@ class ProfileConsts {
 
 class GlobalConsts {
   static const spinkit = CircularProgressIndicator.adaptive();
-  static const bool test = false;
+  static const bool test = true;
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
   static const String inputSourcePopupText = 'Select an input source';
   static const String photoGalleryText = 'Photo gallery';

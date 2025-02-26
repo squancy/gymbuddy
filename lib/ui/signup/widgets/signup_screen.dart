@@ -1,139 +1,38 @@
 import 'package:flutter/material.dart';
-import 'consts/common_consts.dart';
-import 'handlers/handle_signup.dart';
-import 'home_page.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'utils/helpers.dart' as helpers;
-import 'package:geolocator/geolocator.dart';
-import 'login_page.dart';
-import 'package:gym_buddy/utils/email.dart' as email_send;
-import 'package:gym_buddy/consts/email_templates.dart' as email_templates;
+import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/login_page.dart';
+import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
+import 'package:gym_buddy/home_page.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  const SignupPage({
+    required this.viewModel,
+    super.key
+  });
+
+  final SignupViewModel viewModel;
 
   @override
   State<SignupPage> createState() => _SignupPageState();
 }
 
 class _SignupPageState extends State<SignupPage> {
-  final TextEditingController _emailController = TextEditingController(); 
-  final TextEditingController _passwordController = TextEditingController(); 
-  final TextEditingController _passwordConfController = TextEditingController();
-  final TextEditingController _usernameController = TextEditingController(); 
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _passwordConfFocusNode = FocusNode();
-  final FocusNode _usernameFocusNode = FocusNode();
-
-  final ValueNotifier<String> _signupStatus = ValueNotifier<String>("");
-
-  /// Requests the user's position
-  Future<void> _requestPosition() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return;
-    }
-  }
-
-  Future<void> _signup() async {
-    final String email = _emailController.text.trim();
-    final String password = _passwordController.text;
-    final String passwordConf = _passwordConfController.text;
-    final String username = _usernameController.text.trim();
-
-    _signupStatus.value = '';
-    if (!GlobalConsts.test) {
-      await _requestPosition();
-    }
-
-    // Validate data for signup
-    final signupValidator = ValidateSignup(username, email, password, passwordConf);
-    var (bool isValid, String errorMsg) = signupValidator.isValidParams();
-    if (!isValid) {
-      setState(() {
-        _signupStatus.value = errorMsg;
-      });
-      return;
-    }
-
-    (isValid, errorMsg) = await signupValidator.userExists();
-    if (!isValid) {
-      setState(() {
-        _signupStatus.value = errorMsg;
-      });
-      return;
-    }
-
-    // At this point the validation was successful
-    final signupInsert = InsertSignup(email, password, username);
-    String userID;
-    (isValid, errorMsg, userID) = await signupInsert.insertToDB();
-    if (!isValid) {
-      setState(() {
-        _signupStatus.value = errorMsg;
-      });
-      return;
-    }
-
-    // Send email to user about successful sign up
-    final signUpEmail = email_templates.SignUpEmail(username: username);
-    await email_send.sendEmail(
-      from: GlobalConsts.infoEmail,
-      to: email,
-      subject: signUpEmail.subject,
-      content: signUpEmail.generateEmail()
-    );
-
-    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
-    await prefs.setBool('loggedIn', true);
-    await prefs.setString('userID', userID);
-
-    final ActGymRecord actsAndGyms = await helpers.getActivitiesAndGyms();
-
-    // On successful sign up redirect user to the home page
-    // Also delete every previous route so that he cannot go back with a right swipe
-    setState(() {
+  @override
+  void initState() {
+    super.initState();
+    widget.viewModel.pageTransition.addListener(() {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => HomePage(
-            postPageActs: actsAndGyms.activities,
-            postPageGyms: actsAndGyms.gyms,
+            postPageActs: widget.viewModel.actsAndGyms.activities,
+            postPageGyms: widget.viewModel.actsAndGyms.gyms,
           ),
         ),
         (Route<dynamic> route) => false,
       );
     });
-  }
-
-  @override
-  void dispose() {
-    _emailController.dispose();
-    _passwordController.dispose();
-    _passwordConfController.dispose();
-    _usernameController.dispose();
-
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _passwordConfFocusNode.dispose();
-    _usernameFocusNode.dispose();
-    super.dispose();
   }
 
   @override
@@ -178,8 +77,8 @@ class _SignupPageState extends State<SignupPage> {
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.usernameText, // "Username"
-                          _usernameController,
-                          _usernameFocusNode,
+                          widget.viewModel.usernameController,
+                          widget.viewModel.usernameFocusNode,
                           isPassword: false,
                           isEmail: false,
                         ),
@@ -190,8 +89,8 @@ class _SignupPageState extends State<SignupPage> {
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.emailText, // "Email"
-                          _emailController,
-                          _emailFocusNode,
+                          widget.viewModel.emailController,
+                          widget.viewModel.emailFocusNode,
                           isPassword: false,
                           isEmail: true,
                         ),
@@ -202,20 +101,8 @@ class _SignupPageState extends State<SignupPage> {
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.passwordText, // "Password"
-                          _passwordController,
-                          _passwordFocusNode,
-                          isPassword: true,
-                          isEmail: false,
-                        ),
-                      ),
-                      // Password confirmation textfield
-                      Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
-                          context,
-                          SignupConsts.passwordConfText, // "Confirm password"
-                          _passwordConfController,
-                          _passwordConfFocusNode,
+                          widget.viewModel.passwordController,
+                          widget.viewModel.passwordFocusNode,
                           isPassword: true,
                           isEmail: false,
                         ),
@@ -228,7 +115,7 @@ class _SignupPageState extends State<SignupPage> {
                             SizedBox(
                               height: 45,
                               child: helpers.ProgressBtn(
-                                onPressedFn: _signup,
+                                onPressedFn: widget.viewModel.signup,
                                 child: Text(SignupConsts.appBarText), // "Sign up"
                               ),
                             ),
@@ -253,7 +140,7 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                       ValueListenableBuilder<String>(
-                        valueListenable: _signupStatus,
+                        valueListenable: widget.viewModel.signupStatus,
                         builder: (BuildContext context, String value, Widget? child) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
