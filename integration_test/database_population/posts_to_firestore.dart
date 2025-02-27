@@ -19,7 +19,7 @@ void main() async {
       .map((el) => el.keys.toList()[0]).toList();
     Random random = Random();
     final uuid = Uuid();
-    final numOfRandomUsers = 10;
+    final numOfRandomUsers = 50;
 
     // Can be found in firestorage emulator
     const filenameList = [
