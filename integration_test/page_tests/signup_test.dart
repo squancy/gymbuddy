@@ -4,11 +4,11 @@ import 'package:integration_test/integration_test.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
-import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
+import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/data/repository/email_repository.dart';
 import 'package:gym_buddy/service/common_service.dart';
-import 'package:gym_buddy/ui/signup/widgets/signup_screen.dart';
+import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();

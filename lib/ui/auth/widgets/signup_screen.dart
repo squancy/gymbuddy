@@ -2,9 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
-import 'package:gym_buddy/login_page.dart';
-import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
+import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
 import 'package:gym_buddy/home_page.dart';
+import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
+import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
+import 'package:gym_buddy/data/repository/signup_repository.dart';
+import 'package:gym_buddy/data/repository/login_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({
@@ -22,7 +26,11 @@ class _SignupPageState extends State<SignupPage> {
   @override
   void initState() {
     super.initState();
+
+    // On successful sign up redirect user to the home page
+    // Also delete every previous route so that he cannot go back with a right swipe
     widget.viewModel.pageTransition.addListener(() {
+      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (context) => HomePage(
@@ -34,6 +42,11 @@ class _SignupPageState extends State<SignupPage> {
       );
     });
   }
+
+  final LoginViewModel loginViewModel = LoginViewModel(
+    signupRepository: SignupRepository(commononService: CommonService()),
+    loginRepository: LoginRepository()
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -128,7 +141,7 @@ class _SignupPageState extends State<SignupPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => const LoginPage()),
+                              MaterialPageRoute(builder: (context) => LoginPage(viewModel: loginViewModel,)),
                             );
                           },
                           child: Text(

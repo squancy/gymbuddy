@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../consts/common_consts.dart';
 import 'package:gym_buddy/firestore_cache/cache.dart';
+import 'package:gym_buddy/home_page.dart';
 
 Future<List<String>> getAllActivitiesWithoutProps(CollectionReference collection) async {
   QuerySnapshot querySnapshot = await collection.getCached();
@@ -99,6 +100,15 @@ class BlackTextfield extends StatelessWidget {
       keyboardType: isEmail ? TextInputType.emailAddress : TextInputType.text,
     );
   }
+}
+
+MaterialPageRoute<dynamic> homePageRoute(ActGymRecord actsAndGyms) {
+  return MaterialPageRoute(
+    builder: (context) => HomePage(
+      postPageActs: actsAndGyms.activities,
+      postPageGyms: actsAndGyms.gyms,
+    ),
+  );
 }
 
 Future<Position?> getGeolocation() async { 

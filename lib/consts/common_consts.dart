@@ -108,3 +108,9 @@ class HomePageConsts {
 
 // Typedefs
 typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});
+
+// Enums
+enum PageTransition {
+  stayOnPage,
+  goToNextPage
+}

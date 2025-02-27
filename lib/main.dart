@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/data/repository/login_repository.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/service/common_service.dart';
-import 'package:gym_buddy/ui/signup/view_model/signup_view_model.dart';
+import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
+import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
 import 'theme.dart';
-import 'login_page.dart';
-import 'package:gym_buddy/ui/signup/widgets/signup_screen.dart';
+import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';
 import 'home_page.dart';
 import 'consts/common_consts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -14,6 +15,7 @@ import 'utils/helpers.dart' as helpers;
 import 'package:flutter_moving_background/enums/animation_types.dart';
 import 'package:flutter_moving_background/flutter_moving_background.dart';
 import 'package:moye/moye.dart';
+import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 
 typedef PreloadedData = ({
   List<String> activities,
@@ -115,6 +117,11 @@ class WelcomePage extends StatelessWidget {
     emailRepository: EmailRepository()
   );
 
+  final LoginViewModel loginViewModel = LoginViewModel(
+    signupRepository: SignupRepository(commononService: CommonService()),
+    loginRepository: LoginRepository()
+  );
+
   @override
   Widget build(BuildContext context) {
     return FutureBuilder(
@@ -158,7 +165,7 @@ class WelcomePage extends StatelessWidget {
                       onPressedFunc: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => const LoginPage()),
+                          MaterialPageRoute(builder: (context) => LoginPage(viewModel: loginViewModel,)),
                         );
                       },
                       fontSize: 18,
