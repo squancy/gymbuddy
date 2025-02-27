@@ -1,7 +1,9 @@
+import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/data/repository/enter_code_repository.dart';
 import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' show generateRandomString;
 import 'package:gym_buddy/consts/email_templates.dart';
@@ -9,14 +11,16 @@ import 'package:gym_buddy/consts/email_templates.dart';
 class EnterCodeViewModel extends ChangeNotifier {
   EnterCodeViewModel({
     required emailRepository,
-    required forgotPassRepository
+    required forgotPassRepository,
+    required enterCodeRepository
   }) :
   _emailRepository = emailRepository,
-  _forgotPassRepository = forgotPassRepository;
+  _forgotPassRepository = forgotPassRepository,
+  _enterCodeRepository = enterCodeRepository;
 
-  final FirebaseFirestore _db = FirebaseFirestore.instance;
   final EmailRepository _emailRepository;
   final ForgotPassRepository _forgotPassRepository;
+  final EnterCodeRepository _enterCodeRepository;
   final FocusNode codeFocusNode = FocusNode();
   final TextEditingController codeController = TextEditingController();
   final ValueNotifier<String> codeStatus = ValueNotifier<String>("");
@@ -30,25 +34,30 @@ class EnterCodeViewModel extends ChangeNotifier {
     required String code
     }) async {
     // Get the ID of the potential user
-    final userDocs = (await _db
-      .collection('users')
-      .where('email', isEqualTo: email)
-      .where('temp_pass', isEqualTo: code)
-      .get())
-      .docs;
+    try {
+      final userDocs = await _enterCodeRepository.getUserWithCode(
+        email: email,
+        code: code
+      );
 
-    if (userDocs.isEmpty) {
-      codeStatus.value = ForgotPasswordConsts.codePageErrorText;
-      notifyListeners();
-      return;
-    } else if (userDocs.length == 1) {
-      final String userID = userDocs.toList()[0].reference.id;
+      if (userDocs.isEmpty) {
+        codeStatus.value = ForgotPasswordConsts.codePageErrorText;
+        notifyListeners();
+        return;
+      } else if (userDocs.length == 1) {
+        final String userID = userDocs.toList()[0].reference.id;
 
-      // If the entered code is correct redirect user to the next page
-      // There they can change their password
-      userIDRenewPass = userID;
-      pageTransition.value = PageTransition.goToNextPage;
-    } else {
+        // If the entered code is correct redirect user to the next page
+        // There they can change their password
+        userIDRenewPass = userID;
+        pageTransition.value = PageTransition.goToNextPage;
+      } else {
+        codeStatus.value = GlobalConsts.unknownErrorText;
+        notifyListeners();
+        return;
+      }
+    } catch (error) {
+      log("checkCode(): $error");
       codeStatus.value = GlobalConsts.unknownErrorText;
       notifyListeners();
       return;
@@ -60,24 +69,31 @@ class EnterCodeViewModel extends ChangeNotifier {
     required List<QueryDocumentSnapshot<Map<String, dynamic>>> userData
     }) async {
     // Generate a temporary password: user can change it later in their profile
-    final tempPass = generateRandomString(10);
+    try {
+      final tempPass = generateRandomString(10);
 
-    final username = userData[0].data()['username'];
-    final userID = userData[0].reference.id;
-    final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
-      username: username,
-      tempPass: tempPass
-    );
+      final username = userData[0].data()['username'];
+      final userID = userData[0].reference.id;
+      final TemporaryPassEmail tempPassEmail = TemporaryPassEmail(
+        username: username,
+        tempPass: tempPass
+      );
 
-    // Send temporary password to user's email address
-    await _emailRepository.sendEmail(
-      from: GlobalConsts.infoEmail,
-      to: email,
-      template: tempPassEmail
-    );
+      // Send temporary password to user's email address
+      await _emailRepository.sendEmail(
+        from: GlobalConsts.infoEmail,
+        to: email,
+        template: tempPassEmail
+      );
 
-    // Set temporary password in db
-    _forgotPassRepository.setTempPass(userID: userID, tempPass: tempPass);
+      // Set temporary password in db
+      _forgotPassRepository.setTempPass(userID: userID, tempPass: tempPass);
+    } catch (error) {
+      log("sendPassword(): $error");
+      codeStatus.value = GlobalConsts.unknownErrorText;
+      notifyListeners();
+      return;
+    }
   }
 
   @override

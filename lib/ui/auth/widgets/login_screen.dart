@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
   void initState() {
     super.initState();
 
-    // On successful sign up redirect user to the home page
+    // On successful log in redirect user to the home page
     // Also delete every previous route so that he cannot go back with a right swipe
     widget.viewModel.pageTransition.addListener(() {
       if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;

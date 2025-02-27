@@ -27,6 +27,9 @@ class _EnterCodePageState extends State<EnterCodePage> {
   @override
   void initState() {
     super.initState();
+
+    // When the correct code is entered redirect user to the page
+    // where they can change their password
     widget.viewModel.pageTransition.addListener(() {
       if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
       Navigator.of(context).pushAndRemoveUntil(

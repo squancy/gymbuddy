@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
+import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/data/repository/enter_code_repository.dart';
+import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
+import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
-import 'package:gym_buddy/enter_code_page.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:gym_buddy/ui/auth/widgets/enter_code_screen.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({
@@ -22,13 +26,22 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   @override
   void initState() {
     super.initState();
+
+    // When a valid email address is entered redirect user to the
+    // page where they can enter the code received in email
     widget.viewModel.pageTransition.addListener(() {
+      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
       Navigator.push(
         context,
         MaterialPageRoute(
           builder: (context) => EnterCodePage(
             email: widget.viewModel.emailEnterCode as String,
-            userData: widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>> 
+            userData: widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>>,
+            viewModel: EnterCodeViewModel(
+              emailRepository: EmailRepository(),
+              forgotPassRepository: ForgotPassRepository(),
+              enterCodeRepository: EnterCodeRepository()
+            ),
           ) 
         ),
       );
@@ -53,7 +66,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: Text(
-                      ForgotPasswordConsts.mainScreenText, // 'New password'
+                      ForgotPasswordConsts.mainScreenText,
                       style: TextStyle(
                         fontSize: 34,
                         color: Theme.of(context).colorScheme.primary,
@@ -68,7 +81,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   Padding(
                     padding: const EdgeInsets.fromLTRB(0, 0, 0, 10),
                     child: Text(
-                      ForgotPasswordConsts.infoText, // 'We will send a temporary password to your email'
+                      ForgotPasswordConsts.infoText, 
                       style: TextStyle(color: Theme.of(context).colorScheme.onSurface)
                     ),
                   ),
