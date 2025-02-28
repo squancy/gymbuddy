@@ -1,19 +1,31 @@
 import 'package:gym_buddy/handlers/handle_login.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_buddy/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
+import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
+import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
+import 'package:gym_buddy/data/repository/login_repository.dart';
+import 'package:gym_buddy/data/repository/signup_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await helpers.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final LoginPage loginPage = LoginPage(
+    viewModel: LoginViewModel(
+      loginRepository: LoginRepository(),
+      signupRepository: SignupRepository(
+        commononService: CommonService()
+      )
+    )
+  );
 
   testWidgets('Log in page testing with Firestore', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: LoginPage()));
+    await tester.pumpWidget(MaterialApp(home: loginPage));
 
     final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
     List<Finder> fields = [];
@@ -53,7 +65,7 @@ Future<void> main() async {
   });
   group("Navigation testing", () {
     testWidgets("Login page test for homepage navigation", (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: LoginPage()));
+      await tester.pumpWidget(MaterialApp(home: loginPage));
       final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
       List<Finder> fields = [];
       for (final labelName in ['Email', 'Password']) {
@@ -73,7 +85,7 @@ Future<void> main() async {
     testWidgets("Login page test for forgot password navigation", (WidgetTester tester) async {
       await tester.pumpWidget(Container());
       await tester.pumpAndSettle();
-      await tester.pumpWidget(MaterialApp(home: LoginPage()));
+      await tester.pumpWidget(MaterialApp(home: loginPage));
       await tester.pumpAndSettle();
       final forgotPasswordBtn = find.widgetWithText(TextButton, consts.LoginConsts.forgotPasswordText);
       await tester.tap(forgotPasswordBtn);

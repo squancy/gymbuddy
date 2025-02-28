@@ -1,10 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_buddy/forgot_password.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
+import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
+import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
+import 'package:gym_buddy/data/repository/email_repository.dart';
+import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -12,7 +15,12 @@ Future<void> main() async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   testWidgets('Forgot password page testing (also other pages that are related)', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: ForgotPasswordPage()));
+    await tester.pumpWidget(MaterialApp(home: ForgotPasswordPage(
+      viewModel: ForgotPassViewModel(
+        emailRepository: EmailRepository(),
+        forgotPassRepository: ForgotPassRepository()
+      ),
+    )));
 
     final String wrongEmail = 'does_not_exist@example.com';
     final String correctEmail = 'mark@pearscom.com';

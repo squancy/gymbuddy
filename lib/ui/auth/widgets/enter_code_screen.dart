@@ -1,11 +1,13 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/renew_password.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:timer_button/timer_button.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
+import 'package:gym_buddy/ui/auth/widgets/renew_password_screen.dart';
+import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
+import 'package:gym_buddy/data/repository/renew_password_repository.dart';
 
 class EnterCodePage extends StatefulWidget {
   const EnterCodePage({
@@ -36,6 +38,9 @@ class _EnterCodePageState extends State<EnterCodePage> {
         MaterialPageRoute(
           builder: (context) => RenewPasswordPage(
             userID: widget.viewModel.userIDRenewPass,
+            viewModel: RenewPasswordViewModel(
+              renewPasswordRepository: RenewPasswordRepository()
+            ),
           ),
         ),
         (Route<dynamic> route) => false,

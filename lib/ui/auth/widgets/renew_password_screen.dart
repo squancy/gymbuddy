@@ -1,82 +1,50 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:dbcrypt/dbcrypt.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/login_page.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
+import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
+import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
+import 'package:gym_buddy/data/repository/login_repository.dart';
+import 'package:gym_buddy/data/repository/signup_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
 
 class RenewPasswordPage extends StatefulWidget {
   final String userID;
 
-  const RenewPasswordPage({required this.userID, super.key});
+  const RenewPasswordPage({
+    required this.viewModel,
+    required this.userID,
+    super.key
+  });
+
+  final RenewPasswordViewModel viewModel;
 
   @override
   State<RenewPasswordPage> createState() => _RenewPasswordPageState();
 }
 
 class _RenewPasswordPageState extends State<RenewPasswordPage> {
-  final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _passwordConfFocusNode = FocusNode();
-  final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _passwordConfController = TextEditingController();
-  final ValueNotifier<String> _passwordsStatus = ValueNotifier<String>("");
-  final _dbcrypt = DBCrypt();
-
   @override
-  void dispose() {
-    _passwordFocusNode.dispose();
-    _passwordController.dispose();
-    _passwordConfController.dispose();
-    _passwordConfFocusNode.dispose();
-    _passwordsStatus.dispose();
-    super.dispose();
-  }
-
-  /// Make sure the two password fields match
-  Future<void> _checkPassword() async {
-    final FirebaseFirestore db = FirebaseFirestore.instance;
-    final passwordValidator = helpers.ValidatePassword(
-      _passwordController.text,
-      _passwordConfController.text,
-    );
-
-    // Validate password
-    var (bool isValid, String errorMsg) = passwordValidator.isValidPassword();
-    if (!isValid) {
-      setState(() {
-        _passwordsStatus.value = errorMsg;
-      });
-      return;
-    }
-
-    try {
-      // Hash the password and generate a salt
-      String salt = _dbcrypt.gensaltWithRounds(10);
-      String hashedPassword = _dbcrypt.hashpw(_passwordController.text, salt);
-
-      // Update the password in Firestore
-      await db.collection('users').doc(widget.userID).update({
-        'password': hashedPassword,
-        'salt': salt,
-      });
-
-      // Navigate to LoginPage after successful password update
-      setState(() {
-        Navigator.of(context).pushAndRemoveUntil(
-          MaterialPageRoute(
-            builder: (context) => LoginPage(),
+  void initState() {
+    super.initState();
+    widget.viewModel.pageTransition.addListener(() {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (context) => LoginPage(
+            viewModel: LoginViewModel(
+              loginRepository: LoginRepository(),
+              signupRepository: SignupRepository(
+                commononService: CommonService()
+              )
+            )
           ),
-          (Route<dynamic> route) => false,
-        );
-      });
-    } catch (e) {
-      setState(() {
-        _passwordsStatus.value = ForgotPasswordConsts.failureText;
-      });
-    }
+        ),
+        (Route<dynamic> route) => false,
+      );
+    });
   }
-
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -125,8 +93,8 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.passwordText, // "Password"
-                          _passwordController,
-                          _passwordFocusNode,
+                          widget.viewModel.passwordController,
+                          widget.viewModel.passwordFocusNode,
                           isPassword: true,
                           isEmail: false,
                         ),
@@ -136,8 +104,8 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         child: helpers.BlackTextfield(
                           context,
                           SignupConsts.passwordConfText, // "Confirm password"
-                          _passwordConfController,
-                          _passwordConfFocusNode,
+                          widget.viewModel.passwordConfController,
+                          widget.viewModel.passwordConfFocusNode,
                           isPassword: true,
                           isEmail: false,
                         ),
@@ -149,7 +117,9 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                             SizedBox(
                               height: 45,
                               child: helpers.ProgressBtn(
-                                onPressedFn: _checkPassword,
+                                onPressedFn: () {
+                                  widget.viewModel.checkPassword(widget.userID);
+                                },
                                 child:
                                   Text(ForgotPasswordConsts.updatePassText), // "Update password"
                               ),
@@ -158,7 +128,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         ),
                       ),
                       ValueListenableBuilder<String>(
-                        valueListenable: _passwordsStatus,
+                        valueListenable: widget.viewModel.passwordsStatus,
                         builder: (BuildContext context, String value, Widget? child) {
                           return Padding(
                             padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
