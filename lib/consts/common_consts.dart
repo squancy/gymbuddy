@@ -108,9 +108,18 @@ class HomePageConsts {
 
 // Typedefs
 typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});
+typedef PreloadedData = ({
+  List<String> activities,
+  List<Map<String, dynamic>> gyms, bool loggedIn
+});
 
 // Enums
 enum PageTransition {
   stayOnPage,
   goToNextPage
+}
+
+enum LoadingState {
+  loading,
+  done
 }
