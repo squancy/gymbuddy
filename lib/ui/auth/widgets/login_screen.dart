@@ -27,19 +27,22 @@ class _LoginPageState extends State<LoginPage> {
 
     // On successful log in redirect user to the home page
     // Also delete every previous route so that he cannot go back with a right swipe
-    widget.viewModel.pageTransition.addListener(() {
-      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        helpers.homePageRoute(widget.viewModel.actsAndGyms),
-        (Route<dynamic> route) => false,
-      );
-    });
+    widget.viewModel.pageTransition.addListener(_handlePageTransition);
   }
 
-  final ForgotPassViewModel forgorPassViewModel = ForgotPassViewModel(
-    emailRepository: EmailRepository(),
-    forgotPassRepository: ForgotPassRepository()
-  );
+  void _handlePageTransition() {
+    if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      helpers.homePageRoute(widget.viewModel.actsAndGyms),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.pageTransition.removeListener(_handlePageTransition);
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -112,7 +115,10 @@ class _LoginPageState extends State<LoginPage> {
                             Navigator.push(
                               context,
                               MaterialPageRoute(builder: (context) => ForgotPasswordPage(
-                                viewModel: forgorPassViewModel,
+                                viewModel: ForgotPassViewModel(
+                                  emailRepository: EmailRepository(),
+                                  forgotPassRepository: ForgotPassRepository()
+                                )
                               )),
                             );
                           },

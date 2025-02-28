@@ -15,34 +15,30 @@ class EmailRepository {
     required String to,
     required EmailTemplate template
     }) async {
-    try {
-      // First get email credentials from db
-      final Map<String, dynamic> emailCreds = (await _db.collection('email')
-        .doc('email_settings')
-        .get())
-        .data() as Map<String, dynamic>; 
-      final String username = emailCreds['username']; 
-      final String password = emailCreds['password']; 
-      final String incomingOutgoingServer = emailCreds['smtp'];
+    // First get email credentials from db
+    final Map<String, dynamic> emailCreds = (await _db.collection('email')
+      .doc('email_settings')
+      .get())
+      .data() as Map<String, dynamic>; 
+    final String username = emailCreds['username']; 
+    final String password = emailCreds['password']; 
+    final String incomingOutgoingServer = emailCreds['smtp'];
 
-      final smtpServer = SmtpServer(
-        incomingOutgoingServer,
-        port: 465,
-        ignoreBadCertificate: false,
-        ssl: true,
-        username: username,
-        password: password
-      );
+    final smtpServer = SmtpServer(
+      incomingOutgoingServer,
+      port: 465,
+      ignoreBadCertificate: false,
+      ssl: true,
+      username: username,
+      password: password
+    );
 
-      final message = Message()
-        ..from = Address(username, 'Kagur')
-        ..recipients.add(to)
-        ..subject = template.subject
-        ..html = template.generateEmail();
+    final message = Message()
+      ..from = Address(username, 'Kagur')
+      ..recipients.add(to)
+      ..subject = template.subject
+      ..html = template.generateEmail();
 
-      await send(message, smtpServer);
-    } catch (error) {
-      log("sendEmail(): $error");
-    }
+    await send(message, smtpServer);
   }
 }

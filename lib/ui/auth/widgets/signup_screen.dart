@@ -3,7 +3,6 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
-import 'package:gym_buddy/home_page.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
@@ -29,25 +28,23 @@ class _SignupPageState extends State<SignupPage> {
 
     // On successful sign up redirect user to the home page
     // Also delete every previous route so that he cannot go back with a right swipe
-    widget.viewModel.pageTransition.addListener(() {
-      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => HomePage(
-            postPageActs: widget.viewModel.actsAndGyms.activities,
-            postPageGyms: widget.viewModel.actsAndGyms.gyms,
-          ),
-        ),
-        (Route<dynamic> route) => false,
-      );
-    });
+    widget.viewModel.pageTransition.addListener(_handlePageTransition);
   }
 
-  final LoginViewModel loginViewModel = LoginViewModel(
-    signupRepository: SignupRepository(commononService: CommonService()),
-    loginRepository: LoginRepository()
-  );
+  void _handlePageTransition() {
+    if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      helpers.homePageRoute(widget.viewModel.actsAndGyms),
+      (Route<dynamic> route) => false,
+    );
+  }
 
+  @override
+  void dispose() {
+    widget.viewModel.pageTransition.removeListener(_handlePageTransition);
+    super.dispose();
+  }
+  
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -67,7 +64,7 @@ class _SignupPageState extends State<SignupPage> {
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: Text(
-                          SignupConsts.mainScreenText, // "Create account"
+                          SignupConsts.mainScreenText, 
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 34,
@@ -89,7 +86,7 @@ class _SignupPageState extends State<SignupPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
-                          SignupConsts.usernameText, // "Username"
+                          SignupConsts.usernameText, 
                           widget.viewModel.usernameController,
                           widget.viewModel.usernameFocusNode,
                           isPassword: false,
@@ -101,7 +98,7 @@ class _SignupPageState extends State<SignupPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
-                          SignupConsts.emailText, // "Email"
+                          SignupConsts.emailText,
                           widget.viewModel.emailController,
                           widget.viewModel.emailFocusNode,
                           isPassword: false,
@@ -113,7 +110,7 @@ class _SignupPageState extends State<SignupPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
-                          SignupConsts.passwordText, // "Password"
+                          SignupConsts.passwordText,
                           widget.viewModel.passwordController,
                           widget.viewModel.passwordFocusNode,
                           isPassword: true,
@@ -129,7 +126,7 @@ class _SignupPageState extends State<SignupPage> {
                               height: 45,
                               child: helpers.ProgressBtn(
                                 onPressedFn: widget.viewModel.signup,
-                                child: Text(SignupConsts.appBarText), // "Sign up"
+                                child: Text(SignupConsts.appBarText), 
                               ),
                             ),
                           ],
@@ -141,11 +138,18 @@ class _SignupPageState extends State<SignupPage> {
                           onPressed: () {
                             Navigator.push(
                               context,
-                              MaterialPageRoute(builder: (context) => LoginPage(viewModel: loginViewModel,)),
+                              MaterialPageRoute(builder: (context) => LoginPage(
+                                viewModel: LoginViewModel(
+                                  signupRepository: SignupRepository(
+                                    commononService: CommonService()
+                                  ),
+                                  loginRepository: LoginRepository()
+                                ),
+                              )),
                             );
                           },
                           child: Text(
-                            SignupConsts.accountExistsText, // "Already have an account?"
+                            SignupConsts.accountExistsText, 
                             style: TextStyle(
                               color: Theme.of(context).colorScheme.onSurface,
                             ),

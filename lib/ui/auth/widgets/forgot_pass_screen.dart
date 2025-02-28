@@ -29,23 +29,31 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
     // When a valid email address is entered redirect user to the
     // page where they can enter the code received in email
-    widget.viewModel.pageTransition.addListener(() {
-      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => EnterCodePage(
-            email: widget.viewModel.emailEnterCode as String,
-            userData: widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>>,
-            viewModel: EnterCodeViewModel(
-              emailRepository: EmailRepository(),
-              forgotPassRepository: ForgotPassRepository(),
-              enterCodeRepository: EnterCodeRepository()
-            ),
-          ) 
-        ),
-      );
-    });
+    widget.viewModel.pageTransition.addListener(_handlePageTransition);
+  }
+
+  void _handlePageTransition() {
+    if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EnterCodePage(
+          email: widget.viewModel.emailEnterCode as String,
+          userData: widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>>,
+          viewModel: EnterCodeViewModel(
+            emailRepository: EmailRepository(),
+            forgotPassRepository: ForgotPassRepository(),
+            enterCodeRepository: EnterCodeRepository()
+          ),
+        ) 
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    widget.viewModel.pageTransition.removeListener(_handlePageTransition); 
+    super.dispose();
   }
 
   @override

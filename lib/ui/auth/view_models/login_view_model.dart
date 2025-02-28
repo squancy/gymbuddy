@@ -46,6 +46,8 @@ class LoginViewModel extends ChangeNotifier {
       pageTransition.value = PageTransition.goToNextPage;
     } catch (error) {
       log("login(): $error");
+      loginStatus.value = GlobalConsts.unknownErrorText;
+      notifyListeners();
     }
   }
 

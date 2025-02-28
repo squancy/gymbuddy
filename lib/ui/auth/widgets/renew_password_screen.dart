@@ -28,21 +28,29 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.pageTransition.addListener(() {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => LoginPage(
-            viewModel: LoginViewModel(
-              loginRepository: LoginRepository(),
-              signupRepository: SignupRepository(
-                commononService: CommonService()
-              )
+    widget.viewModel.pageTransition.addListener(_handlePageTransition);
+  }
+
+  void _handlePageTransition() {
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => LoginPage(
+          viewModel: LoginViewModel(
+            loginRepository: LoginRepository(),
+            signupRepository: SignupRepository(
+              commononService: CommonService()
             )
-          ),
+          )
         ),
-        (Route<dynamic> route) => false,
-      );
-    });
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+  
+  @override
+  void dispose() {
+    widget.viewModel.pageTransition.removeListener(_handlePageTransition);
+    super.dispose();
   }
   
   @override
@@ -92,7 +100,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
-                          SignupConsts.passwordText, // "Password"
+                          SignupConsts.passwordText, 
                           widget.viewModel.passwordController,
                           widget.viewModel.passwordFocusNode,
                           isPassword: true,
@@ -103,7 +111,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: helpers.BlackTextfield(
                           context,
-                          SignupConsts.passwordConfText, // "Confirm password"
+                          SignupConsts.passwordConfText, 
                           widget.viewModel.passwordConfController,
                           widget.viewModel.passwordConfFocusNode,
                           isPassword: true,
@@ -118,10 +126,10 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                               height: 45,
                               child: helpers.ProgressBtn(
                                 onPressedFn: () {
-                                  widget.viewModel.checkPassword(widget.userID);
+                                  return widget.viewModel.checkPassword(widget.userID);
                                 },
                                 child:
-                                  Text(ForgotPasswordConsts.updatePassText), // "Update password"
+                                  Text(ForgotPasswordConsts.updatePassText),
                               ),
                             ),
                           ],

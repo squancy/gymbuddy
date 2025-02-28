@@ -32,20 +32,28 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
     // When the correct code is entered redirect user to the page
     // where they can change their password
-    widget.viewModel.pageTransition.addListener(() {
-      if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(
-          builder: (context) => RenewPasswordPage(
-            userID: widget.viewModel.userIDRenewPass,
-            viewModel: RenewPasswordViewModel(
-              renewPasswordRepository: RenewPasswordRepository()
-            ),
+    widget.viewModel.pageTransition.addListener(_handlePageTransition);
+  }
+
+  void _handlePageTransition() {
+    if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(
+        builder: (context) => RenewPasswordPage(
+          userID: widget.viewModel.userIDRenewPass,
+          viewModel: RenewPasswordViewModel(
+            renewPasswordRepository: RenewPasswordRepository()
           ),
         ),
-        (Route<dynamic> route) => false,
-      );
-    });
+      ),
+      (Route<dynamic> route) => false,
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    widget.viewModel.pageTransition.removeListener(_handlePageTransition);
   }
 
   @override
@@ -105,7 +113,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                       height: 45,
                       child: helpers.ProgressBtn(
                         onPressedFn: () {
-                          widget.viewModel.checkCode(
+                          return widget.viewModel.checkCode(
                             email: widget.email,
                             code: widget.viewModel.codeController.text
                           );
