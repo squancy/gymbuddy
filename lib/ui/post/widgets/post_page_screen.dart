@@ -33,9 +33,6 @@ class PostPage extends StatefulWidget {
 class _PostPageState extends State<PostPage> {
   @override
   Widget build(BuildContext context) {
-    final uploadPhoto = BottomSheetContent(
-      selectFromSource: widget.viewModel.selectFromSource
-    );
     return Scaffold(
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(0),
@@ -229,7 +226,9 @@ class _PostPageState extends State<PostPage> {
                                 child: FilledButton.icon(
                                   key: const Key('uploadField'),
                                   onPressed: () {
-                                    uploadPhoto.showOptions(context);
+                                    BottomSheetContent(
+                                      selectFromSource: widget.viewModel.selectFromSource
+                                    ).showOptions(context);
                                   },
                                   label: Text(PostPageConsts.photosUploadText), // 'Add photos'
                                   icon: Icon(

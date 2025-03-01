@@ -48,9 +48,16 @@ class PostPageViewModel extends ChangeNotifier {
   }
 
   Future<void> selectFromSource(ImageSource sourceType) async {
-    await (GlobalConsts.test ?
-      _selectFromSourceMock(sourceType) :
-      _selectFromSource(sourceType));
+    try {
+      await (GlobalConsts.test ?
+        _selectFromSourceMock(sourceType) :
+        _selectFromSource(sourceType));
+    } catch (error) {
+      log("selectFromSource(): $error");
+      errorMsg = GlobalConsts.unknownErrorText; 
+      hasError = true;
+      notifyListeners();
+  }
   }
 
   set dayType(String? val) {
@@ -78,41 +85,41 @@ class PostPageViewModel extends ChangeNotifier {
     List<String> downloadURLs = [];
     List<String> filenames = [];
 
-    errorMsg = '';
-    hasError = false;
-    notifyListeners();
-    if (postText.isEmpty) {
-      errorMsg = PostPageConsts.emptyFieldError;
-      hasError = true;
+    try {
+      errorMsg = '';
+      hasError = false;
       notifyListeners();
-      return;
-    }
+      if (postText.isEmpty) {
+        errorMsg = PostPageConsts.emptyFieldError;
+        hasError = true;
+        notifyListeners();
+        return;
+      }
 
-    if (images.isNotEmpty) {
-      // Upload every image
-      for (var i = 0; i < images.length; i++) {
-        final image = images[i];
-        final [UploadTask uploadTask, ref, filename] = await _uploadImageRepository.uploadImageProgess(
-          image: image,
-          size: 800,
-          pathPrefix: "post_pics/$postID"
-        );
-        uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
-          switch (taskSnapshot.state) {
-            case TaskState.running:
-              if (progress == null) {
-                progress = 0;
-              } else if (taskSnapshot.totalBytes > 0) {
-                progress = progress! +
-                  (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) /
-                  images.length;
-              }
-              notifyListeners();
-              break;
-            case TaskState.success:
-              downloadURLs.add(await ref.getDownloadURL());
-              if (downloadURLs.length == images.length) {
-                try {
+      if (images.isNotEmpty) {
+        // Upload every image
+        for (var i = 0; i < images.length; i++) {
+          final image = images[i];
+          final [UploadTask uploadTask, ref, filename] = await _uploadImageRepository.uploadImageProgess(
+            image: image,
+            size: 800,
+            pathPrefix: "post_pics/$postID"
+          );
+          uploadTask.snapshotEvents.listen((TaskSnapshot taskSnapshot) async {
+            switch (taskSnapshot.state) {
+              case TaskState.running:
+                if (progress == null) {
+                  progress = 0;
+                } else if (taskSnapshot.totalBytes > 0) {
+                  progress = progress! +
+                    (taskSnapshot.bytesTransferred / taskSnapshot.totalBytes) /
+                    images.length;
+                }
+                notifyListeners();
+                break;
+              case TaskState.success:
+                downloadURLs.add(await ref.getDownloadURL());
+                if (downloadURLs.length == images.length) {
                   await _postPageRepository.pushToDB(
                     postID: postID,
                     postText: postText,
@@ -125,22 +132,15 @@ class PostPageViewModel extends ChangeNotifier {
                   progress = null;
                   hasError = false;
                   notifyListeners();
-                } catch (error) {
-                  log("createNewPost(): $error");
-                  errorMsg = GlobalConsts.unknownErrorText; 
-                  hasError = true;
-                  notifyListeners();
                 }
-              }
-              break;
-            default:
-              break;
-          }
-        });
-        filenames.add(filename);
-      }
-    } else {
-      try {
+                break;
+              default:
+                break;
+            }
+          });
+          filenames.add(filename);
+        }
+      } else {
         await _postPageRepository.pushToDB(
           postID: postID,
           postText: postText,
@@ -153,12 +153,12 @@ class PostPageViewModel extends ChangeNotifier {
         progress = null;
         hasError = false;
         notifyListeners();
-      } catch (error) {
-        log("createNewPost(): $error");
-        errorMsg = GlobalConsts.unknownErrorText; 
-        hasError = true;
-        notifyListeners();
       }
+    } catch (error) {
+      log("selectFromSource(): $error");
+      errorMsg = GlobalConsts.unknownErrorText; 
+      hasError = true;
+      notifyListeners();
     }
   }
 }
