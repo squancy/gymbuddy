@@ -15,17 +15,16 @@ Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await helpers.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
-  final LoginPage loginPage = LoginPage(
-    viewModel: LoginViewModel(
-      loginRepository: LoginRepository(),
-      signupRepository: SignupRepository(
-        commononService: CommonService()
-      )
-    )
-  );
 
   testWidgets('Log in page testing with Firestore', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: loginPage));
+    await tester.pumpWidget(MaterialApp(home: LoginPage(
+      viewModel: LoginViewModel(
+        loginRepository: LoginRepository(),
+        signupRepository: SignupRepository(
+          commononService: CommonService()
+        )
+      )
+    )));
 
     final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
     List<Finder> fields = [];
@@ -65,7 +64,14 @@ Future<void> main() async {
   });
   group("Navigation testing", () {
     testWidgets("Login page test for homepage navigation", (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: loginPage));
+      await tester.pumpWidget(MaterialApp(home: LoginPage(
+        viewModel: LoginViewModel(
+          loginRepository: LoginRepository(),
+          signupRepository: SignupRepository(
+            commononService: CommonService()
+          )
+        )
+      )));
       final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
       List<Finder> fields = [];
       for (final labelName in ['Email', 'Password']) {
@@ -77,15 +83,24 @@ Future<void> main() async {
       }
       await tester.enterText(fields[0], "asd@test.com");
       await tester.enterText(fields[1], "asdasd");
+      await tester.pumpAndSettle(Duration(seconds: 2));
       await tester.tap(loginBtn);
       await tester.pumpAndSettle();
+      await tester.pumpAndSettle(Duration(seconds: 2));
       expect(find.byKey(Key('homepage')), findsOneWidget);
     });
 
     testWidgets("Login page test for forgot password navigation", (WidgetTester tester) async {
       await tester.pumpWidget(Container());
       await tester.pumpAndSettle();
-      await tester.pumpWidget(MaterialApp(home: loginPage));
+      await tester.pumpWidget(MaterialApp(home: LoginPage(
+        viewModel: LoginViewModel(
+          loginRepository: LoginRepository(),
+          signupRepository: SignupRepository(
+            commononService: CommonService()
+          )
+        )
+      )));
       await tester.pumpAndSettle();
       final forgotPasswordBtn = find.widgetWithText(TextButton, consts.LoginConsts.forgotPasswordText);
       await tester.tap(forgotPasswordBtn);

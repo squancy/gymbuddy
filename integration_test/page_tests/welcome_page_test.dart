@@ -1,16 +1,24 @@
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/main.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
+import 'package:gym_buddy/ui/main/widgets/welcome_page_screen.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await helpers.firebaseInit(test: true);
   group("Welcome page testing", () {
     testWidgets('Welcomepage test for login navigation', (WidgetTester tester) async {
-      await tester.pumpWidget(MaterialApp(home: WelcomePage(key: const Key("welcomePage1"))));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: WelcomePage(
+            key: const Key("welcomePage1"),
+            viewModel: WelcomePageViewModel(),
+          )
+        )
+      );
 
       /*
         pumpAndSettle() cannot be used here since there is a background animation running forever
@@ -29,7 +37,14 @@ Future<void> main() async {
       // Reload the page and reset states
       await tester.pumpWidget(Container());
       await tester.pumpAndSettle();
-      await tester.pumpWidget(MaterialApp(home: WelcomePage(key: const Key("welcomePage2"))));
+      await tester.pumpWidget(
+        MaterialApp(
+          home: WelcomePage(
+            key: const Key("welcomePage2"),
+            viewModel: WelcomePageViewModel(),
+          )
+        )
+      );
       await tester.pump(Duration(seconds: 5));
 
       final signupBtn = find.text(WelcomePageConsts.signupButtonTitle);

@@ -12,11 +12,11 @@ import 'package:flutter_moving_background/flutter_moving_background.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
 import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
-import 'package:gym_buddy/ui/core/ui/common_ui.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 import 'package:moye/moye.dart';
 import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
 
-class WelcomePage extends StatelessWidget {
+class WelcomePage extends StatefulWidget {
   const WelcomePage({
     required this.viewModel,
     super.key
@@ -25,9 +25,20 @@ class WelcomePage extends StatelessWidget {
   final WelcomePageViewModel viewModel;
 
   @override
+  State<WelcomePage> createState() => _WelcomePageState();
+}
+
+class _WelcomePageState extends State<WelcomePage> {
+@override
+  void initState() {
+    super.initState();
+    widget.viewModel.getPreloadedData();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return ValueListenableBuilder<PreloadedData?>(
-      valueListenable: viewModel.preloadedData,
+      valueListenable: widget.viewModel.preloadedData,
       builder: (BuildContext context, PreloadedData? data, Widget? child) {
         if (data != null && data.loggedIn) {
           return HomePage(

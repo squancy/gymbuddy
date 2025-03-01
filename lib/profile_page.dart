@@ -1,17 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/main.dart';
 import 'consts/common_consts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'utils/photo_upload_popup.dart';
-import 'utils/upload_image_firestorage.dart';
 import 'utils/helpers.dart' as helpers;
 import 'utils/post_builder.dart' as post_builder;
 import 'package:image_fade/image_fade.dart';
 import 'consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/mocks.dart';
+import 'package:gym_buddy/ui/main/widgets/welcome_page_screen.dart';
+import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
+import 'package:gym_buddy/data/repository/core/upload_image_repository.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance; 
 final storageRef = FirebaseStorage.instance.ref();
@@ -227,8 +228,12 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
 
   /// Upload the profile picture to Firebase Storage
   Future<void> _uploadPic(File file, String? userID) async {
-    var (String downloadURL, String filename) = await UploadImageFirestorage(storageRef)
-      .uploadImage(file, ProfileConsts.profilePicSize, "profile_pics/$userID"); 
+    var (String downloadURL, String filename) = await UploadImageRepository()
+      .uploadImage(
+        image: file,
+        size: ProfileConsts.profilePicSize,
+        pathPrefix: "profile_pics/$userID"
+      ); 
     final settingsDocRef = db.collection('user_settings').doc(userID);
     try {
       await settingsDocRef.update({
@@ -290,9 +295,11 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
     return FutureBuilder<Map<String, String>>(
       future: _getProfilePicFile(),
       builder: (BuildContext context, AsyncSnapshot<Map<String, String>> snapshot) {
-        final uploadPopup = PhotoUploadPopup(
-          context,
-          consts.GlobalConsts.test ? _selectFromSourceMock : _selectFromSource);
+        final uploadPopup = BottomSheetContent(
+          selectFromSource: consts.GlobalConsts.test ?
+            _selectFromSourceMock :
+            _selectFromSource
+        );
         if (snapshot.hasData) {
           dynamic bgImage;
           if (snapshot.data?['type'] == 'default') {
@@ -301,7 +308,9 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
             bgImage = NetworkImage(snapshot.data?['path'] as String);
           }
           return GestureDetector(
-            onDoubleTap: uploadPopup.showOptions,
+            onDoubleTap: () {
+              uploadPopup.showOptions(context);
+            },
             child: Builder(
               builder: (context) {
                 return SizedBox(
@@ -567,7 +576,9 @@ class _ProfilePageState extends State<ProfilePage> {
                                   setState(() {
                                     Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(
-                                        builder: (context) => WelcomePage(),
+                                        builder: (context) => WelcomePage(
+                                          viewModel: WelcomePageViewModel(),
+                                        ),
                                       ),
                                       (Route<dynamic> route) => false,
                                     );

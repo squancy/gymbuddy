@@ -106,6 +106,7 @@ class SignupViewModel extends ChangeNotifier {
       pageTransition.value = PageTransition.goToNextPage;
     } catch (error) {
       log("signup(): $error");
+      print(error);
       signupStatus.value = GlobalConsts.unknownErrorText;
       notifyListeners();
     }

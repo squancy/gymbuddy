@@ -10,7 +10,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../consts/common_consts.dart';
 import 'package:gym_buddy/firestore_cache/cache.dart';
-import 'package:gym_buddy/home_page.dart';
+import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
+import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
 
 Future<List<String>> getAllActivitiesWithoutProps(CollectionReference collection) async {
   QuerySnapshot querySnapshot = await collection.getCached();
@@ -107,6 +108,7 @@ MaterialPageRoute<dynamic> homePageRoute(ActGymRecord actsAndGyms) {
     builder: (context) => HomePage(
       postPageActs: actsAndGyms.activities,
       postPageGyms: actsAndGyms.gyms,
+      viewModel: HomePageViewModel(),
     ),
   );
 }

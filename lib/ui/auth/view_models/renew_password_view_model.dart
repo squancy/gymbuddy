@@ -1,3 +1,5 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:dbcrypt/dbcrypt.dart';
@@ -57,7 +59,8 @@ class RenewPasswordViewModel extends ChangeNotifier {
 
       // Navigate to LoginPage after successful password update
       pageTransition.value = PageTransition.goToNextPage;
-    } catch (e) {
+    } catch (error) {
+      log("checkPassword(): $error");
       passwordsStatus.value = ForgotPasswordConsts.failureText;
       notifyListeners();
     }

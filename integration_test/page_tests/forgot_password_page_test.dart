@@ -48,6 +48,7 @@ Future<void> main() async {
     await tester.pumpAndSettle();
     await tester.tap(sendPwdBtn);
     await tester.pumpAndSettle();
+
     /*
       Now the user should be redirected to the the page where they can enter the code
       received in email

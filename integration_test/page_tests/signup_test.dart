@@ -16,13 +16,19 @@ Future<void> main() async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final users = db.collection('users');
 
-  final SignupViewModel signupViewModel = SignupViewModel(
-    signupRepository: SignupRepository(commononService: CommonService()),
-    emailRepository: EmailRepository()
-  );
-
   testWidgets('Sign up test with Firestore', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: SignupPage(viewModel: signupViewModel,)));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SignupPage(
+          viewModel:SignupViewModel(
+            signupRepository: SignupRepository(
+              commononService: CommonService()
+            ),
+            emailRepository: EmailRepository()
+          )
+        )
+      )
+    );
     final signupBtn = find.widgetWithText(FilledButton, 'Sign up');
 
     List<Finder> fields = [];
@@ -71,7 +77,18 @@ Future<void> main() async {
   });
 
   testWidgets("Signup page test for login navigation", (WidgetTester tester) async {
-    await tester.pumpWidget(MaterialApp(home: SignupPage(viewModel: signupViewModel,)));
+    await tester.pumpWidget(
+      MaterialApp(
+        home: SignupPage(
+          viewModel:SignupViewModel(
+            signupRepository: SignupRepository(
+              commononService: CommonService()
+            ),
+            emailRepository: EmailRepository()
+          )
+        )
+      )
+    );
     final loginBtn = find.widgetWithText(TextButton, consts.SignupConsts.accountExistsText); 
     await tester.tap(loginBtn);
     await tester.pumpAndSettle();

@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'package:gym_buddy/data/repository/email_repository.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
@@ -47,19 +48,25 @@ class ForgotPassViewModel extends ChangeNotifier {
       );
 
       // Send temporary password to user's email address
-      await _emailRepository.sendEmail(
-        from: GlobalConsts.infoEmail,
-        to: email,
-        template: tempPassEmail
-      );
+      try {
+        await _emailRepository.sendEmail(
+          from: GlobalConsts.infoEmail,
+          to: email,
+          template: tempPassEmail
+        );
 
-      // Set temporary password in db
-      await _forgotPassRepository.setTempPass(userID: userID, tempPass: tempPass);
+        // Set temporary password in db
+        await _forgotPassRepository.setTempPass(userID: userID, tempPass: tempPass);
 
-      // Redirect to a new page when user has to enter the code in the email
-      userDataEnterCode = userData;
-      emailEnterCode = email;
-      pageTransition.value = PageTransition.goToNextPage;
+        // Redirect to a new page when user has to enter the code in the email
+        userDataEnterCode = userData;
+        emailEnterCode = email;
+        pageTransition.value = PageTransition.goToNextPage;
+      } catch (error) {
+        log("sendPassword(): $error");
+        forgotPassStatus.value = GlobalConsts.unknownErrorText;
+        notifyListeners();
+      }
     }
   }
 
