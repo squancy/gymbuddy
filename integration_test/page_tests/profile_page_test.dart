@@ -9,10 +9,10 @@ import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:image_fade/image_fade.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_buddy/utils/post_builder.dart' as post_builder;
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:gym_buddy/utils/time_ago_format.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/ui/post_builder/view_models/post_builder_view_model.dart';
 
 Future<void> main() async {
   final CommonRepository commonRepo = CommonRepository();
@@ -329,7 +329,7 @@ Future<void> main() async {
           expect(elTxt, findsOneWidget);
           
           if (el == 'gym' || el == 'when' || el == 'day_type') {
-            final fieldIconData = post_builder.getPostIcon(el);
+            final fieldIconData = PostBuilderViewModel().getPostIcon(el);
             final icon = find.descendant(
               of: postToFind,
               matching: find.byIcon(fieldIconData)

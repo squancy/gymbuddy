@@ -4,7 +4,6 @@ import 'consts/common_consts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'utils/post_builder.dart' as post_builder;
 import 'package:image_fade/image_fade.dart';
 import 'consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/mocks.dart';
@@ -13,6 +12,8 @@ import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
 import 'package:gym_buddy/data/repository/core/upload_image_repository.dart';
 import 'package:gym_buddy/ui/core/common_ui.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/data/repository/post_builder/post_builder_repository.dart';
+import 'package:gym_buddy/ui/post_builder/widgets/post_builder_screen.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance; 
 final storageRef = FirebaseStorage.instance.ref();
@@ -406,7 +407,7 @@ class _ProfilePageState extends State<ProfilePage> {
       print(e);
       return [];
     }
-    _res += (await post_builder.createDataForPosts(userPostDocs));
+    _res += (await PostBuilderRepository().createDataForPosts(userPostDocs));
     return _res;
   }
 
@@ -655,7 +656,10 @@ class _ProfilePageState extends State<ProfilePage> {
                     if (snapshot.hasData && snapshot.data != null) {
                       for (final post in snapshot.data!) {
                         posts.add(
-                          post_builder.postBuilder(post, DisplayUsername.uname, context)
+                          PostBuilder(
+                            post: post,
+                            displayUsername: DisplayUsername.uname
+                          )
                         );
                       }
                       return Column(
