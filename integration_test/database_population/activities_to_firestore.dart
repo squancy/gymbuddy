@@ -1,17 +1,17 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:integration_test/integration_test.dart';
 import 'package:uuid/uuid.dart';
-import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/consts/common_consts.dart';
 
 // Import potential activities to the database
 
 void main() async {
   test('Push activities to database', () async {
     IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    await helpers.firebaseInit(test: true); // set it to false when pushing to the live database
+    await CommonRepository().firebaseInit(test: GlobalConsts.test); 
     final FirebaseFirestore db = FirebaseFirestore.instance;
     final actDocRef = db.collection('activities');
     
@@ -23,7 +23,7 @@ void main() async {
     int batchSize = 200;
     WriteBatch batch = db.batch();
 
-    for (final el in consts.GlobalConsts.activities) {
+    for (final el in GlobalConsts.activities) {
       count++;
       String actID = uuid.v4();
       final acts = actDocRef.doc(actID);

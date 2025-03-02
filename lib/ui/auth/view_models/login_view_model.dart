@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/data/repository/login_repository.dart';
-import 'package:gym_buddy/utils/helpers.dart' show getActivitiesAndGyms;
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class LoginViewModel extends ChangeNotifier {
   LoginViewModel({
@@ -42,7 +42,7 @@ class LoginViewModel extends ChangeNotifier {
       }
 
       await _signupRepository.setUserState(userID: userID, loggedIn: true);
-      actsAndGyms = await getActivitiesAndGyms();
+      actsAndGyms = await CommonRepository().getActivitiesAndGyms();
       pageTransition.value = PageTransition.goToNextPage;
     } catch (error) {
       log("login(): $error");

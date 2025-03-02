@@ -2,7 +2,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class WelcomePageViewModel extends ChangeNotifier {
   WelcomePageViewModel();
@@ -20,7 +20,7 @@ class WelcomePageViewModel extends ChangeNotifier {
         loggedIn = false;
       }
 
-      final ActGymRecord actAndGyms = await helpers.getActivitiesAndGyms();
+      final ActGymRecord actAndGyms = await CommonRepository().getActivitiesAndGyms();
       preloadedData.value = (
         activities: actAndGyms.activities,
         gyms: actAndGyms.gyms, loggedIn :loggedIn

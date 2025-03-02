@@ -3,7 +3,6 @@ import 'package:animated_custom_dropdown/custom_dropdown.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart' as datepicker;
 import 'package:intl/intl.dart';
 import 'package:moye/moye.dart';
@@ -253,7 +252,7 @@ class _PostPageState extends State<PostPage> {
                       // Show selected images
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
-                        child: helpers.HorizontalImageViewer(
+                        child: HorizontalImageViewer(
                           showImages: widget.viewModel.showImages,
                           images: widget.viewModel.selectedImages,
                           isPost: true
@@ -263,7 +262,7 @@ class _PostPageState extends State<PostPage> {
                         padding: const EdgeInsets.fromLTRB(0, 10, 0, 10),
                         child: SizedBox(
                           height: 45,
-                          child: helpers.ProgressBtn(
+                          child: ProgressBtn(
                             key: const Key('postBtn'),
                             onPressedFn: () {
                               return widget.viewModel.createNewPost(

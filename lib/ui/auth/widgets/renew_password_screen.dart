@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:gym_buddy/data/repository/login_repository.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class RenewPasswordPage extends StatefulWidget {
   final String userID;
@@ -98,7 +98,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
+                        child: BlackTextfield(
                           context,
                           SignupConsts.passwordText, 
                           widget.viewModel.passwordController,
@@ -109,7 +109,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                       ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
+                        child: BlackTextfield(
                           context,
                           SignupConsts.passwordConfText, 
                           widget.viewModel.passwordConfController,
@@ -124,7 +124,7 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
                           children: [
                             SizedBox(
                               height: 45,
-                              child: helpers.ProgressBtn(
+                              child: ProgressBtn(
                                 onPressedFn: () {
                                   return widget.viewModel.checkPassword(widget.userID);
                                 },

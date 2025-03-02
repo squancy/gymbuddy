@@ -1,5 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class PostPageRepository {
   PostPageRepository();
@@ -17,7 +17,7 @@ class PostPageRepository {
   }) async {
     final postsDocRef = _db.collection('posts').doc(postID);
     final data = {
-      'author': await helpers.getUserID(),
+      'author': await CommonRepository().getUserID(),
       'content': postText,
       'day_type': dayType,
       'gym': gymID,

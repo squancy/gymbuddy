@@ -5,10 +5,10 @@ import 'package:gym_buddy/data/repository/enter_code_repository.dart';
 import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/ui/auth/widgets/enter_code_screen.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({
@@ -95,7 +95,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: helpers.BlackTextfield(
+                    child: BlackTextfield(
                       context,
                       'Email',
                       widget.viewModel.emailController,
@@ -108,7 +108,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: SizedBox(
                       height: 45,
-                      child: helpers.ProgressBtn(
+                      child: ProgressBtn(
                         onPressedFn: widget.viewModel.sendPassword,
                         child: Text('Send password')
                       )

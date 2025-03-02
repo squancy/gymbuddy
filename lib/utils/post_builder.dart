@@ -2,10 +2,11 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:image_fade/image_fade.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/material.dart';
-import 'helpers.dart' as helpers;
 import 'time_ago_format.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:timeago/timeago.dart' as timeago;
+import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 IconData getPostIcon(String field) {
   switch (field) {
@@ -47,7 +48,7 @@ Widget buildInfoPart(field, post, context) {
 Future<List<Map<String, dynamic>>> createDataForPosts(List<QueryDocumentSnapshot<Map<String, dynamic>>> userPostDocs) async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   List<Map<String, dynamic>> res = [];
-  String? userID = await helpers.getUserID();
+  String? userID = await CommonRepository().getUserID();
   var userData = (await db.collection('user_settings').doc(userID).get()).data();
   for (final post in userPostDocs) {
     Map<String, dynamic> data = post.data();
@@ -92,7 +93,7 @@ Widget postBuilder(post, displayUsername, context) {
               },
             ) : ClipOval(
               child: ImageFade(
-                placeholder: helpers.ProfilePicPlaceholder(radius: 20,),
+                placeholder: ProfilePicPlaceholder(radius: 20,),
                 image: NetworkImage(post['author_profile_pic_url']),
                 height: 40,
                 width: 40,
@@ -153,7 +154,7 @@ Widget postBuilder(post, displayUsername, context) {
       ),
       post['download_url_list'].isEmpty ? Container() : Padding(
         padding: const EdgeInsets.fromLTRB(20, 10, 20, 20),
-        child: helpers.HorizontalImageViewer(
+        child: HorizontalImageViewer(
           showImages: true,
           images: post['download_url_list'],
           isPost: false,

@@ -2,16 +2,16 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
-import 'package:gym_buddy/consts/common_consts.dart' as consts;
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
 import 'package:gym_buddy/data/repository/email_repository.dart';
 import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  await helpers.firebaseInit(test: true);
+  await CommonRepository().firebaseInit(test: GlobalConsts.test);
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   testWidgets('Forgot password page testing (also other pages that are related)', (tester) async {
@@ -27,7 +27,7 @@ Future<void> main() async {
 
     final sendPwdBtn = find.widgetWithText(
       FilledButton,
-      consts.ForgotPasswordConsts.sendBtnText
+      ForgotPasswordConsts.sendBtnText
     );
 
     final emailField = find.ancestor(
@@ -40,7 +40,7 @@ Future<void> main() async {
     await tester.pumpAndSettle();
     await tester.tap(sendPwdBtn);
     await tester.pumpAndSettle();
-    expect(find.text(consts.ForgotPasswordConsts.userNotExistsText), findsOneWidget);
+    expect(find.text(ForgotPasswordConsts.userNotExistsText), findsOneWidget);
 
     // Email in firestore
     await tester.tap(emailField);
@@ -58,9 +58,9 @@ Future<void> main() async {
 
     // Make sure the widgets appear on the screen
     // With this page transition is also tested implicitly
-    final mainText = find.text(consts.ForgotPasswordConsts.codePageMainText);
+    final mainText = find.text(ForgotPasswordConsts.codePageMainText);
     expect(mainText, findsOneWidget);
-    final infoText = find.text(consts.ForgotPasswordConsts.codePageInfoText);
+    final infoText = find.text(ForgotPasswordConsts.codePageInfoText);
     expect(infoText, findsOneWidget);
     final codeField = find.ancestor(
       of: find.text('Code'),
@@ -80,7 +80,7 @@ Future<void> main() async {
     await tester.pumpAndSettle();
     await tester.tap(confirmBtn);
     await tester.pumpAndSettle();
-    expect(find.text(consts.ForgotPasswordConsts.codePageErrorText), findsOneWidget);
+    expect(find.text(ForgotPasswordConsts.codePageErrorText), findsOneWidget);
 
     // Tapping the resend code button while still in coundown phase should not send an email
     await tester.tap(resendBtn);
@@ -111,9 +111,9 @@ Future<void> main() async {
     await tester.pumpAndSettle();
 
     // Now the user should be on the page where they can set a new password
-    final setPwdText = find.text(consts.ForgotPasswordConsts.createNewPassText);
+    final setPwdText = find.text(ForgotPasswordConsts.createNewPassText);
     expect(setPwdText, findsOneWidget);
-    final subText = find.text(consts.ForgotPasswordConsts.renewPasswordInfoText);
+    final subText = find.text(ForgotPasswordConsts.renewPasswordInfoText);
     expect(subText, findsOneWidget);
     final passwordField = find.ancestor(
       of: find.text('Password'),
@@ -138,21 +138,21 @@ Future<void> main() async {
     await tester.pumpAndSettle();
     await tester.tap(updatePassBtn);
     await tester.pumpAndSettle();
-    expect(find.text(consts.SignupConsts.allFieldsText), findsOneWidget);
+    expect(find.text(SignupConsts.allFieldsText), findsOneWidget);
     await tester.tap(confPasswordField); 
     await tester.pumpAndSettle();
     await tester.enterText(confPasswordField, 'def');
     await tester.pumpAndSettle();
     await tester.tap(updatePassBtn);
     await tester.pumpAndSettle();
-    expect(find.text(consts.SignupConsts.passwordMismatchText), findsOneWidget);
+    expect(find.text(SignupConsts.passwordMismatchText), findsOneWidget);
     await tester.tap(confPasswordField); 
     await tester.pumpAndSettle();
     await tester.enterText(confPasswordField, 'asd');
     await tester.pumpAndSettle();
     await tester.tap(updatePassBtn);
     await tester.pumpAndSettle();
-    expect(find.text(consts.SignupConsts.passwordLengthText), findsOneWidget);
+    expect(find.text(SignupConsts.passwordLengthText), findsOneWidget);
     await tester.tap(passwordField); 
     await tester.pumpAndSettle();
     await tester.enterText(passwordField, 'newpassword');
@@ -177,7 +177,7 @@ Future<void> main() async {
 
     final logInBtn = find.widgetWithText(
       FilledButton,
-      consts.LoginConsts.appBarText
+      LoginConsts.appBarText
     );
 
     await tester.enterText(loginEmailField, correctEmail);

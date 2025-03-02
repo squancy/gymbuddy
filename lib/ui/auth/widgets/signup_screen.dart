@@ -8,6 +8,7 @@ import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/data/repository/login_repository.dart';
 import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({
@@ -84,7 +85,7 @@ class _SignupPageState extends State<SignupPage> {
                       // Username textfield
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
+                        child: BlackTextfield(
                           context,
                           SignupConsts.usernameText, 
                           widget.viewModel.usernameController,
@@ -96,7 +97,7 @@ class _SignupPageState extends State<SignupPage> {
                       // Email textfield
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
+                        child: BlackTextfield(
                           context,
                           SignupConsts.emailText,
                           widget.viewModel.emailController,
@@ -108,7 +109,7 @@ class _SignupPageState extends State<SignupPage> {
                       // Password textfield
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        child: helpers.BlackTextfield(
+                        child: BlackTextfield(
                           context,
                           SignupConsts.passwordText,
                           widget.viewModel.passwordController,
@@ -124,7 +125,7 @@ class _SignupPageState extends State<SignupPage> {
                           children: [
                             SizedBox(
                               height: 45,
-                              child: helpers.ProgressBtn(
+                              child: ProgressBtn(
                                 onPressedFn: widget.viewModel.signup,
                                 child: Text(SignupConsts.appBarText), 
                               ),

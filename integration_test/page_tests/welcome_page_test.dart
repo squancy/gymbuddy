@@ -2,13 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:integration_test/integration_test.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
 import 'package:gym_buddy/ui/main/widgets/welcome_page_screen.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  await helpers.firebaseInit(test: true);
+  await CommonRepository().firebaseInit(test: true);
   group("Welcome page testing", () {
     testWidgets('Welcomepage test for login navigation', (WidgetTester tester) async {
       await tester.pumpWidget(

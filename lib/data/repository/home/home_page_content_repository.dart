@@ -1,7 +1,8 @@
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/service/common_service.dart';
 
 class HomePageContentRepository {
   HomePageContentRepository();
@@ -11,8 +12,8 @@ class HomePageContentRepository {
   Future<Object> fetchPosts() async {
     // First get the geoloc of the user (if possible) and update it in db
     // TODO: finish function
-    Position? geoloc = await helpers.getGeolocation(); 
-    String? userID = await helpers.getUserID(); 
+    Position? geoloc = await CommonService().getGeolocation(); 
+    String? userID = await CommonRepository().getUserID(); 
     if (geoloc != null) {
       final geoPoint = GeoFirePoint(GeoPoint(geoloc.latitude, geoloc.longitude));
       _db.collection('users').doc(userID).update({'geoloc': geoPoint.data}); 

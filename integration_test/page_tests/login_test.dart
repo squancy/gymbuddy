@@ -1,19 +1,18 @@
-import 'package:gym_buddy/handlers/handle_login.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
-import 'package:gym_buddy/consts/common_consts.dart' as consts;
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/data/repository/login_repository.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  await helpers.firebaseInit(test: true);
+  await CommonRepository().firebaseInit(test: GlobalConsts.test);
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   testWidgets('Log in page testing with Firestore', (tester) async {
@@ -26,7 +25,7 @@ Future<void> main() async {
       )
     )));
 
-    final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
+    final loginBtn = find.widgetWithText(FilledButton, LoginConsts.appBarText);
     List<Finder> fields = [];
     for (final labelName in ['Email', 'Password']) {
       final labelField = find.ancestor(
@@ -46,8 +45,10 @@ Future<void> main() async {
         await tester.enterText(fields[1], passwords[j]);
         await tester.tap(loginBtn);
         await tester.pumpAndSettle();
-        CheckLogin cp = CheckLogin(emails[i], passwords[j]);
-        (bool, String, String) res = await cp.validateLogin();
+        (bool, String, String) res = await LoginRepository().validateLogin(
+          email: emails[i],
+          password: passwords[j]
+        );
         if (i == 1 && j == 1) {
           final user = (await db.collection('users').where('email', isEqualTo: emails[i])
             .get())
@@ -56,8 +57,8 @@ Future<void> main() async {
           expect(res, (true, '', user['id']));
           expect(find.byKey(Key('homepage')), findsOneWidget);
         } else {
-          expect(res, (false, consts.ForgotPasswordConsts.wrongCredentialsText, ''));
-          expect(find.text(consts.ForgotPasswordConsts.wrongCredentialsText), findsOneWidget);
+          expect(res, (false, ForgotPasswordConsts.wrongCredentialsText, ''));
+          expect(find.text(ForgotPasswordConsts.wrongCredentialsText), findsOneWidget);
         }
       }
     }
@@ -72,7 +73,7 @@ Future<void> main() async {
           )
         )
       )));
-      final loginBtn = find.widgetWithText(FilledButton, consts.LoginConsts.appBarText);
+      final loginBtn = find.widgetWithText(FilledButton, LoginConsts.appBarText);
       List<Finder> fields = [];
       for (final labelName in ['Email', 'Password']) {
         final labelField = find.ancestor(
@@ -102,7 +103,7 @@ Future<void> main() async {
         )
       )));
       await tester.pumpAndSettle();
-      final forgotPasswordBtn = find.widgetWithText(TextButton, consts.LoginConsts.forgotPasswordText);
+      final forgotPasswordBtn = find.widgetWithText(TextButton, LoginConsts.forgotPasswordText);
       await tester.tap(forgotPasswordBtn);
       await tester.pumpAndSettle();
       expect(find.byKey(Key("forgotPasswordPage")), findsOneWidget);

@@ -5,7 +5,7 @@ import 'package:email_validator/email_validator.dart';
 import 'package:gym_buddy/data/repository/signup_repository.dart';
 import 'package:gym_buddy/data/repository/email_repository.dart';
 import 'package:gym_buddy/consts/email_templates.dart';
-import 'package:gym_buddy/utils/helpers.dart' show getActivitiesAndGyms;
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class SignupViewModel extends ChangeNotifier {
   SignupViewModel({
@@ -29,7 +29,7 @@ class SignupViewModel extends ChangeNotifier {
   late ActGymRecord actsAndGyms;
   ValueNotifier<PageTransition> pageTransition = ValueNotifier(PageTransition.stayOnPage);
 
-  (bool isValid, String errorMsg) _isValidParams({
+  (bool isValid, String errorMsg) isValidParams({
     required String username,
     required String email,
     required String password
@@ -60,7 +60,7 @@ class SignupViewModel extends ChangeNotifier {
       }
 
       // Validate data for signup
-      var (bool isValid, String errorMsg) = _isValidParams(
+      var (bool isValid, String errorMsg) = isValidParams(
         username: username, email: email, password: password
       );
       if (!isValid) {
@@ -101,7 +101,7 @@ class SignupViewModel extends ChangeNotifier {
 
       await _signupRepository.setUserState(userID: userID, loggedIn: true);
 
-      actsAndGyms = await getActivitiesAndGyms();
+      actsAndGyms = await CommonRepository().getActivitiesAndGyms();
 
       pageTransition.value = PageTransition.goToNextPage;
     } catch (error) {

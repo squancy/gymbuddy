@@ -4,7 +4,6 @@ import 'consts/common_consts.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
-import 'utils/helpers.dart' as helpers;
 import 'utils/post_builder.dart' as post_builder;
 import 'package:image_fade/image_fade.dart';
 import 'consts/common_consts.dart' as consts;
@@ -13,9 +12,11 @@ import 'package:gym_buddy/ui/main/widgets/welcome_page_screen.dart';
 import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
 import 'package:gym_buddy/data/repository/core/upload_image_repository.dart';
 import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance; 
 final storageRef = FirebaseStorage.instance.ref();
+final CommonRepository commonRepo = CommonRepository();
 
 /// Save the new data to the db
 Future<void> _saveNewData(String newData, int maxLen, String fieldName, {required bool isBio}) async {
@@ -23,7 +24,7 @@ Future<void> _saveNewData(String newData, int maxLen, String fieldName, {require
     return;
   }
 
-  final userID = await helpers.getUserID();
+  final userID = await commonRepo.getUserID();
   final settingsDocRef = db.collection('user_settings').doc(userID);
 
   try {
@@ -248,7 +249,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   /// Select an image from the gallery or camera
   void _selectFromSource(ImageSource sourceType) async {
     final pickedFile = await _picker.pickImage(source: sourceType);
-    final userID = await helpers.getUserID();
+    final userID = await commonRepo.getUserID();
     if (pickedFile != null) {
       _uploadPic(File(pickedFile.path), userID);
     }
@@ -264,7 +265,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   /// Image selection mock (select default profile pic)
   void _selectFromSourceMock(ImageSource sourceType) async {
     File file = await getDefaultProfilePicAsFile();
-    _uploadPic(file, await helpers.getUserID());
+    _uploadPic(file, await commonRepo.getUserID());
     setState(() {
       _image = file;
       _showFile = true;
@@ -273,7 +274,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
 
   /// Get the profile picture URL
   Future<String> _getProfilePicURL() async {
-    final userID = await helpers.getUserID();
+    final userID = await commonRepo.getUserID();
     final settingsDocRef = db.collection('user_settings').doc(userID);
     final usettings = await settingsDocRef.get();
     final userSettings = usettings.data() as Map<String, dynamic>;
@@ -336,7 +337,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
             ),
           );
         } else {
-          return helpers.ProfilePicPlaceholder(radius: 40,);
+          return ProfilePicPlaceholder(radius: 40,);
         }
       }
     );
@@ -386,7 +387,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// Get the posts by the user from db
   Future<List<Map<String, dynamic>>> _getPostsByUser() async {
     if (_lastVisible == null) return [];
-    String? userID = await helpers.getUserID();
+    String? userID = await commonRepo.getUserID();
     List<QueryDocumentSnapshot<Map<String, dynamic>>> userPostDocs;
     try {
       var userPosts = await db.collection('posts')
@@ -422,7 +423,7 @@ class _ProfilePageState extends State<ProfilePage> {
   /// Get the user data from db
   Future<Map<String, dynamic>> _getUserData() async {
     // First get the ID of the user currently logged in 
-    final userID = await helpers.getUserID();
+    final userID = await commonRepo.getUserID();
     final users = db.collection('users');
     final settingsDocRef = db.collection('user_settings').doc(userID);
     _totalNumberOfPosts = (await db.collection('posts')
@@ -572,7 +573,7 @@ class _ProfilePageState extends State<ProfilePage> {
                               SizedBox(height: 10,),
                               GestureDetector(
                                 onTap: () async {
-                                  await helpers.logout();
+                                  await commonRepo.logout();
                                   setState(() {
                                     Navigator.of(context).pushAndRemoveUntil(
                                       MaterialPageRoute(

@@ -1,4 +1,3 @@
-import 'package:gym_buddy/handlers/handle_signup.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
@@ -17,6 +16,10 @@ void main() {
   /// Sign up logic test START
   group('Test the validity of username, email and password fields on the sign up page', () {
     group('If any field is empty return false', () {
+      /*
+        The last element in the tuples was the password confirmation.
+        Currently, it is not used but is kept for now.
+      */
       List<dynamic> emptyTestcases = [
         ('', '', '', ''),
         ('testusername', '', '', ''),
@@ -37,15 +40,21 @@ void main() {
 
       for (final testcase in emptyTestcases) {
         test('Some of the fields are empty', () {
-          final t = ValidateSignup(testcase.$1, testcase.$2, testcase.$3, testcase.$4);      
-          final v = t.isValidParams();
+          final v = signupViewModel.isValidParams(
+            username: testcase.$1,
+            email: testcase.$2,
+            password: testcase.$2
+          );
           expect(v, (false, SignupConsts.allFieldsText));
         });
       }
     });
     test(SignupConsts.usernameTooLongText, () {
-      final t = ValidateSignup('a' * (ValidateSignupConsts.maxUsernameLength + 1), 'testemail@test.com', 'password', 'password');
-      final v = t.isValidParams();
+      final v = signupViewModel.isValidParams(
+        username: 'a' * (ValidateSignupConsts.maxUsernameLength + 1),
+        email: 'testemail@test.com',
+        password: 'password'
+      );
       expect(v, (false, SignupConsts.usernameTooLongText));
     });
 
@@ -58,33 +67,48 @@ void main() {
 
     for (final testcase in invalidEmails) {
       test('Invalid emails', () {
-        final t = ValidateSignup(testcase.$1, testcase.$2, testcase.$3, testcase.$4);      
-        final v = t.isValidParams();
+        final v = signupViewModel.isValidParams(
+          username: testcase.$1,
+          email: testcase.$2,
+          password: testcase.$3
+        );      
         expect(v, (false, SignupConsts.invalidEmailText));
       });
     }
 
     test('Password length < ${ValidateSignupConsts.maxPasswordLength}', () {
-      final t = ValidateSignup('testusername', 'testemail@test.com', 'asd', 'asd');      
-      final v = t.isValidParams();
+      final v = signupViewModel.isValidParams(
+        username: 'testusername',
+        email: 'testemail@test.com',
+        password: 'asd'
+      );      
       expect(v, (false, SignupConsts.passwordLengthText));
     });
 
     test(SignupConsts.invalidUsernameText, () {
-      final t = ValidateSignup('hey(=)', 'testemail@test.com', 'password', 'password');      
-      final v = t.isValidParams();
+      final v = signupViewModel.isValidParams(
+        username: 'hey(=)',
+        email: 'testemail@test.com',
+        password: 'password'
+      );      
       expect(v, (false, SignupConsts.invalidUsernameText));
     });
 
+    // Old code, currently not used
+    /*
     test(SignupConsts.passwordMismatchText, () {
       final t = ValidateSignup('testusername', 'testemail@test.com', 'password1', 'password2');      
       final v = t.isValidParams();
       expect(v, (false, SignupConsts.passwordMismatchText));
     });
+    */
 
     test('All parameters are valid', () {
-      final t = ValidateSignup('testusername', 'testemail@test.com', 'password', 'password');      
-      final v = t.isValidParams();
+      final v = signupViewModel.isValidParams(
+        username: 'testusername',
+        email: 'testemail@test.com',
+        password: 'password'
+      );
       expect(v, (true, ''));
     });
   });

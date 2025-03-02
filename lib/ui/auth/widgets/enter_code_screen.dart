@@ -2,12 +2,12 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:timer_button/timer_button.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/renew_password_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
 import 'package:gym_buddy/data/repository/renew_password_repository.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class EnterCodePage extends StatefulWidget {
   const EnterCodePage({
@@ -98,7 +98,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: helpers.BlackTextfield(
+                    child: BlackTextfield(
                       context,
                       'Code',
                       widget.viewModel.codeController,
@@ -111,7 +111,7 @@ class _EnterCodePageState extends State<EnterCodePage> {
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                     child: SizedBox(
                       height: 45,
-                      child: helpers.ProgressBtn(
+                      child: ProgressBtn(
                         onPressedFn: () {
                           return widget.viewModel.checkCode(
                             email: widget.email,

@@ -7,6 +7,7 @@ import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
+import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -76,7 +77,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Padding( 
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: helpers.BlackTextfield(
+                    child: BlackTextfield(
                       context,
                       'Email',
                       widget.viewModel.emailController,
@@ -87,7 +88,7 @@ class _LoginPageState extends State<LoginPage> {
                   ),
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                    child: helpers.BlackTextfield(
+                    child: BlackTextfield(
                       context,
                       'Password',
                       widget.viewModel.passwordController,
@@ -102,7 +103,7 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: SizedBox(
                           height: 45,
-                          child: helpers.ProgressBtn(
+                          child: ProgressBtn(
                             onPressedFn: widget.viewModel.login,
                             child: Text(LoginConsts.appBarText)
                           )
