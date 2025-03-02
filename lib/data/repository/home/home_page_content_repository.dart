@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
-import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/data/service/common_service.dart';
 
 class HomePageContentRepository {
   HomePageContentRepository();

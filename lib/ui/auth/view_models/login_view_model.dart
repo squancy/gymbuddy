@@ -1,8 +1,8 @@
 import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
-import 'package:gym_buddy/data/repository/signup_repository.dart';
-import 'package:gym_buddy/data/repository/login_repository.dart';
+import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
+import 'package:gym_buddy/data/repository/auth/login_repository.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class LoginViewModel extends ChangeNotifier {

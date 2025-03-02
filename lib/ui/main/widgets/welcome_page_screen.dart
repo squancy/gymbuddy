@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/data/repository/email_repository.dart';
-import 'package:gym_buddy/data/repository/login_repository.dart';
-import 'package:gym_buddy/data/repository/signup_repository.dart';
-import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/data/repository/auth/email_repository.dart';
+import 'package:gym_buddy/data/repository/auth/login_repository.dart';
+import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
+import 'package:gym_buddy/data/service/common_service.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';

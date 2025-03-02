@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
-import 'package:gym_buddy/data/repository/email_repository.dart';
-import 'package:gym_buddy/data/repository/enter_code_repository.dart';
-import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
+import 'package:gym_buddy/data/repository/auth/email_repository.dart';
+import 'package:gym_buddy/data/repository/auth/enter_code_repository.dart';
+import 'package:gym_buddy/data/repository/auth/forgot_pass_repository.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';

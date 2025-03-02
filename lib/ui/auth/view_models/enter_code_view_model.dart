@@ -2,9 +2,9 @@ import 'dart:developer';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
-import 'package:gym_buddy/data/repository/email_repository.dart';
-import 'package:gym_buddy/data/repository/enter_code_repository.dart';
-import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
+import 'package:gym_buddy/data/repository/auth/email_repository.dart';
+import 'package:gym_buddy/data/repository/auth/enter_code_repository.dart';
+import 'package:gym_buddy/data/repository/auth/forgot_pass_repository.dart';
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' show generateRandomString;
 import 'package:gym_buddy/consts/email_templates.dart';
 

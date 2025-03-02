@@ -2,7 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:dbcrypt/dbcrypt.dart';
-import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/data/service/common_service.dart';
 import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:uuid/uuid.dart';
 import 'package:shared_preferences/shared_preferences.dart';

@@ -3,9 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
-import 'package:gym_buddy/data/repository/signup_repository.dart';
-import 'package:gym_buddy/data/repository/login_repository.dart';
-import 'package:gym_buddy/service/common_service.dart';
+import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
+import 'package:gym_buddy/data/repository/auth/login_repository.dart';
+import 'package:gym_buddy/data/service/common_service.dart';
 
 void main() {
   testWidgets('Login page UI testing', (tester) async {

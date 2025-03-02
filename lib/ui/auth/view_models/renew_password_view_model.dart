@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:dbcrypt/dbcrypt.dart';
-import 'package:gym_buddy/data/repository/renew_password_repository.dart';
+import 'package:gym_buddy/data/repository/auth/renew_password_repository.dart';
 
 class RenewPasswordViewModel extends ChangeNotifier {
   RenewPasswordViewModel({

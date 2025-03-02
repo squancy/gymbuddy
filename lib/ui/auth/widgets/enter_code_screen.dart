@@ -6,7 +6,7 @@ import 'package:timer_button/timer_button.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/renew_password_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
-import 'package:gym_buddy/data/repository/renew_password_repository.dart';
+import 'package:gym_buddy/data/repository/auth/renew_password_repository.dart';
 import 'package:gym_buddy/ui/core/common_ui.dart';
 
 class EnterCodePage extends StatefulWidget {
