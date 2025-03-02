@@ -4,7 +4,6 @@ import 'package:gym_buddy/data/repository/email_repository.dart';
 import 'package:gym_buddy/data/repository/forgot_pass_repository.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
 import 'package:gym_buddy/ui/core/common_ui.dart';
@@ -34,7 +33,7 @@ class _LoginPageState extends State<LoginPage> {
   void _handlePageTransition() {
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
     Navigator.of(context).pushAndRemoveUntil(
-      helpers.homePageRoute(widget.viewModel.actsAndGyms),
+      homePageRoute(widget.viewModel.actsAndGyms),
       (Route<dynamic> route) => false,
     );
   }

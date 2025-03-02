@@ -4,6 +4,18 @@ import 'package:image_picker/image_picker.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:image_fade/image_fade.dart';
 import 'dart:io';
+import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
+import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
+
+MaterialPageRoute<dynamic> homePageRoute(ActGymRecord actsAndGyms) {
+  return MaterialPageRoute(
+    builder: (context) => HomePage(
+      postPageActs: actsAndGyms.activities,
+      postPageGyms: actsAndGyms.gyms,
+      viewModel: HomePageViewModel(),
+    ),
+  );
+}
 
 class MainButton extends StatelessWidget {
   const MainButton({

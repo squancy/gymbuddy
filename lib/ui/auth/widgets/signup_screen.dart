@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
 import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
@@ -35,7 +34,7 @@ class _SignupPageState extends State<SignupPage> {
   void _handlePageTransition() {
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
     Navigator.of(context).pushAndRemoveUntil(
-      helpers.homePageRoute(widget.viewModel.actsAndGyms),
+      homePageRoute(widget.viewModel.actsAndGyms),
       (Route<dynamic> route) => false,
     );
   }
