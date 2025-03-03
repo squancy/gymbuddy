@@ -11,6 +11,7 @@ windows/
 .dart_tool/
 devtools_options.yaml
 storage.rules
+lib/auth/*
 
 .firebaserc
 .metadata

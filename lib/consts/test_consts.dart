@@ -27,7 +27,7 @@ class _User {
 
 final user1 = _User(
   username: 'test',
-  email: 'test@exmaple.com',
+  email: 'test@example.com',
   password: 'asdasd',
   userID: 'b727fd96-f618-4121-b875-e5fb74539034',
   bio: 'test',

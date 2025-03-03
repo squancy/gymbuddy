@@ -3,46 +3,50 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
 import 'package:gym_buddy/profile_page.dart';
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:image_fade/image_fade.dart';
 import 'package:intl/intl.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:gym_buddy/utils/post_builder.dart' as post_builder;
 import 'package:timeago/timeago.dart' as timeago;
 import 'package:gym_buddy/utils/time_ago_format.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/ui/post_builder/view_models/post_builder_view_model.dart';
 
 Future<void> main() async {
+  final CommonRepository commonRepo = CommonRepository();
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  await helpers.firebaseInit(test: true);
+  await commonRepo.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
 
   final newBioTxt = 'new bio';
   final newUnameTxt = 'new display username';
 
   Future<String> getBio() async {
-    return (await db.collection('user_settings').doc(await helpers.getUserID())
+    return (await db.collection('user_settings')
+      .doc(await commonRepo.getUserID())
       .get())
       .data()?['bio'];
   }
 
   Future<String> getDisplayUname() async {
-    return (await db.collection('user_settings').doc(await helpers.getUserID())
+    return (await db.collection('user_settings')
+      .doc(await commonRepo.getUserID())
       .get())
       .data()?['display_username'];
   }
 
   Future<Map<String, dynamic>> getUserData() async {
     final userData = (await db.collection('users')
-      .where('id', isEqualTo: await helpers.getUserID())
+      .where('id', isEqualTo: await commonRepo.getUserID())
       .get())
       .docs
       .toList()[0]
       .data();
     
-    final userSettingsData = (await db.collection('user_settings').doc(await helpers.getUserID())
+    final userSettingsData = (await db.collection('user_settings')
+      .doc(await commonRepo.getUserID())
       .get())
       .data();
     
@@ -268,7 +272,7 @@ Future<void> main() async {
 
     // Get all posts by the user 
     var userPosts = (await db.collection('posts')
-      .where('author', isEqualTo: await helpers.getUserID())
+      .where('author', isEqualTo: await commonRepo.getUserID())
       .orderBy('date', descending: true)
       .get()).docs;
     final postScroll = find.byType(Scrollable).first;
@@ -325,7 +329,7 @@ Future<void> main() async {
           expect(elTxt, findsOneWidget);
           
           if (el == 'gym' || el == 'when' || el == 'day_type') {
-            final fieldIconData = post_builder.getPostIcon(el);
+            final fieldIconData = PostBuilderViewModel().getPostIcon(el);
             final icon = find.descendant(
               of: postToFind,
               matching: find.byIcon(fieldIconData)

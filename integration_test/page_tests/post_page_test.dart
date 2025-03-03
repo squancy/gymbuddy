@@ -2,30 +2,38 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
-import 'package:gym_buddy/post_page.dart';
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
 import 'dart:math';
+import 'package:gym_buddy/data/repository/core/upload_image_repository.dart';
+import 'package:gym_buddy/data/repository/post/post_page_repository.dart';
+import 'package:gym_buddy/ui/post/widgets/post_page_screen.dart';
+import 'package:gym_buddy/ui/post/view_models/post_page_view_model.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+
+final CommonRepository commonRepo = CommonRepository();
 
 String gymToString(Map<String, dynamic> gym) {
   return "${gym[gym.keys.toList()[0]]['name']}\t|\t${gym[gym.keys.toList()[0]]['address']}";
 }
 
-Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> getDBRecord(String postText, String dayType) async {
+Future<List<QueryDocumentSnapshot<Map<String, dynamic>>>> getDBRecord(
+  String postText,
+  String dayType) async {
+  final FirebaseFirestore db = FirebaseFirestore.instance;
   return (await db.collection('posts')
-    .where('author', isEqualTo: await helpers.getUserID())
+    .where('author', isEqualTo: await commonRepo.getUserID())
     .where('day_type', isEqualTo: dayType)
     .where('content', isEqualTo: postText).get()).docs;
 }
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  await helpers.firebaseInit(test: true);
+  await commonRepo.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final random = Random();
   final numOfRandomPosts = 10;
-  final consts.ActGymRecord actsAndGyms = await helpers.getActivitiesAndGyms();
+  final consts.ActGymRecord actsAndGyms = await commonRepo.getActivitiesAndGyms();
 
   testWidgets('Post page testing', (tester) async {
     // Necessary for being able to enterText when not in debug mode 
@@ -38,8 +46,12 @@ Future<void> main() async {
         home: PostPage(
           postPageActs: actsAndGyms.activities,
           postPageGyms: actsAndGyms.gyms,
+          viewModel: PostPageViewModel(
+            postPageRepository: PostPageRepository(),
+            uploadImageRepository: UploadImageRepository()
+          ),
           key: const Key('postPage1'),
-        )
+        ),
       )
     );
     await tester.pumpAndSettle();
@@ -72,7 +84,7 @@ Future<void> main() async {
     await tester.tap(actDD);
     await tester.pumpAndSettle();
     final actScroll = find.byType(Scrollable).first;
-    var activities = await helpers.getAllActivitiesWithoutProps(db.collection('activities'));
+    var activities = await commonRepo.getAllActivitiesWithoutProps(db.collection('activities'));
     activities.sort();
 
     for (final el in activities) {
@@ -88,8 +100,8 @@ Future<void> main() async {
     await tester.pumpAndSettle();
 
     final gymsScroll = find.byType(Scrollable).last;
-    var gyms = (await helpers.getAllGymsWithProps(db.collection('gyms/budapest/gyms')));
-    helpers.sortGymsByName(gyms);
+    var gyms = (await commonRepo.getAllGymsWithProps(db.collection('gyms/budapest/gyms')));
+    commonRepo.sortGymsByName(gyms);
 
     // NOTE: this takes a lot of time to run since it scrolls through thousands of gyms in a dropdown
     for (final el in gyms) {
@@ -119,7 +131,7 @@ Future<void> main() async {
     
     // Make sure the new post is pushed to database
     var post = await db.collection('posts')
-      .where('author', isEqualTo: await helpers.getUserID())
+      .where('author', isEqualTo: await commonRepo.getUserID())
       .where('content', isEqualTo: 'sample post').get();
     expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
 
@@ -238,8 +250,32 @@ Future<void> main() async {
 
     // Random posts
     for (int i = 0; i < numOfRandomPosts; i++){
+      /*
+        Pumping a Container first and then the app again with a different key
+        forces Flutter to rebuild the widget tree AND reset the states
+      */ 
+      await tester.pumpWidget(Container());
+      await tester.pumpAndSettle();
+      await tester.pumpWidget(
+        MaterialApp(
+          home: PostPage(
+            postPageActs: actsAndGyms.activities,
+            postPageGyms: actsAndGyms.gyms,
+            viewModel: PostPageViewModel(
+              postPageRepository: PostPageRepository(),
+              uploadImageRepository: UploadImageRepository()
+            ),
+            key: const Key('postPage2'),
+          ),
+        )
+      );
+      await tester.pumpAndSettle();
+
       // Random string with a few emojis
-      String randomText = '${test_helpers.generateRandomString(random.nextInt(100) + 1)}${test_helpers.generateEmojis()}';
+      String randomText = '${test_helpers.generateRandomString(
+        random.nextInt(100) + 1
+        )}${test_helpers.generateEmojis()
+      }';
 
       // Select an activity from the first few ones to avoid scrolling
       int randomIndex = random.nextInt(5);
@@ -298,30 +334,13 @@ Future<void> main() async {
 
       if (textSelected) {
         final post = await db.collection('posts')
-          .where('author', isEqualTo: await helpers.getUserID())
+          .where('author', isEqualTo: await commonRepo.getUserID())
           .where('content', isEqualTo: randomText).get();
         expect(post.docs.length, 1, reason: "Make sure there is exactly one entry in db");
       } else {
         final errorText = find.text(consts.PostPageConsts.emptyFieldError);
         expect(errorText, findsOneWidget);
       }
-
-      /*
-        Pumping a Container first and then the app again with a different key
-        forces Flutter to rebuild the widget tree AND reset the states
-      */ 
-      await tester.pumpWidget(Container());
-      await tester.pumpAndSettle();
-      await tester.pumpWidget(
-        MaterialApp(
-          home: PostPage(
-            postPageActs: actsAndGyms.activities,
-            postPageGyms: actsAndGyms.gyms,
-            key: const Key('postPage2'),
-          )
-        )
-      );
-      await tester.pumpAndSettle();
     }
   });
 }

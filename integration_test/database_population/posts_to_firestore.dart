@@ -1,22 +1,29 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:gym_buddy/utils/helpers.dart' as helpers;
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:gym_buddy/consts/test_consts.dart' as test_consts;
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
 import 'package:uuid/uuid.dart';
 import 'dart:math';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 // Import posts to the database for testing
 
 void main() async {
+  final CommonRepository commonRepo = CommonRepository();
+
   test('Push posts to database', () async {
     IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-    await helpers.firebaseInit(test: true); // set it to false when pushing to the live database
+    await commonRepo.firebaseInit(test: GlobalConsts.test);
     final FirebaseFirestore db = FirebaseFirestore.instance;
-    final allActivities = await helpers.getAllActivitiesWithoutProps(db.collection('activities'));
-    final allGyms = (await helpers.getAllGymsWithProps(db.collection('gyms/budapest/gyms')))
-      .map((el) => el.keys.toList()[0]).toList();
+    final allActivities = await commonRepo.getAllActivitiesWithoutProps(
+      db.collection('activities')
+    );
+    final allGyms = (await commonRepo.getAllGymsWithProps(
+      db.collection('gyms/budapest/gyms')))
+      .map((el) => el.keys.toList()[0])
+      .toList();
     Random random = Random();
     final uuid = Uuid();
     final numOfRandomUsers = 50;

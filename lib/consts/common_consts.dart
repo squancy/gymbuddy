@@ -21,7 +21,7 @@ class SignupConsts {
   static const String usernameTooLongText = 'Username is too long';
   static const String invalidEmailText = 'Email is invalid';
   static const String passwordMismatchText = 'Password fields do not match';
-  static const String invalidUsernameText = 'Username can only contain alphanumeric characters and _ and .'; 
+  static const String invalidUsernameText = 'Username can only contain alphanumeric characters, _ and .'; 
   static const String emailAddrTakenText = 'This email address is already taken';
   static const String usernameTakenText = 'This username is already taken';
 }
@@ -102,5 +102,24 @@ class GlobalConsts {
   static const String infoEmail = 'info@kagur.com';
 }
 
+class HomePageConsts {
+  static const int cacheSize = 100;
+}
+
 // Typedefs
 typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});
+typedef PreloadedData = ({
+  List<String> activities,
+  List<Map<String, dynamic>> gyms, bool loggedIn
+});
+
+// Enums
+enum PageTransition {
+  stayOnPage,
+  goToNextPage
+}
+
+enum LoadingState {
+  loading,
+  done
+}
