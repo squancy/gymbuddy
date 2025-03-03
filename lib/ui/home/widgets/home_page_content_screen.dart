@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/search/default_search.dart' as default_search;
 import 'package:gym_buddy/ui/home/view_models/home_page_content_view_model.dart';
+import 'package:gym_buddy/ui/post_builder/widgets/post_builder_screen.dart';
+import 'package:gym_buddy/profile_page.dart';
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({
@@ -15,6 +18,15 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
+@override
+void initState() {
+  super.initState();
+  if (!widget.viewModel.dataLoaded) {
+    print("Data was not loaded");
+    widget.viewModel.fetchPosts();
+  }
+}
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -83,7 +95,25 @@ class _HomePageContentState extends State<HomePageContent> {
                 ],
               ),
             )
-          )
+          ),
+          Expanded(
+          child: ValueListenableBuilder<LoadingState>(
+            valueListenable: widget.viewModel.loadingState,
+            builder: (context, value, child) {
+              if (value == LoadingState.loading) {
+                return Center(child: GlobalConsts.spinkit);
+              } 
+              return RefreshIndicator(
+                onRefresh: widget.viewModel.fetchPosts,
+                child: ListView.builder(
+                  controller: widget.viewModel.scrollController,
+                  itemCount: widget.viewModel.nearbyPosts.length,
+                  itemBuilder: (context, index) => PostBuilder(post:widget.viewModel.nearbyPosts[index], displayUsername: DisplayUsername.uname),
+                ),
+              );
+            },
+          ),
+        ),
         ],
       )
     );
