@@ -27,6 +27,7 @@ class HomePageContentRepository {
   
 
   Future<void> updateLocation() async {
+    await _commonService.requestPosition();
     Position? geoloc = await _commonService.getGeolocation();
     String? userID = await _commonRepository.getUserID();
     if (_lastKnownPosition != null) {
@@ -74,7 +75,7 @@ class HomePageContentRepository {
   Future<void> updateLocationFor_NearbyGyms() async {
     if (_nearbyGyms.isEmpty) return;
     nearbyPosts.clear();
-    for (var gymBatch in _chunkList(_nearbyGyms, 30)) {
+    for (var gymBatch in _chunkList(_nearbyGyms, 10)) {
       try {
         final postsQuery = _db.collection('posts')
             .where('gym', whereIn: gymBatch)
@@ -98,7 +99,7 @@ class HomePageContentRepository {
     List<String> userList = userIDs.toList();
     Map<String, Map<String, dynamic>> userSettingsMap = {};
     try {
-      for (var batch in _chunkList(userList, 30)) {
+      for (var batch in _chunkList(userList, 10)) {
         final usersSnapshot = await _db.collection('user_settings').where(FieldPath.documentId, whereIn: batch).get();
         for (var doc in usersSnapshot.docs) {
           userSettingsMap[doc.id] = doc.data();
