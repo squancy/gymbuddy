@@ -164,7 +164,9 @@ class _SignupPageState extends State<SignupPage> {
                             child: Text(
                               value,
                               textAlign: TextAlign.center,
-                              style: TextStyle(color: Theme.of(context).colorScheme.onSurface),
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.onSurface
+                              ),
                             ),
                           );
                         },

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/search/default_search.dart' as default_search;
+import 'package:gym_buddy/data/repository/search/search_repository.dart';
 import 'package:gym_buddy/ui/home/view_models/home_page_content_view_model.dart';
+import 'package:gym_buddy/ui/search/view_models/search_view_model.dart';
+import 'package:gym_buddy/ui/search/widgets/search_screen.dart';
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({
@@ -47,9 +49,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   trailing: <Widget>[
                     IconButton(
                       onPressed: () {
-                        setState(() {
-                          widget.viewModel.searchController.text = '';
-                        });
+                        widget.viewModel.resetSearchController();
                       },
                       icon: Icon(
                         Icons.clear_rounded,
@@ -75,10 +75,13 @@ class _HomePageContentState extends State<HomePageContent> {
             child: SingleChildScrollView( 
               child: Column(
                 children: [
-                  default_search.DefaultSearch(
+                  DefaultSearch(
                     key: UniqueKey(),
                     searchController: widget.viewModel.searchController,
-                    searchFocus: widget.viewModel.searchFocus
+                    viewModel: SearchViewModel(
+                      searchRepository: SearchRepository(),
+                      searchController: widget.viewModel.searchController,
+                    ),
                   )
                 ],
               ),

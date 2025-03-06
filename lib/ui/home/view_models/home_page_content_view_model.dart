@@ -15,6 +15,10 @@ class HomePageContentViewModel extends ChangeNotifier {
     return _homePageContentRepository.fetchPosts();
   }
 
+  void resetSearchController() {
+    searchController.text = '';
+  }
+
   @override
   void dispose() {
     super.dispose();
