@@ -1,9 +1,13 @@
 import 'package:flutter/gestures.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/data/repository/post_builder/post_builder_repository.dart';
+import 'package:gym_buddy/data/repository/profile/profile_field_repository.dart';
+import 'package:gym_buddy/data/repository/profile/profile_repository.dart';
+import 'package:gym_buddy/ui/profile/view_models/profile_field_view_model.dart';
+import 'package:gym_buddy/ui/profile/view_models/profile_page_view_model.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/profile_page.dart';
 import 'package:gym_buddy/utils/test_utils/test_helpers.dart' as test_helpers;
 import 'package:gym_buddy/consts/common_consts.dart' as consts;
 import 'package:image_fade/image_fade.dart';
@@ -13,6 +17,7 @@ import 'package:timeago/timeago.dart' as timeago;
 import 'package:gym_buddy/utils/time_ago_format.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
 import 'package:gym_buddy/ui/post_builder/view_models/post_builder_view_model.dart';
+import 'package:gym_buddy/ui/profile/widgets/profile_page_screen.dart';
 
 Future<void> main() async {
   final CommonRepository commonRepo = CommonRepository();
@@ -69,7 +74,16 @@ Future<void> main() async {
     // User with the given ID, its username is 'test' and can be found in the test database
     // This user does not have any posts
     test_helpers.logInUser('b727fd96-f618-4121-b875-e5fb74539034');
-    await tester.pumpWidget(MaterialApp(home: ProfilePage()));
+    await tester.pumpWidget(MaterialApp(home: ProfilePage(
+      viewModel: ProfilePageViewModel(
+        profileRepository: ProfileRepository(),
+        commonRepository: CommonRepository(),
+        postBuilderRepository: PostBuilderRepository()
+      ),
+      viewModelField: ProfileFieldViewModel(
+        profileFieldRepository: ProfileFieldRepository()
+      ),
+    )));
 
     Future<void> doubleTap(obj) async {
       await tester.tap(obj);
@@ -260,7 +274,16 @@ Future<void> main() async {
     test_helpers.logInUser('4f307ff7-f201-4732-93a9-72810a52e194');
     await tester.pumpWidget(Container());
     await tester.pumpAndSettle();
-    await tester.pumpWidget(MaterialApp(home: ProfilePage()));
+    await tester.pumpWidget(MaterialApp(home: ProfilePage(
+      viewModel: ProfilePageViewModel(
+        profileRepository: ProfileRepository(),
+        commonRepository: CommonRepository(),
+        postBuilderRepository: PostBuilderRepository()
+      ),
+      viewModelField: ProfileFieldViewModel(
+        profileFieldRepository: ProfileFieldRepository()
+      ),
+    )));
     await tester.pumpAndSettle();
     final postDUname = await getDisplayUname();
 

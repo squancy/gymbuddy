@@ -5,7 +5,6 @@ import 'package:gym_buddy/ui/home/view_models/home_page_content_view_model.dart'
 import 'package:gym_buddy/ui/search/view_models/search_view_model.dart';
 import 'package:gym_buddy/ui/search/widgets/search_screen.dart';
 import 'package:gym_buddy/ui/post_builder/widgets/post_builder_screen.dart';
-import 'package:gym_buddy/profile_page.dart';
 
 class HomePageContent extends StatefulWidget {
   const HomePageContent({
@@ -24,7 +23,6 @@ class _HomePageContentState extends State<HomePageContent> {
 void initState() {
   super.initState();
   if (!widget.viewModel.dataLoaded) {
-    print("Data was not loaded");
     widget.viewModel.fetchPosts();
   }
 }
@@ -111,7 +109,10 @@ void initState() {
                 child: ListView.builder(
                   controller: widget.viewModel.scrollController,
                   itemCount: widget.viewModel.nearbyPosts.length,
-                  itemBuilder: (context, index) => PostBuilder(post:widget.viewModel.nearbyPosts[index], displayUsername: DisplayUsername.uname),
+                  itemBuilder: (context, index) => PostBuilder(
+                    post: widget.viewModel.nearbyPosts[index],
+                    displayUsername: 'a'
+                  ),
                 ),
               );
             },

@@ -5,8 +5,6 @@ import 'package:geoflutterfire_plus/geoflutterfire_plus.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
 import 'package:gym_buddy/data/service/common_service.dart';
 
-
-
 class HomePageContentRepository {
   HomePageContentRepository();
 
@@ -24,19 +22,10 @@ class HomePageContentRepository {
   final CommonRepository _commonRepository = CommonRepository();
   final CommonService _commonService = CommonService();
 
-  
-
   Future<void> updateLocation() async {
     await _commonService.requestPosition();
     Position? geoloc = await _commonService.getGeolocation();
     String? userID = await _commonRepository.getUserID();
-    if (_lastKnownPosition != null) {
-      double distance = Geolocator.distanceBetween(
-        _lastKnownPosition!.latitude, _lastKnownPosition!.longitude,
-        geoloc!.latitude, geoloc.longitude,
-      );
-      if (distance < 100) return;
-    }
     _geoPoint = GeoFirePoint(GeoPoint(geoloc!.latitude, geoloc.longitude));
     await _db.collection('users').doc(userID).update({'geoloc': _geoPoint!.data});
     _lastKnownPosition = geoloc;
