@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/data/repository/post_builder/post_builder_repository.dart';
+import 'package:gym_buddy/data/repository/profile/profile_field_repository.dart';
+import 'package:gym_buddy/data/repository/profile/profile_repository.dart';
 import 'package:gym_buddy/data/repository/search/search_repository.dart';
+import 'package:gym_buddy/ui/profile/view_models/profile_field_view_model.dart';
+import 'package:gym_buddy/ui/profile/view_models/profile_page_view_model.dart';
+import 'package:gym_buddy/ui/profile/widgets/profile_page_screen.dart';
 import 'package:image_fade/image_fade.dart';
 import 'dart:async';
 import 'package:gym_buddy/ui/search/view_models/search_view_model.dart';
@@ -104,11 +111,31 @@ class SearchRowUser extends StatelessWidget {
           if (snapshot.hasData &&
             snapshot.data != null &&
             snapshot.connectionState == ConnectionState.done) {
-            final (:profilePicUrl, :displayUsername, :username) = snapshot.data!;
-            return SearchRowResult(
-              profilePicUrl: profilePicUrl,
-              displayUsername: displayUsername,
-              username: username
+            final (:profilePicUrl, :displayUsername, :username, :userID) = snapshot.data!;
+            return TapRegion(
+              child: SearchRowResult(
+                profilePicUrl: profilePicUrl,
+                displayUsername: displayUsername,
+                username: username
+              ),
+              onTapInside: (event) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ProfilePage(
+                      viewModelField: ProfileFieldViewModel(
+                        profileFieldRepository: ProfileFieldRepository()
+                      ),
+                      viewModel: ProfilePageViewModel(
+                        profileRepository: ProfileRepository(),
+                        commonRepository: CommonRepository(),
+                        postBuilderRepository: PostBuilderRepository()
+                      ),
+                      userID: userID
+                    )
+                  ),
+                );
+              },
             );
           } else {
             return Container();

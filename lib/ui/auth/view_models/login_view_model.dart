@@ -22,7 +22,7 @@ class LoginViewModel extends ChangeNotifier {
   final FocusNode passwordFocusNode = FocusNode();
 
   final ValueNotifier<String> loginStatus = ValueNotifier<String>(""); 
-  late ActGymRecord actsAndGyms;
+  late InfoRecord actsAndGyms;
   ValueNotifier<PageTransition> pageTransition = ValueNotifier(PageTransition.stayOnPage);
 
   Future<void> login() async {

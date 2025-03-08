@@ -45,6 +45,7 @@ class _WelcomePageState extends State<WelcomePage> {
             postPageActs: data.activities,
             postPageGyms: data.gyms,
             viewModel: HomePageViewModel(),
+            userID: data.userID,
           );
         } else if (data == null) {
           return Scaffold(

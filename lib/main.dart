@@ -32,7 +32,9 @@ class GymBuddyApp extends StatelessWidget {
         colorSchemeSeed: Colors.blue.shade900
       ),
       home: WelcomePage(
-        viewModel: WelcomePageViewModel(),
+        viewModel: WelcomePageViewModel(
+          commonRepository: CommonRepository()
+        ),
       ),
     );
   }

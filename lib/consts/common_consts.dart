@@ -82,7 +82,7 @@ class ProfileConsts {
 
 class GlobalConsts {
   static const spinkit = CircularProgressIndicator.adaptive();
-  static const bool test = true;
+  static const bool test = false;
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
   static const String inputSourcePopupText = 'Select an input source';
   static const String photoGalleryText = 'Photo gallery';
@@ -107,10 +107,17 @@ class HomePageConsts {
 }
 
 // Typedefs
-typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});
+typedef InfoRecord = ({
+  List<String> activities,
+  List<Map<String, dynamic>> gyms,
+  String userID
+});
+
 typedef PreloadedData = ({
   List<String> activities,
-  List<Map<String, dynamic>> gyms, bool loggedIn
+  List<Map<String, dynamic>> gyms,
+  bool loggedIn,
+  String userID
 });
 
 // Enums

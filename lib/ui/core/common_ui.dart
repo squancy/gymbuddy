@@ -7,11 +7,12 @@ import 'dart:io';
 import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
 import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
 
-MaterialPageRoute<dynamic> homePageRoute(ActGymRecord actsAndGyms) {
+MaterialPageRoute<dynamic> homePageRoute(InfoRecord info) {
   return MaterialPageRoute(
     builder: (context) => HomePage(
-      postPageActs: actsAndGyms.activities,
-      postPageGyms: actsAndGyms.gyms,
+      postPageActs: info.activities,
+      postPageGyms: info.gyms,
+      userID: info.userID,
       viewModel: HomePageViewModel(),
     ),
   );

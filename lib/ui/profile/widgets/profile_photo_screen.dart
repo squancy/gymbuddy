@@ -7,10 +7,12 @@ import 'package:gym_buddy/ui/profile/view_models/profile_photo_view_model.dart';
 class ProfilePhoto extends StatefulWidget {
   const ProfilePhoto({
     required this.viewModel,
+    required this.userID,
     super.key
   });
 
   final ProfilePhotoViewModel viewModel;
+  final String userID;
 
   @override
   State<ProfilePhoto> createState() => _ProfilePhotoState();
@@ -20,7 +22,7 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.getProfilePicFile();
+    widget.viewModel.getProfilePicFile(widget.userID);
   }
 
   @override

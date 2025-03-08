@@ -56,8 +56,8 @@ class ProfilePhotoViewModel extends ChangeNotifier {
       await _selectFromSourceReal(sourceType);
   }
 
-  Future<void> getProfilePicFile() async {
-    final profilePicURL = await _profilePhotoRepository.getProfilePicURL();
+  Future<void> getProfilePicFile(String userID) async {
+    final profilePicURL = await _profilePhotoRepository.getProfilePicURL(userID);
     if (profilePicURL.isEmpty) {
       profilePicFile = {
         'type': 'default',

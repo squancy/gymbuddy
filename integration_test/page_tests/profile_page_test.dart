@@ -24,6 +24,7 @@ Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await commonRepo.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
+  final String userID = await CommonRepository().getUserID();
 
   final newBioTxt = 'new bio';
   final newUnameTxt = 'new display username';
@@ -83,6 +84,7 @@ Future<void> main() async {
       viewModelField: ProfileFieldViewModel(
         profileFieldRepository: ProfileFieldRepository()
       ),
+      userID: userID,
     )));
 
     Future<void> doubleTap(obj) async {
@@ -283,6 +285,7 @@ Future<void> main() async {
       viewModelField: ProfileFieldViewModel(
         profileFieldRepository: ProfileFieldRepository()
       ),
+      userID: userID,
     )));
     await tester.pumpAndSettle();
     final postDUname = await getDisplayUname();

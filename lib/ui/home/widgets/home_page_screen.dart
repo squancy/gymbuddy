@@ -27,10 +27,12 @@ class HomePage extends StatefulWidget {
     required this.viewModel,
     required this.postPageActs,
     required this.postPageGyms,
+    required this.userID,
     super.key
   });
 
   final HomePageViewModel viewModel;
+  final String userID;
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -72,6 +74,7 @@ class _HomePageState extends State<HomePage> {
                     viewModelField: ProfileFieldViewModel(
                       profileFieldRepository: ProfileFieldRepository()
                     ),
+                    userID: widget.userID,
                   )
                 ][widget.viewModel.selectedIndex.value], 
               ),

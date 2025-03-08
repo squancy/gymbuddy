@@ -19,36 +19,35 @@ class ProfilePageViewModel extends ChangeNotifier {
   final CommonRepository _commonRepository;
   final PostBuilderRepository _postBuilderRepository;
 
-  QueryDocumentSnapshot<Map<String, dynamic>>? lastVisible;
-  int lastVisibleNum = 1;
-  bool isFirst = true;
-  QueryDocumentSnapshot<Map<String, dynamic>>? firstVisible;
+  QueryDocumentSnapshot<Map<String, dynamic>>? _lastVisible;
+  int _lastVisibleNum = 1;
+  bool _isFirst = true;
   Future<List<Map<String, dynamic>>>? getPostsByUserFuture;
   Future<Map<String, dynamic>>? getUserDataFuture;
-  List<Map<String, dynamic>> res = [];
-  int totalNumberOfPosts = 0;
+  List<Map<String, dynamic>> _res = [];
+  int _totalNumberOfPosts = 0;
   ValueNotifier<PageTransition> pageTransition = ValueNotifier(PageTransition.stayOnPage);
+  final bottomScrollController = ScrollController();
 
   /// Get the posts by the user from db
-  Future<List<Map<String, dynamic>>> getPostsByUser() async {
-    if (lastVisible == null) return [];
-    String? userID = await _commonRepository.getUserID();
+  Future<List<Map<String, dynamic>>> getPostsByUser(String userID) async {
+    if (_lastVisible == null) return [];
     var userPosts = await _profileRepository.getUserPosts(
-      userID: userID as String,
-      lastVisible: lastVisible
+      userID: userID,
+      lastVisible: _lastVisible
     );
-    isFirst = false;
-    lastVisible = userPosts.docs.isEmpty ?
+    _isFirst = false;
+    _lastVisible = userPosts.docs.isEmpty ?
       null :
       userPosts.docs[userPosts.docs.length - 1];
-    lastVisibleNum += userPosts.docs.length;
+    _lastVisibleNum += userPosts.docs.length;
     List<QueryDocumentSnapshot<Map<String, dynamic>>> userPostDocs = _profileRepository.getUserPostDocs(
       userPosts: userPosts,
-      isFirst: isFirst,
-      lastVisible: lastVisible
+      isFirst: _isFirst,
+      lastVisible: _lastVisible
     );
-    res += (await _postBuilderRepository.createDataForPosts(userPostDocs));
-    return res;
+    _res += (await _postBuilderRepository.createDataForPosts(userPostDocs));
+    return _res;
   }
 
   /// Set the last visible post to the first post
@@ -56,15 +55,13 @@ class ProfilePageViewModel extends ChangeNotifier {
     final userPosts = await _profileRepository.getLastPostByUser(
       userID: userID
     );
-    lastVisible = userPosts.docs.isEmpty ? null : userPosts.docs[0];
-    firstVisible = lastVisible;
+    _lastVisible = userPosts.docs.isEmpty ? null : userPosts.docs[0];
   }
 
   /// Get the user data from db
-  Future<Map<String, dynamic>> getUserData() async {
+  Future<Map<String, dynamic>> _getUserData(String userID) async {
     // First get the ID of the user currently logged in 
-    final userID = await _commonRepository.getUserID() as String;
-    totalNumberOfPosts = await _profileRepository.getTotalNumOfPostsByUser(
+    _totalNumberOfPosts = await _profileRepository.getTotalNumOfPostsByUser(
       userID: userID
     );
 
@@ -81,23 +78,35 @@ class ProfilePageViewModel extends ChangeNotifier {
     */
 
     await _setLastVisibleToFirst(userID);
-    getPostsByUserFuture = getPostsByUser();
+    getPostsByUserFuture = getPostsByUser(userID);
 
     return {
       'username': user['username'],
       'displayUsername': userSettings['display_username'],
-      'bio': userSettings['bio'],
-      'userID': userID
+      'bio': userSettings['bio']
     };
   }
 
-  void setFuture() {
-    getPostsByUserFuture = getPostsByUser();
+  void _setFuture(String userID) {
+    getPostsByUserFuture = getPostsByUser(userID);
     notifyListeners();
   }
 
   void logout() async {
     await _commonRepository.logout();
     pageTransition.value = PageTransition.goToNextPage;
+  }
+
+  void init(String userID) {
+    getUserDataFuture = _getUserData(userID);
+    bottomScrollController.addListener(() {
+      if (bottomScrollController.position.atEdge) {
+        bool isTop = bottomScrollController.position.pixels == 0;
+        if (!isTop &&
+          _lastVisibleNum < _totalNumberOfPosts) {
+          _setFuture(userID);
+        }
+      }
+    });
   }
 }

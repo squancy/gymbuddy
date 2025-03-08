@@ -11,7 +11,12 @@ enum SearchStates {
   noSearch // the search bar is not in focus
 }
 
-typedef UserData = ({String profilePicUrl, String displayUsername, String username});
+typedef UserData = ({
+  String profilePicUrl,
+  String displayUsername, 
+  String username,
+  String userID
+});
 
 class SearchViewModel extends ChangeNotifier {
   SearchViewModel({

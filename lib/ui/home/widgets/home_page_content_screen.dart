@@ -19,13 +19,13 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-@override
-void initState() {
-  super.initState();
-  if (!widget.viewModel.dataLoaded) {
-    widget.viewModel.fetchPosts();
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.viewModel.dataLoaded) {
+      widget.viewModel.fetchPosts();
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {

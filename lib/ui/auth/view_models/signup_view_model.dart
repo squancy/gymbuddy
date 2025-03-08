@@ -26,7 +26,7 @@ class SignupViewModel extends ChangeNotifier {
   final FocusNode usernameFocusNode = FocusNode();
 
   final ValueNotifier<String> signupStatus = ValueNotifier<String>("");
-  late ActGymRecord actsAndGyms;
+  late InfoRecord actsAndGyms;
   ValueNotifier<PageTransition> pageTransition = ValueNotifier(PageTransition.stayOnPage);
 
   (bool isValid, String errorMsg) isValidParams({
