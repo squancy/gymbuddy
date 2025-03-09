@@ -46,15 +46,19 @@ class ProfilePageViewModel extends ChangeNotifier {
       isFirst: _isFirst,
       lastVisible: _lastVisible
     );
-    _res += (await _postBuilderRepository.createDataForPosts(userPostDocs));
+    _res += (await _postBuilderRepository.createDataForPosts(
+      userPostDocs: userPostDocs,
+      userID: userID
+    ));
     return _res;
   }
 
   /// Set the last visible post to the first post
-  Future<void> _setLastVisibleToFirst(userID) async {
+  Future<void> _setLastVisibleToFirst(String userID) async {
     final userPosts = await _profileRepository.getLastPostByUser(
       userID: userID
     );
+
     _lastVisible = userPosts.docs.isEmpty ? null : userPosts.docs[0];
   }
 

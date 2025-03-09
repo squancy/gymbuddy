@@ -110,14 +110,14 @@ class HomePageConsts {
 typedef InfoRecord = ({
   List<String> activities,
   List<Map<String, dynamic>> gyms,
-  String userID
+  String? userID
 });
 
 typedef PreloadedData = ({
   List<String> activities,
   List<Map<String, dynamic>> gyms,
   bool loggedIn,
-  String userID
+  String? userID
 });
 
 // Enums

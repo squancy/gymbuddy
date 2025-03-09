@@ -102,7 +102,6 @@ class SearchViewModel extends ChangeNotifier {
       _prevText != _searchController.text) {
       _applySearchState();
       _setSearchState();
-      print(curSearchState);
       notifyListeners();
       _prevText = _searchController.text;
     }

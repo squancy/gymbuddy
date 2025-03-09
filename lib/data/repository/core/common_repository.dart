@@ -39,9 +39,9 @@ class CommonRepository {
       }).toList();
   }
 
-  Future<String> getUserID() async {
+  Future<String?> getUserID() async {
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
-    return (await prefs.getString('userID')) as String;
+    return (await prefs.getString('userID'));
   }
 
   Future<void> logout() async {
@@ -77,7 +77,7 @@ class CommonRepository {
     final allActivities = await getAllActivitiesWithoutProps(db.collection('activities'));
     allActivities.sort();
 
-    final String userID = await getUserID();
+    final String? userID = await getUserID();
     return (activities: allActivities, gyms: allGyms, userID: userID);
   }
 }

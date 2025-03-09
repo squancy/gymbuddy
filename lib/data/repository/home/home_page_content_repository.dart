@@ -26,6 +26,7 @@ class HomePageContentRepository {
     await _commonService.requestPosition();
     Position? geoloc = await _commonService.getGeolocation();
     String? userID = await _commonRepository.getUserID();
+    if (geoloc == null) return;
     _geoPoint = GeoFirePoint(GeoPoint(geoloc!.latitude, geoloc.longitude));
     await _db.collection('users').doc(userID).update({'geoloc': _geoPoint!.data});
     _lastKnownPosition = geoloc;

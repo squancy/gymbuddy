@@ -112,30 +112,10 @@ class SearchRowUser extends StatelessWidget {
             snapshot.data != null &&
             snapshot.connectionState == ConnectionState.done) {
             final (:profilePicUrl, :displayUsername, :username, :userID) = snapshot.data!;
-            return TapRegion(
-              child: SearchRowResult(
-                profilePicUrl: profilePicUrl,
-                displayUsername: displayUsername,
-                username: username
-              ),
-              onTapInside: (event) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => ProfilePage(
-                      viewModelField: ProfileFieldViewModel(
-                        profileFieldRepository: ProfileFieldRepository()
-                      ),
-                      viewModel: ProfilePageViewModel(
-                        profileRepository: ProfileRepository(),
-                        commonRepository: CommonRepository(),
-                        postBuilderRepository: PostBuilderRepository()
-                      ),
-                      userID: userID
-                    )
-                  ),
-                );
-              },
+            return SearchRowResult(
+              profilePicUrl: profilePicUrl,
+              displayUsername: displayUsername,
+              username: username
             );
           } else {
             return Container();
@@ -198,17 +178,38 @@ class SearchColumn extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        for (final hit in _hits) Padding(
-          padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
-          child: Row(
-            children: [
-              SearchRowUser.fromHit(
-                hit: hit,
-                cached: _shouldCache,
-                viewModel: _viewModel,
-              )
-            ],
-          ),
+        for (final hit in _hits) TapRegion(
+          behavior: HitTestBehavior.translucent,
+          onTapInside: (event) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => ProfilePage(
+                  viewModelField: ProfileFieldViewModel(
+                    profileFieldRepository: ProfileFieldRepository()
+                  ),
+                  viewModel: ProfilePageViewModel(
+                    profileRepository: ProfileRepository(),
+                    commonRepository: CommonRepository(),
+                    postBuilderRepository: PostBuilderRepository()
+                  ),
+                  userID: hit['objectID']
+                )
+              ),
+            );
+          },
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(20, 10, 20, 10),
+            child: Row(
+              children: [
+                SearchRowUser.fromHit(
+                  hit: hit,
+                  cached: _shouldCache,
+                  viewModel: _viewModel,
+                )
+              ],
+            )
+            )
         )
       ],
     );

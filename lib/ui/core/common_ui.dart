@@ -12,7 +12,7 @@ MaterialPageRoute<dynamic> homePageRoute(InfoRecord info) {
     builder: (context) => HomePage(
       postPageActs: info.activities,
       postPageGyms: info.gyms,
-      userID: info.userID,
+      userID: info.userID as String,
       viewModel: HomePageViewModel(),
     ),
   );

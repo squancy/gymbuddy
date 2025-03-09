@@ -24,7 +24,7 @@ Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
   await commonRepo.firebaseInit(test: true);
   final FirebaseFirestore db = FirebaseFirestore.instance;
-  final String userID = await CommonRepository().getUserID();
+  final String userID = await CommonRepository().getUserID() as String;
 
   final newBioTxt = 'new bio';
   final newUnameTxt = 'new display username';
