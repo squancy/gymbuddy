@@ -84,10 +84,13 @@ class ProfilePageViewModel extends ChangeNotifier {
     await _setLastVisibleToFirst(userID);
     getPostsByUserFuture = getPostsByUser(userID);
 
+    final String? loggedInUserID = await CommonRepository().getUserID();
+
     return {
       'username': user['username'],
       'displayUsername': userSettings['display_username'],
-      'bio': userSettings['bio']
+      'bio': userSettings['bio'],
+      'loggedInUserID': loggedInUserID
     };
   }
 

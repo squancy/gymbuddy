@@ -73,6 +73,7 @@ class _ProfilePageState extends State<ProfilePage> {
             final Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
             widget.viewModelField.uname = data['displayUsername'];
             widget.viewModelField.bio = data['bio'];
+            final bool viewingOwnProfile = data['loggedInUserID'] == widget.userID;
 
             return ListView(
               controller: widget.viewModel.bottomScrollController,
@@ -87,32 +88,49 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              viewingOwnProfile ?
                               DUnameTapRegion(
                                 viewModel: widget.viewModelField
+                              )
+                              :
+                              DisplayUsernameStatic(
+                                displayUsername: widget.viewModelField.uname
                               ),
                               Text("@${data['username']}")
                             ],
                           ),),
                           Column(
-                            // Profile photo and logout button
                             children: [
+                              viewingOwnProfile ?
+                              ProfilePhotoOwn(
+                                viewModel: ProfilePhotoViewModel(
+                                  profilePhotoRepository: ProfilePhotoRepository(
+                                    uploadImageRepository: UploadImageRepository()
+                                  ),
+                                ),
+                                userID: widget.userID,
+                              )
+                              : 
                               ProfilePhoto(
                                 viewModel: ProfilePhotoViewModel(
                                   profilePhotoRepository: ProfilePhotoRepository(
                                     uploadImageRepository: UploadImageRepository()
-                                  )
+                                  ),
                                 ),
                                 userID: widget.userID,
                               ),
                               SizedBox(height: 10,),
-                              GestureDetector(
-                                onTap: widget.viewModel.logout,
-                                child: Icon(
-                                  Icons.logout_rounded,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              )
+                              viewingOwnProfile ?
+                                GestureDetector(
+                                  onTap: widget.viewModel.logout,
+                                  child: Icon(
+                                    Icons.logout_rounded,
+                                    size: 20,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                )
+                              :
+                              Container(),
                             ],
                           )
                         ],
@@ -120,9 +138,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ],
                 ),
-                // Bio
+                viewingOwnProfile ?
                 BioTapRegion(
                   viewModel: widget.viewModelField
+                )
+                :
+                BioStatic(
+                  bio: widget.viewModelField.bio
                 ),
                 Divider(
                   color: Colors.white12
