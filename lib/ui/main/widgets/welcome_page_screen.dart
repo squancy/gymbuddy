@@ -1,18 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/data/repository/auth/email_repository.dart';
-import 'package:gym_buddy/data/repository/auth/login_repository.dart';
-import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
-import 'package:gym_buddy/data/service/common_service.dart';
-import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
-import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
-import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:flutter_moving_background/enums/animation_types.dart';
 import 'package:flutter_moving_background/flutter_moving_background.dart';
-import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
 import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
 import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 import 'package:moye/moye.dart';
 import 'package:gym_buddy/ui/main/view_models/welcome_page_view_model.dart';
 
@@ -44,8 +36,8 @@ class _WelcomePageState extends State<WelcomePage> {
           return HomePage(
             postPageActs: data.activities,
             postPageGyms: data.gyms,
-            viewModel: HomePageViewModel(),
             userID: data.userID as String,
+            viewModel: HomePageViewModel(),
           );
         } else if (data == null) {
           return Scaffold(
@@ -80,17 +72,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     MainButton(
                       displayText: WelcomePageConsts.loginButtonTitle,
                       onPressedFunc: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => LoginPage(
-                            viewModel: LoginViewModel(
-                              signupRepository: SignupRepository(
-                                commononService: CommonService()
-                              ),
-                              loginRepository: LoginRepository()
-                            )
-                          )),
-                        );
+                        Navigator.pushNamed(context, Routes.loginRoute);
                       },
                       fontSize: 18,
                     ).withGlowContainer(
@@ -101,17 +83,7 @@ class _WelcomePageState extends State<WelcomePage> {
                     MainButton(
                       displayText: WelcomePageConsts.signupButtonTitle,
                       onPressedFunc: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => SignupPage(
-                            viewModel: SignupViewModel(
-                              signupRepository: SignupRepository(
-                                commononService: CommonService()
-                              ),
-                              emailRepository: EmailRepository()
-                            )
-                          )),
-                        );
+                        Navigator.pushNamed(context, Routes.signupRoute);
                       },
                       fontSize: 18,
                     ).withGlowContainer(

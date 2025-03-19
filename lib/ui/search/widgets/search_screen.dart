@@ -8,6 +8,7 @@ import 'package:gym_buddy/data/repository/search/search_repository.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_field_view_model.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_page_view_model.dart';
 import 'package:gym_buddy/ui/profile/widgets/profile_page_screen.dart';
+import 'package:gym_buddy/ui/search_extended/widgets/search_extended_screen.dart';
 import 'package:image_fade/image_fade.dart';
 import 'dart:async';
 import 'package:gym_buddy/ui/search/view_models/search_view_model.dart';
@@ -128,32 +129,47 @@ class SearchRowUser extends StatelessWidget {
 
 class AlwaysOnSearchBar extends StatelessWidget {
   const AlwaysOnSearchBar({
+    required this.searchQuery,
     super.key
   });
 
+  final String searchQuery;
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
-      child: Row(
-        children: [
-          CircleAvatar(
-            radius: 22.5,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
-            child: IconButton(
-              icon: Icon(
-                Icons.saved_search_rounded,
-                color: Theme.of(context).colorScheme.secondary,
-              ),
-              onPressed: () {
-              },
-            ),
+    return TapRegion(
+      onTapInside: (event) {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => SearchExtendedScreen(
+              searchQuery: searchQuery,
+            )
           ),
-          Padding(
-            padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
-            child: Text(SearchViewModel.latestQuery),
-          )
-        ],
+        );
+      },
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(20, 20, 20, 10),
+        child: Row(
+          children: [
+            CircleAvatar(
+              radius: 22.5,
+              backgroundColor: Theme.of(context).colorScheme.surfaceContainer,
+              child: IconButton(
+                icon: Icon(
+                  Icons.saved_search_rounded,
+                  color: Theme.of(context).colorScheme.secondary,
+                ),
+                onPressed: () {
+                },
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.fromLTRB(10, 0, 0, 0),
+              child: Text(SearchViewModel.latestQuery),
+            )
+          ],
+        ),
       ),
     );
   }
@@ -219,11 +235,14 @@ class SearchColumn extends StatelessWidget {
 class SearchContent extends StatelessWidget {
   const SearchContent({
     required viewModel,
+    required searchController,
     super.key
   }) :
-  _viewModel = viewModel;
+  _viewModel = viewModel,
+  _searchController = searchController;
 
   final SearchViewModel _viewModel;
+  final TextEditingController _searchController;
 
   @override
   Widget build(BuildContext context) {
@@ -232,7 +251,9 @@ class SearchContent extends StatelessWidget {
     return isHit ?
     Column(
       children: [
-        AlwaysOnSearchBar(),
+        AlwaysOnSearchBar(
+          searchQuery: _searchController.text,
+        ),
         SearchColumn(
           hits: hit![SearchViewModel.latestQuery],
           shouldCache: true,
@@ -243,7 +264,9 @@ class SearchContent extends StatelessWidget {
     :
     Column(
       children: [
-        AlwaysOnSearchBar(),
+        AlwaysOnSearchBar(
+          searchQuery: _searchController.text,
+        ),
         StreamBuilder(
           stream: _viewModel.combinedUserStream,
           builder: (BuildContext context, AsyncSnapshot<List<Map<String, dynamic>>> snapshot) {
@@ -301,6 +324,7 @@ class _DefaultSearchState extends State<DefaultSearch> {
         return SearchViewModel.curSearchState == SearchStates.textSearch ?
           SearchContent(
             key: UniqueKey(),
+            searchController: widget.searchController, 
             viewModel: SearchViewModel(
               searchRepository: SearchRepository(),
               searchController: widget.searchController,

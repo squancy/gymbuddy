@@ -106,6 +106,16 @@ class HomePageConsts {
   static const int cacheSize = 100;
 }
 
+class Routes {
+  static const String rootRoute = '/';
+  static const String signupRoute = '/signup';
+  static const String loginRoute = '/login';
+  static const String renewPassRoute = '/renewPassword';
+  static const String homeRoute = '/home';
+  static const String enterCodeRoute = '/enterCode';
+  static const String forgotPassRoute = '/forgotPassword';
+}
+
 // Typedefs
 typedef InfoRecord = ({
   List<String> activities,

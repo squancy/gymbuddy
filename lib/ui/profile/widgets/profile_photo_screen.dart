@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:image_fade/image_fade.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_photo_view_model.dart';
 
 class ProfilePhotoBox extends StatelessWidget {

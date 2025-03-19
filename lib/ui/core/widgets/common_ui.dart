@@ -6,6 +6,7 @@ import 'package:image_fade/image_fade.dart';
 import 'dart:io';
 import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
 import 'package:gym_buddy/ui/home/widgets/home_page_screen.dart';
+import 'package:awesome_bottom_bar/awesome_bottom_bar.dart';
 
 MaterialPageRoute<dynamic> homePageRoute(InfoRecord info) {
   return MaterialPageRoute(
@@ -329,6 +330,45 @@ class ProgressBtn extends StatelessWidget {
       ),
       type: ProgressButtonType.filled,
       child: child,
+    );
+  }
+}
+
+class BottomNavbar extends StatelessWidget {
+  const BottomNavbar({
+    required viewModel,
+    super.key
+  }) :
+  _viewModel = viewModel;
+
+  final HomePageViewModel _viewModel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(30), 
+      child: Container(
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.all(Radius.circular(30)) 
+        ),
+        clipBehavior: Clip.hardEdge,
+        child: BottomBarFloating(
+          items: _viewModel.items,
+          backgroundColor: Colors.black,
+          color: Theme.of(context).colorScheme.primary,
+          colorSelected: Theme.of(context).colorScheme.tertiary,
+          indexSelected: _viewModel.selectedIndex.value,
+          onTap: _viewModel.onItemTapped,
+          duration: Duration(milliseconds: 200), 
+          titleStyle: TextStyle(
+            letterSpacing: 0,
+          ),
+          pad: 1,
+          animated: false,
+          paddingVertical: 8,
+          iconSize: 18,
+        ),
+      ),
     );
   }
 }

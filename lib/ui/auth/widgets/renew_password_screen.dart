@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
-import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
-import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
-import 'package:gym_buddy/data/repository/auth/login_repository.dart';
-import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
-import 'package:gym_buddy/data/service/common_service.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 class RenewPasswordPage extends StatefulWidget {
   final String userID;
@@ -32,18 +27,10 @@ class _RenewPasswordPageState extends State<RenewPasswordPage> {
   }
 
   void _handlePageTransition() {
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => LoginPage(
-          viewModel: LoginViewModel(
-            loginRepository: LoginRepository(),
-            signupRepository: SignupRepository(
-              commononService: CommonService()
-            )
-          )
-        ),
-      ),
-      (Route<dynamic> route) => false,
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      Routes.loginRoute,
+      (Route<dynamic> route) => false
     );
   }
   
