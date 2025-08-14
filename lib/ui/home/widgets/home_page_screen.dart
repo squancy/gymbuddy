@@ -31,6 +31,18 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late final HomePageContentViewModel _homePageContentViewModel;
+  late final ProfilePage _profilePage;
+
+  @override
+  void initState() {
+    super.initState();
+    _homePageContentViewModel = HomePageContentViewModel(
+      homePageContentRepository: HomePageContentRepository()
+    );
+    _profilePage = ProfilePage();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Builder(
@@ -44,9 +56,7 @@ class _HomePageState extends State<HomePage> {
               body: Center(
                 child: [
                   HomePageContent(
-                    viewModel: HomePageContentViewModel(
-                      homePageContentRepository: HomePageContentRepository()
-                    ),
+                    viewModel: _homePageContentViewModel,
                   ),
                   PostPage(
                     postPageActs: widget.postPageActs,
@@ -57,7 +67,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Container(),
-                  ProfilePage()
+                  _profilePage
                 ][widget.viewModel.selectedIndex.value], 
               ),
               bottomNavigationBar: Padding(

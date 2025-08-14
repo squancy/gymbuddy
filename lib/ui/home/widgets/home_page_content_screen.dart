@@ -84,36 +84,30 @@ void initState() {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView( 
-              child: Column(
-                children: [
-                  default_search.DefaultSearch(
-                    key: UniqueKey(),
-                    searchController: widget.viewModel.searchController,
-                    searchFocus: widget.viewModel.searchFocus
-                  )
-                ],
-              ),
-            )
+            // child: 
+            // Column(
+            //   children: [
+                // Expanded(
+                  child: ValueListenableBuilder<LoadingState>(
+                    valueListenable: widget.viewModel.loadingState,
+                    builder: (context, value, child) {
+                      if (value == LoadingState.loading) {
+                        return Center(child: GlobalConsts.spinkit);
+                      } 
+                      return RefreshIndicator(
+                        onRefresh: widget.viewModel.fetchPosts,
+                        child: ListView.builder(
+                          controller: widget.viewModel.scrollController,
+                          itemCount: widget.viewModel.nearbyPosts.length,
+                          itemBuilder: (context, index) => PostBuilder(post:widget.viewModel.nearbyPosts[index], displayUsername: widget.viewModel.nearbyPosts[index]['displayUsername']),
+                        ),
+                      );
+                    },
+                  ),
+                // ),
+            //   ],
+            // ),
           ),
-          Expanded(
-          child: ValueListenableBuilder<LoadingState>(
-            valueListenable: widget.viewModel.loadingState,
-            builder: (context, value, child) {
-              if (value == LoadingState.loading) {
-                return Center(child: GlobalConsts.spinkit);
-              } 
-              return RefreshIndicator(
-                onRefresh: widget.viewModel.fetchPosts,
-                child: ListView.builder(
-                  controller: widget.viewModel.scrollController,
-                  itemCount: widget.viewModel.nearbyPosts.length,
-                  itemBuilder: (context, index) => PostBuilder(post:widget.viewModel.nearbyPosts[index], displayUsername: DisplayUsername.uname),
-                ),
-              );
-            },
-          ),
-        ),
         ],
       )
     );

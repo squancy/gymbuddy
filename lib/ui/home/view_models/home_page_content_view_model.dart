@@ -18,7 +18,6 @@ class HomePageContentViewModel extends ChangeNotifier {
   bool dataLoaded = false;
 
   Future<void> fetchPosts() async {
-    await _homePageContentRepository.updateLocation();
     await _homePageContentRepository.fetchData();
     dataLoaded = true;
     nearbyPosts = _homePageContentRepository.nearbyPosts;
