@@ -106,6 +106,33 @@ class _SignupPageState extends State<SignupPage> {
                         ),
                       ),
                       // Password textfield
+                        // Padding(
+                        // padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                        // child: ValueListenableBuilder<String>(
+                        //   valueListenable: widget.viewModel.selectedSex,
+                          
+                        //   builder: (context, value, child) {
+                        //   return DropdownButtonFormField<String>(
+                        //     decoration: InputDecoration(
+                        //     labelText: 'Sex',
+                        //     border: OutlineInputBorder(),
+                        //     ),
+                        //     value: value.isEmpty ? null : value,
+                        //     items: ['Male', 'Female']
+                        //       .map((sex) => DropdownMenuItem(
+                        //         value: sex,
+                        //         child: Text(sex),
+                        //         ))
+                        //       .toList(),
+                        //     onChanged: (selected) {
+                        //     if (selected != null) {
+                        //       widget.viewModel.selectedSex.value = selected;
+                        //     }
+                        //     },
+                        //   );
+                        //   },
+                        // ),
+                        // ),
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: BlackTextfield(

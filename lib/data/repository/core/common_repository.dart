@@ -44,6 +44,11 @@ class CommonRepository {
     return prefs.getString('userID');
   }
 
+  Future<String?> getSex() async {
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+    return prefs.getString("sex");
+  }
+
   Future<void> logout() async {
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
     await prefs.setBool('loggedIn', false);
