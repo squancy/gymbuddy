@@ -6,7 +6,6 @@ import 'package:gym_buddy/data/repository/post/post_page_repository.dart';
 import 'package:gym_buddy/data/repository/post_builder/post_builder_repository.dart';
 import 'package:gym_buddy/data/repository/profile/profile_field_repository.dart';
 import 'package:gym_buddy/data/repository/profile/profile_repository.dart';
-import 'package:gym_buddy/ui/core/view_models/bottom_navbar_view_model.dart';
 import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 import 'package:gym_buddy/ui/home/view_models/home_page_view_model.dart';
 import 'package:gym_buddy/ui/home/widgets/home_page_content_screen.dart';

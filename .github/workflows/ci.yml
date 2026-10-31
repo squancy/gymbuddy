@@ -1,0 +1,48 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  analyze-and-test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          flutter-version: 3.47.9
+          cache: true
+
+      # lib/auth/secrets.dart is gitignored. The widget tests never call
+      # Algolia, so placeholder values are enough to compile.
+      - name: Create placeholder secrets.dart
+        run: |
+          mkdir -p lib/auth
+          cat > lib/auth/secrets.dart <<'EOF'
+          class Algolia {
+            static const String applicationID = 'ci-placeholder';
+            static const String searchAPIKey = 'ci-placeholder';
+            static const String indexNamePosts = 'ci-placeholder';
+            static const String indexNameUsers = 'ci-placeholder';
+            static const String indexNameUserSettings = 'ci-placeholder';
+          }
+          EOF
+
+      - run: flutter pub get
+
+      - name: Analyze
+        run: flutter analyze
+
+      # Widget tests only; the integration tests need an Android emulator and
+      # the Firebase emulators (see SETUP.md).
+      - name: Test
+        run: flutter test

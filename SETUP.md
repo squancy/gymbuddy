@@ -133,13 +133,23 @@ The integration tests and the database population scripts in
 also need `--dart-define=USE_EMULATORS=true`. Without it they talk to
 production.
 
-**Known failures (2026-10-31):**
+**Widget tests never touch Firebase.** They pass the fakes from
+`test/fakes/fake_auth_repositories.dart` into the view models. A fake method a
+test doesn't override throws, so an accidental backend call fails loudly. New
+widget tests should do the same: construct view models with fakes, never with
+the real repositories.
 
-- All 3 widget tests in `test/` fail. The repositories construct
-  `FirebaseFirestore.instance`, and Firebase isn't set up in a widget test.
-  Phase 0 fixes this by injecting mock repositories.
-- `integration_test/page_tests/signup_test.dart` doesn't fill in the new **Sex**
-  field yet, so signup validation will reject it.
+**Integration tests need an ASCII path.** On Windows, Gradle and `aapt` can't
+build the test APK from a path with characters like `á`. `subst` doesn't fix it
+either. Run them from a clone under an ASCII path, such as `C:\src\gymbuddy`.
+
+### CI
+
+`.github/workflows/ci.yml` runs `flutter analyze` and `flutter test` on every
+pull request and on every push to `main`, using Flutter 3.47.9. It writes a
+placeholder `lib/auth/secrets.dart`. CI fails on any analyzer warning or info,
+so keep `flutter analyze` clean. The integration tests are not part of CI,
+because they need an Android emulator and the Firebase emulators.
 
 ## 6. Windows notes
 

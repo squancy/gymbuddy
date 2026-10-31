@@ -131,7 +131,7 @@ class _SignupPageState extends State<SignupPage> {
                               dropdownColor: Colors.black,
                               style: const TextStyle(color: Colors.white), // kiválasztott érték színe
                               iconEnabledColor: Colors.white,
-                              value: value.isEmpty ? null : value,
+                              initialValue: value.isEmpty ? null : value,
                               items: const ['Male', 'Female']
                                   .map(
                                     (sex) => DropdownMenuItem<String>(

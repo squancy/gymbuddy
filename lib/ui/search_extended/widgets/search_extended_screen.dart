@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:gym_buddy/data/repository/search/search_repository.dart';
-import 'package:gym_buddy/ui/search/view_models/search_view_model.dart';
-import 'package:gym_buddy/ui/search/widgets/search_screen.dart';
 
 class SearchExtendedScreen extends StatefulWidget {
   const SearchExtendedScreen({
