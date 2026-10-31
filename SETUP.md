@@ -22,19 +22,18 @@ device must both be green.
 The Android build uses Gradle 8.14.3, Android Gradle Plugin 8.11.1 and Kotlin
 2.2.20. Flutter 3.47 won't build with older versions.
 
-## 2. Files that are not in git
+## 2. The one file that is not in git
 
-`.gitignore` excludes these files, so a fresh clone **cannot build**. Get them
-from a teammate:
+Everything else is versioned: `android/` (including `google-services.json`),
+`ios/`, `pubspec.lock`, `lib/firebase_options.dart`, and the Firebase config
+(`firebase.json`, `.firebaserc`, `firestore.rules`, `storage.rules`,
+`firestore.indexes.json`). The Firebase API keys in those files are public
+identifiers that ship inside every app build anyway. Access is controlled by the
+security rules, not by keeping the keys hidden.
 
-| Path | What it is | How to get it |
-| --- | --- | --- |
-| `android/` (whole folder) | Android project, Gradle config, `google-services.json` | Copy from a teammate. Don't regenerate it with `flutter create`: that gives the wrong application ID (`com.android.gymbuddy`) |
-| `lib/firebase_options.dart` | Firebase app config | `flutterfire configure --project=gym-buddy-9ab39`, or copy it |
-| `lib/auth/secrets.dart` | Algolia keys for search | Copy from a teammate (shape below) |
-| `firebase.json`, `firestore.rules`, `storage.rules`, `firestore.indexes.json`, `.firebaserc` | Firebase CLI and emulator config | Copy from a teammate |
-
-`lib/auth/secrets.dart` looks like this:
+The only file you need from a teammate is `lib/auth/secrets.dart`, which holds
+the Algolia keys for search. Without it the app doesn't compile. It looks like
+this:
 
 ```dart
 class Algolia {
@@ -46,12 +45,13 @@ class Algolia {
 }
 ```
 
-`firebase.json` must have the emulator ports that the app hard-codes:
-Firestore on `8080` and Storage on `9199`.
+Don't commit release signing keys (`*.jks`, `*.keystore`, `key.properties`) or
+`android/local.properties`. `.gitignore` already excludes them.
 
-> Phase 0 of the plan moves `android/`, `ios/`, `pubspec.lock` and the Firebase
-> config files into git. `secrets.dart` and `google-services.json` stay out.
-> Update this section when that lands.
+> **Security rules:** `firestore.rules` (open until 2027-06-30) and
+> `storage.rules` (always open) are still allow-all placeholders. Never run
+> `firebase deploy` with them unchanged. Phase 3 of the plan replaces them with
+> per-user rules.
 
 ## 3. Emulators or production
 
@@ -195,7 +195,7 @@ the widget only renders.
 | "An unknown error occurred" on signup or login | The build is using production. Rebuild with `--dart-define=USE_EMULATORS=true` |
 | Home feed is empty | There are no posts at gyms within 1 km. Check the GPS fix (step 3) and the `posts` in the emulator UI. Widening the radius is a Phase 1 item |
 | Search returns nothing | `lib/auth/secrets.dart` is missing or wrong. Search uses Algolia, not the emulators |
-| `Could not resolve` / AGP errors in Gradle | Your `android/` is older than the Gradle 8.14.3 / AGP 8.11.1 / Kotlin 2.2.20 upgrade. Get a current copy |
+| `Could not resolve` / AGP errors in Gradle | Your Flutter is older than 3.47, or your `android/` is a local copy left over from before it was versioned. Use the one from git |
 | Firebase emulators won't start | Wrong Java version (needs 21+), or something else is using port 8080/9199 |
 | `flutter analyze` crashes with `FormatException` | Non-ASCII path. See section 6 |
 
