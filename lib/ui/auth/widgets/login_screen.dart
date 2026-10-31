@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
-import 'package:gym_buddy/data/repository/auth/email_repository.dart';
-import 'package:gym_buddy/data/repository/auth/forgot_pass_repository.dart';
 import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
-import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
-import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({
@@ -32,9 +28,13 @@ class _LoginPageState extends State<LoginPage> {
 
   void _handlePageTransition() {
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      homePageRoute(widget.viewModel.actsAndGyms),
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      Routes.homeRoute,
       (Route<dynamic> route) => false,
+      arguments: {
+        'info': widget.viewModel.actsAndGyms
+      }
     );
   }
 
@@ -112,15 +112,7 @@ class _LoginPageState extends State<LoginPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => ForgotPasswordPage(
-                                viewModel: ForgotPassViewModel(
-                                  emailRepository: EmailRepository(),
-                                  forgotPassRepository: ForgotPassRepository()
-                                )
-                              )),
-                            );
+                            Navigator.pushNamed(context, Routes.forgotPassRoute);
                           },
                           child: Text(
                             LoginConsts.forgotPasswordText, // 'Forgot password' text

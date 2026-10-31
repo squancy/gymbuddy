@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
-import 'package:gym_buddy/data/repository/auth/email_repository.dart';
-import 'package:gym_buddy/data/repository/auth/enter_code_repository.dart';
-import 'package:gym_buddy/data/repository/auth/forgot_pass_repository.dart';
-import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/ui/auth/widgets/enter_code_screen.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
   const ForgotPasswordPage({
@@ -34,19 +29,13 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
   void _handlePageTransition() {
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EnterCodePage(
-          email: widget.viewModel.emailEnterCode as String,
-          userData: widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>>,
-          viewModel: EnterCodeViewModel(
-            emailRepository: EmailRepository(),
-            forgotPassRepository: ForgotPassRepository(),
-            enterCodeRepository: EnterCodeRepository()
-          ),
-        ) 
-      ),
+    Navigator.pushNamed(
+      context, 
+      Routes.enterCodeRoute,
+      arguments: {
+        'email': widget.viewModel.emailEnterCode as String,
+        'userData': widget.viewModel.userDataEnterCode as List<QueryDocumentSnapshot<Map<String, dynamic>>>
+      }
     );
   }
 

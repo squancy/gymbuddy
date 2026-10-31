@@ -1,0 +1,41 @@
+{
+  "flutter": {
+    "platforms": {
+      "android": {
+        "default": {
+          "projectId": "gym-buddy-9ab39",
+          "appId": "1:16181150799:android:18690ef5e3ad8eb1d3963a",
+          "fileOutput": "android/app/google-services.json"
+        }
+      },
+      "dart": {
+        "lib/firebase_options.dart": {
+          "projectId": "gym-buddy-9ab39",
+          "configurations": {
+            "android": "1:16181150799:android:18690ef5e3ad8eb1d3963a",
+            "ios": "1:16181150799:ios:d754aa5078217980d3963a"
+          }
+        }
+      }
+    }
+  },
+  "emulators": {
+    "firestore": {
+      "port": 8080
+    },
+    "storage": {
+      "port": 9199
+    },
+    "singleProjectMode": true,
+    "ui": {
+      "enabled": true
+    }
+  },
+  "storage": {
+    "rules": "storage.rules"
+  },
+  "firestore": {
+    "rules": "firestore.rules",
+    "indexes": "firestore.indexes.json"
+  }
+}

@@ -61,7 +61,7 @@ void main() async {
     // Convert each element to nullable since Dart infers the type as List<GeoFirePoint>
     List<GeoFirePoint?> geoPoints = test_helpers
     .generateRandomCoordinates(numOfUsers - numOfNulls)
-    .map((e) => e as GeoFirePoint?) 
+    .map<GeoFirePoint?>((e) => e)
     .toList();
     geoPoints.addAll(List<GeoFirePoint?>.generate(numOfNulls, (_) => null));
 

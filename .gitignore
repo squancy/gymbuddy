@@ -1,19 +1,15 @@
 # Do not remove or rename entries in this file, only add new ones
 # See https://github.com/flutter/flutter/issues/128635 for more context.
 
-android/
 build/
-ios/
 linux/
 macos/
 web/
 windows/
 .dart_tool/
 devtools_options.yaml
-storage.rules
 lib/auth/*
 
-.firebaserc
 .metadata
 analysis_options.yaml
 gym_buddy.iml
@@ -149,6 +145,7 @@ coverage/
 app.*.symbols
 
 # Exceptions to above rules.
+!pubspec.lock
 !**/ios/**/default.mode1v3
 !**/ios/**/default.mode2v3
 !**/ios/**/default.pbxuser
@@ -158,14 +155,11 @@ app.*.symbols
 !.vscode/settings.json
 
 # Firebase
-firebase.json
 firepit-log.txt
-lib/firebase_options.dart
 lib/*.code-workspace
-
-#Firestore
-firestore.rules
-firestore.indexes.json
 
 #Vscode
 .vscode/settings.json
+
+# Android native build cache
+**/android/app/.cxx/

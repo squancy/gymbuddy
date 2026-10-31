@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mailer/mailer.dart';
 import 'package:mailer/smtp_server.dart';
+import 'package:flutter/foundation.dart' show debugPrint;
+import 'package:gym_buddy/consts/common_consts.dart' show GlobalConsts;
 import 'package:gym_buddy/consts/email_templates.dart' show EmailTemplate;
 
 class EmailRepository {
@@ -14,6 +16,12 @@ class EmailRepository {
     required String to,
     required EmailTemplate template
     }) async {
+    // The emulators hold no SMTP credentials: log the email instead of sending it
+    if (GlobalConsts.test) {
+      debugPrint('sendEmail (emulator, not sent) to $to: ${template.subject}');
+      return;
+    }
+
     // First get email credentials from db
     final Map<String, dynamic> emailCreds = (await _db.collection('email')
       .doc('email_settings')

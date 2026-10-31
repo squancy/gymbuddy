@@ -29,7 +29,6 @@ class ProfileFieldViewModel extends ChangeNotifier {
   final bioFocusNode = FocusNode();
   String uname = '';
   String bio = '';
-  final bottomScrollController = ScrollController();
 
   Future<void> _resetToTxt({
     required Toggle toggle,

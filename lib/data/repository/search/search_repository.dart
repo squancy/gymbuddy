@@ -46,7 +46,8 @@ class SearchRepository {
     return (
       profilePicUrl: profilePicUrl,
       displayUsername: displayUsername,
-      username: username
+      username: username,
+      userID: userID
     );
   }
 }

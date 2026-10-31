@@ -3,15 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/ui/auth/widgets/forgot_pass_screen.dart';
 import 'package:gym_buddy/ui/auth/view_models/forgot_pass_view_model.dart';
-import 'package:gym_buddy/data/repository/auth/email_repository.dart';
-import 'package:gym_buddy/data/repository/auth/forgot_pass_repository.dart';
+import '../fakes/fake_auth_repositories.dart';
 
 void main() {
   testWidgets('Forgot password UI testing', (tester) async {
     final ForgotPasswordPage forgotPasswordPage = ForgotPasswordPage(
       viewModel: ForgotPassViewModel(
-      emailRepository: EmailRepository(),
-      forgotPassRepository: ForgotPassRepository()
+      emailRepository: FakeEmailRepository(),
+      forgotPassRepository: FakeForgotPassRepository()
       )
     );
 

@@ -1,26 +1,59 @@
 import 'package:flutter/material.dart';
 import 'package:image_fade/image_fade.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_photo_view_model.dart';
 
-// Profile photo widget
-class ProfilePhoto extends StatefulWidget {
-  const ProfilePhoto({
+class ProfilePhotoBox extends StatelessWidget {
+  const ProfilePhotoBox({
+    required this.image,
+    super.key
+  });
+
+  final ImageProvider image;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      width: 80,
+      height: 80,
+      child: ClipOval(
+        child: FittedBox(
+        fit: BoxFit.cover,
+        clipBehavior: Clip.hardEdge,
+          child: ImageFade(
+            key: const Key('profilePic'),
+            image: image,
+            placeholder: Container(
+              width: 80,
+              height: 80,
+              color: Colors.black,
+            ),
+          )
+        ),
+      ),
+    );
+  }
+}
+
+class ProfilePhotoOwn extends StatefulWidget {
+  const ProfilePhotoOwn({
     required this.viewModel,
+    required this.userID,
     super.key
   });
 
   final ProfilePhotoViewModel viewModel;
+  final String userID;
 
   @override
-  State<ProfilePhoto> createState() => _ProfilePhotoState();
+  State<ProfilePhotoOwn> createState() => _ProfilePhotoOwnState();
 }
 
-class _ProfilePhotoState extends State<ProfilePhoto> {
+class _ProfilePhotoOwnState extends State<ProfilePhotoOwn> {
   @override
   void initState() {
     super.initState();
-    widget.viewModel.getProfilePicFile();
+    widget.viewModel.getProfilePicFile(widget.userID);
   }
 
   @override
@@ -37,29 +70,51 @@ class _ProfilePhotoState extends State<ProfilePhoto> {
             },
             child: Builder(
               builder: (context) {
-                return SizedBox(
-                  width: 80,
-                  height: 80,
-                  child: ClipOval(
-                    child: FittedBox(
-                    fit: BoxFit.cover,
-                    clipBehavior: Clip.hardEdge,
-                      child: ImageFade(
-                        key: const Key('profilePic'),
-                        image: widget.viewModel.showFile ?
-                          FileImage(widget.viewModel.image) :
-                          widget.viewModel.getBgImage(),
-                        placeholder: Container(
-                          width: 80,
-                          height: 80,
-                          color: Colors.black,
-                        ),
-                      )
-                    ),
-                  ),
+                return ProfilePhotoBox(
+                  image: widget.viewModel.showFile ?
+                  FileImage(widget.viewModel.image) :
+                  widget.viewModel.getBgImage()
                 );
               }
             ),
+          );
+        } else {
+          return ProfilePicPlaceholder(radius: 40,);
+        }
+      }
+    );
+  }
+}
+
+class ProfilePhoto extends StatefulWidget {
+  const ProfilePhoto({
+    required this.viewModel,
+    required this.userID,
+    super.key
+  });
+
+  final ProfilePhotoViewModel viewModel;
+  final String userID;
+
+  @override
+  State<ProfilePhoto> createState() => _ProfilePhotoState();
+}
+
+class _ProfilePhotoState extends State<ProfilePhoto> {
+  @override
+  void initState() {
+    super.initState();
+    widget.viewModel.getProfilePicFile(widget.userID);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return ListenableBuilder(
+      listenable: widget.viewModel,
+      builder: (BuildContext context, Widget? child) {
+        if (widget.viewModel.profilePicFile != null) {
+          return ProfilePhotoBox(
+            image: widget.viewModel.getBgImage()
           );
         } else {
           return ProfilePicPlaceholder(radius: 40,);

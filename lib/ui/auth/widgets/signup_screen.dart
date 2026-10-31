@@ -2,12 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
-import 'package:gym_buddy/ui/auth/widgets/login_screen.dart';
-import 'package:gym_buddy/ui/auth/view_models/login_view_model.dart';
-import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
-import 'package:gym_buddy/data/repository/auth/login_repository.dart';
-import 'package:gym_buddy/data/service/common_service.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({
@@ -32,10 +27,16 @@ class _SignupPageState extends State<SignupPage> {
   }
 
   void _handlePageTransition() {
+    print("haa");
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      homePageRoute(widget.viewModel.actsAndGyms),
+    print("aaa");
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      Routes.homeRoute,
       (Route<dynamic> route) => false,
+      arguments: {
+        'info': widget.viewModel.actsAndGyms
+      }
     );
   }
 
@@ -105,7 +106,53 @@ class _SignupPageState extends State<SignupPage> {
                           isEmail: true,
                         ),
                       ),
-                      // Password textfield
+                      // Sex Menufield
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                        child: ValueListenableBuilder<String>(
+                          valueListenable: widget.viewModel.selectedSex,
+                          builder: (context, value, child) {
+                            return DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.black,
+                                labelText: 'Sex',
+                                labelStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                                floatingLabelStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(color: Colors.white), // kiválasztott érték színe
+                              iconEnabledColor: Colors.white,
+                              initialValue: value.isEmpty ? null : value,
+                              items: const ['Male', 'Female']
+                                  .map(
+                                    (sex) => DropdownMenuItem<String>(
+                                      value: sex,
+                                      child: Text(
+                                        sex,
+                                        style: TextStyle(color: Colors.white, fontSize: 16), // menü opciók fehéren
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (selected) {
+                                if (selected != null) {
+                                  widget.viewModel.selectedSex.value = selected;
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                       // Password textfield
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: BlackTextfield(
@@ -136,17 +183,7 @@ class _SignupPageState extends State<SignupPage> {
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: TextButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(builder: (context) => LoginPage(
-                                viewModel: LoginViewModel(
-                                  signupRepository: SignupRepository(
-                                    commononService: CommonService()
-                                  ),
-                                  loginRepository: LoginRepository()
-                                ),
-                              )),
-                            );
+                            Navigator.pushNamed(context, Routes.loginRoute);
                           },
                           child: Text(
                             SignupConsts.accountExistsText, 

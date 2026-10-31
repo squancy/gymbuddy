@@ -41,7 +41,12 @@ class CommonRepository {
 
   Future<String?> getUserID() async {
     final SharedPreferencesAsync prefs = SharedPreferencesAsync();
-    return prefs.getString('userID');
+    return (await prefs.getString('userID'));
+  }
+
+  Future<String?> getSex() async {
+    final SharedPreferencesAsync prefs = SharedPreferencesAsync();
+    return prefs.getString("sex");
   }
 
   Future<void> logout() async {
@@ -69,13 +74,15 @@ class CommonRepository {
   }
 
   /// Fetch all activities and gyms from db
-  Future<ActGymRecord> getActivitiesAndGyms() async {
+  Future<InfoRecord> getActivitiesAndGyms() async {
     final FirebaseFirestore db = FirebaseFirestore.instance;
     final allGyms = await getAllGymsWithProps(db.collection('gyms/budapest/gyms'));
     sortGymsByName(allGyms);
 
     final allActivities = await getAllActivitiesWithoutProps(db.collection('activities'));
     allActivities.sort();
-    return (activities: allActivities, gyms: allGyms);
+
+    final String? userID = await getUserID();
+    return (activities: allActivities, gyms: allGyms, userID: userID);
   }
 }

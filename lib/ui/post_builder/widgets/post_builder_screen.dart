@@ -3,7 +3,7 @@ import 'package:image_fade/image_fade.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/utils/time_ago_format.dart';
 import 'package:timeago/timeago.dart' as timeago;
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 import 'package:gym_buddy/ui/post_builder/view_models/post_builder_view_model.dart';
 
 class PostBuilder extends StatelessWidget {
@@ -23,7 +23,7 @@ class PostBuilder extends StatelessWidget {
     timeago.setLocaleMessages('en', CustomMessages());
 
     return Column(
-      key: Key(_post['post_id']),
+      key: Key(_post['id'] ?? ''),
       children: [
         Padding(
           padding: const EdgeInsets.all(20.0),

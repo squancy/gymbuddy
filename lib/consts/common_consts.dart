@@ -82,7 +82,8 @@ class ProfileConsts {
 
 class GlobalConsts {
   static const spinkit = CircularProgressIndicator.adaptive();
-  static const bool test = true;
+  // Use the local Firebase emulators: flutter run --dart-define=USE_EMULATORS=true
+  static const bool test = bool.fromEnvironment('USE_EMULATORS');
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
   static const String inputSourcePopupText = 'Select an input source';
   static const String photoGalleryText = 'Photo gallery';
@@ -106,11 +107,28 @@ class HomePageConsts {
   static const int cacheSize = 100;
 }
 
+class Routes {
+  static const String rootRoute = '/';
+  static const String signupRoute = '/signup';
+  static const String loginRoute = '/login';
+  static const String renewPassRoute = '/renewPassword';
+  static const String homeRoute = '/home';
+  static const String enterCodeRoute = '/enterCode';
+  static const String forgotPassRoute = '/forgotPassword';
+}
+
 // Typedefs
-typedef ActGymRecord = ({List<String> activities, List<Map<String, dynamic>> gyms});
+typedef InfoRecord = ({
+  List<String> activities,
+  List<Map<String, dynamic>> gyms,
+  String? userID
+});
+
 typedef PreloadedData = ({
   List<String> activities,
-  List<Map<String, dynamic>> gyms, bool loggedIn
+  List<Map<String, dynamic>> gyms,
+  bool loggedIn,
+  String? userID
 });
 
 // Enums

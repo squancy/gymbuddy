@@ -2,76 +2,71 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter/material.dart';
 import 'package:gym_buddy/ui/auth/view_models/signup_view_model.dart';
-import 'package:gym_buddy/data/repository/auth/signup_repository.dart';
-import 'package:gym_buddy/data/repository/auth/email_repository.dart';
-import 'package:gym_buddy/data/service/common_service.dart';
 import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';
+import '../fakes/fake_auth_repositories.dart';
+
+SignupViewModel makeViewModel({FakeSignupRepository? signupRepository}) {
+  return SignupViewModel(
+    signupRepository: signupRepository ?? FakeSignupRepository(),
+    emailRepository: FakeEmailRepository()
+  );
+}
 
 void main() {
-  final SignupViewModel signupViewModel = SignupViewModel(
-    signupRepository: SignupRepository(commononService: CommonService()),
-    emailRepository: EmailRepository()
-  );
-
   /// Sign up logic test START
-  group('Test the validity of username, email and password fields on the sign up page', () {
+  group('Test the validity of username, email, password and sex fields on the sign up page', () {
+    final SignupViewModel signupViewModel = makeViewModel();
+
     group('If any field is empty return false', () {
-      /*
-        The last element in the tuples was the password confirmation.
-        Currently, it is not used but is kept for now.
-      */
-      List<dynamic> emptyTestcases = [
+      // (username, email, password, sex)
+      List<(String, String, String, String)> emptyTestcases = [
         ('', '', '', ''),
         ('testusername', '', '', ''),
         ('', 'testemail@test.com', '', ''),
         ('', '', 'password', ''),
-        ('', '', '', 'password'),
+        ('', '', '', 'Male'),
         ('testusername', 'testemail@test.com', '', ''),
         ('testusername', '', 'password', ''),
-        ('testusername', '', '', 'password'),
         ('', 'testemail@test.com', 'password', ''),
-        ('', 'testemail@test.com', '', 'password'),
-        ('', '', 'password', 'password'),
         ('testusername', 'testemail@test.com', 'password', ''),
-        ('testusername', 'testemail@test.com', '', 'password'),
-        ('testusername', '', 'password', 'password'),
-        ('testusername', '', 'password', 'password'),
+        ('', 'testemail@test.com', 'password', 'Male'),
+        ('testusername', '', 'password', 'Male'),
+        ('testusername', 'testemail@test.com', '', 'Male'),
       ];
 
       for (final testcase in emptyTestcases) {
-        test('Some of the fields are empty', () {
+        test('Some of the fields are empty: $testcase', () {
           final v = signupViewModel.isValidParams(
             username: testcase.$1,
             email: testcase.$2,
-            password: testcase.$2
+            password: testcase.$3,
+            sex: testcase.$4
           );
           expect(v, (false, SignupConsts.allFieldsText));
         });
       }
     });
+
     test(SignupConsts.usernameTooLongText, () {
       final v = signupViewModel.isValidParams(
         username: 'a' * (ValidateSignupConsts.maxUsernameLength + 1),
         email: 'testemail@test.com',
-        password: 'password'
+        password: 'password',
+        sex: 'Male'
       );
       expect(v, (false, SignupConsts.usernameTooLongText));
     });
 
-    List<dynamic> invalidEmails = [
-      ('testusername', 'wrongemail', 'password', 'password'),
-      ('testusername', 'wrongemail@', 'password', 'password'),
-      ('testusername', '@wrongemail', 'password', 'password'),
-      ('testusername', 'wron@gemail', 'password', 'password')
-    ];
+    List<String> invalidEmails = ['wrongemail', 'wrongemail@', '@wrongemail', 'wron@gemail'];
 
-    for (final testcase in invalidEmails) {
-      test('Invalid emails', () {
+    for (final email in invalidEmails) {
+      test('Invalid email: $email', () {
         final v = signupViewModel.isValidParams(
-          username: testcase.$1,
-          email: testcase.$2,
-          password: testcase.$3
-        );      
+          username: 'testusername',
+          email: email,
+          password: 'password',
+          sex: 'Female'
+        );
         expect(v, (false, SignupConsts.invalidEmailText));
       });
     }
@@ -80,8 +75,9 @@ void main() {
       final v = signupViewModel.isValidParams(
         username: 'testusername',
         email: 'testemail@test.com',
-        password: 'asd'
-      );      
+        password: 'asd',
+        sex: 'Male'
+      );
       expect(v, (false, SignupConsts.passwordLengthText));
     });
 
@@ -89,41 +85,43 @@ void main() {
       final v = signupViewModel.isValidParams(
         username: 'hey(=)',
         email: 'testemail@test.com',
-        password: 'password'
-      );      
+        password: 'password',
+        sex: 'Male'
+      );
       expect(v, (false, SignupConsts.invalidUsernameText));
     });
-
-    // Old code, currently not used
-    /*
-    test(SignupConsts.passwordMismatchText, () {
-      final t = ValidateSignup('testusername', 'testemail@test.com', 'password1', 'password2');      
-      final v = t.isValidParams();
-      expect(v, (false, SignupConsts.passwordMismatchText));
-    });
-    */
 
     test('All parameters are valid', () {
       final v = signupViewModel.isValidParams(
         username: 'testusername',
         email: 'testemail@test.com',
-        password: 'password'
+        password: 'password',
+        sex: 'Female'
       );
       expect(v, (true, ''));
     });
   });
   /// Sign up logic test END
-  
+
   /// Sign up UI test START
   testWidgets('Sign up page UI testing', (tester) async {
-    await tester.pumpWidget(MaterialApp(home: SignupPage(viewModel: signupViewModel,)));
+    tester.view.physicalSize = const Size(1080, 2400);
+    tester.view.devicePixelRatio = 2.625;
+    addTearDown(tester.view.reset);
+
+    await tester.pumpWidget(MaterialApp(home: SignupPage(
+      viewModel: makeViewModel(
+        signupRepository: FakeSignupRepository(takenUsernames: {'takenname'})
+      )
+    )));
 
     final createAccountTxt = find.text(SignupConsts.mainScreenText);
     final signupBtn = find.widgetWithText(FilledButton, SignupConsts.appBarText);
     final haveAccountBtn = find.widgetWithText(TextButton, SignupConsts.accountExistsText);
+    final sexDropdown = find.byType(DropdownButtonFormField<String>);
 
     List<Finder> fields = [];
-    for (final labelName in ['Username', 'Email', 'Password', 'Confirm password']) {
+    for (final labelName in ['Username', 'Email', 'Password']) {
       final labelField = find.ancestor(
         of: find.text(labelName),
         matching: find.byType(TextField),
@@ -135,50 +133,52 @@ void main() {
     expect(createAccountTxt, findsOneWidget);
     expect(signupBtn, findsOneWidget);
     expect(haveAccountBtn, findsOneWidget);
+    expect(sexDropdown, findsOneWidget);
 
-    await tester.tap(signupBtn);
-    await tester.pumpAndSettle();
-    final msgFill = find.text(SignupConsts.allFieldsText);
-    expect(msgFill, findsOneWidget);
+    Future<void> submit() async {
+      await tester.tap(signupBtn);
+      await tester.pumpAndSettle();
+    }
 
-    await tester.enterText(fields[0], "a" * 101);
-    await tester.enterText(fields[1], "a");
-    await tester.enterText(fields[2], "a");
-    await tester.enterText(fields[3], "a");
-    await tester.tap(signupBtn);
-    await tester.pumpAndSettle();
-    final msgTooLong = find.text(SignupConsts.usernameTooLongText);
-    expect(msgTooLong, findsOneWidget);
+    await submit();
+    expect(find.text(SignupConsts.allFieldsText), findsOneWidget);
 
-    await tester.enterText(fields[0], "testusername");
-    await tester.enterText(fields[1], "invalid email");
-    await tester.tap(signupBtn);
-    await tester.pumpAndSettle();
-    final msgInvalidEmail = find.text(SignupConsts.invalidEmailText);
-    expect(msgInvalidEmail, findsOneWidget);
+    // Every text field filled but no sex chosen
+    await tester.enterText(fields[0], 'testusername');
+    await tester.enterText(fields[1], 'valid@email.com');
+    await tester.enterText(fields[2], 'password');
+    await submit();
+    expect(find.text(SignupConsts.allFieldsText), findsOneWidget);
 
-    await tester.enterText(fields[1], "valid@email.com");
-    await tester.enterText(fields[2], "short");
-    await tester.enterText(fields[3], "short");
-    await tester.tap(signupBtn);
+    await tester.tap(sexDropdown);
     await tester.pumpAndSettle();
-    final msgShortPwd = find.text(SignupConsts.passwordLengthText);
-    expect(msgShortPwd, findsOneWidget);
+    await tester.tap(find.text('Male').last);
+    await tester.pumpAndSettle();
+    expect(find.text('Male'), findsOneWidget);
 
-    await tester.enterText(fields[2], "password1");
-    await tester.enterText(fields[3], "password2");
-    await tester.tap(signupBtn);
-    await tester.pumpAndSettle();
-    final msgMismatchPwd = find.text(SignupConsts.passwordMismatchText);
-    expect(msgMismatchPwd, findsOneWidget);
+    await tester.enterText(fields[0], 'a' * 101);
+    await submit();
+    expect(find.text(SignupConsts.usernameTooLongText), findsOneWidget);
 
-    await tester.enterText(fields[0], "invalid_username!");
-    await tester.enterText(fields[2], "password");
-    await tester.enterText(fields[3], "password");
-    await tester.tap(signupBtn);
-    await tester.pumpAndSettle();
-    final msgInvalidUname = find.text(SignupConsts.invalidUsernameText);
-    expect(msgInvalidUname, findsOneWidget);
+    await tester.enterText(fields[0], 'testusername');
+    await tester.enterText(fields[1], 'invalid email');
+    await submit();
+    expect(find.text(SignupConsts.invalidEmailText), findsOneWidget);
+
+    await tester.enterText(fields[1], 'valid@email.com');
+    await tester.enterText(fields[2], 'short');
+    await submit();
+    expect(find.text(SignupConsts.passwordLengthText), findsOneWidget);
+
+    await tester.enterText(fields[0], 'invalid_username!');
+    await tester.enterText(fields[2], 'password');
+    await submit();
+    expect(find.text(SignupConsts.invalidUsernameText), findsOneWidget);
+
+    // Passes validation, then the repository reports the username as taken
+    await tester.enterText(fields[0], 'takenname');
+    await submit();
+    expect(find.text('username taken'), findsOneWidget);
   });
   /// Sign up UI test END
 }

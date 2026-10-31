@@ -19,13 +19,13 @@ class HomePageContent extends StatefulWidget {
 }
 
 class _HomePageContentState extends State<HomePageContent> {
-@override
-void initState() {
-  super.initState();
-  if (!widget.viewModel.dataLoaded) {
-    widget.viewModel.fetchPosts();
+  @override
+  void initState() {
+    super.initState();
+    if (!widget.viewModel.dataLoaded) {
+      widget.viewModel.fetchPosts();
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -82,7 +82,7 @@ void initState() {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView( 
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   DefaultSearch(
@@ -111,7 +111,7 @@ void initState() {
                   itemCount: widget.viewModel.nearbyPosts.length,
                   itemBuilder: (context, index) => PostBuilder(
                     post: widget.viewModel.nearbyPosts[index],
-                    displayUsername: 'a'
+                    displayUsername: widget.viewModel.nearbyPosts[index]['displayUsername'] ?? ''
                   ),
                 ),
               );

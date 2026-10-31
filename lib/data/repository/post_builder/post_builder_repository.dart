@@ -1,15 +1,15 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class PostBuilderRepository {
   PostBuilderRepository();
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  Future<List<Map<String, dynamic>>> createDataForPosts(
-    List<QueryDocumentSnapshot<Map<String, dynamic>>> userPostDocs) async {
+  Future<List<Map<String, dynamic>>> createDataForPosts({
+    required List<QueryDocumentSnapshot<Map<String, dynamic>>> userPostDocs,
+    required String userID
+    }) async {
     List<Map<String, dynamic>> res = [];
-    String? userID = await CommonRepository().getUserID();
     var userData = (await _db.collection('user_settings').doc(userID).get()).data();
     for (final post in userPostDocs) {
       Map<String, dynamic> data = post.data();

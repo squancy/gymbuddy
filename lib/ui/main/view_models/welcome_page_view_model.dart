@@ -5,9 +5,13 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
 
 class WelcomePageViewModel extends ChangeNotifier {
-  WelcomePageViewModel();
+  WelcomePageViewModel({
+    required commonRepository
+  }) :
+  _commonRepository = commonRepository;
 
   ValueNotifier<PreloadedData?> preloadedData = ValueNotifier(null);
+  final CommonRepository _commonRepository;
 
   /// Get log in status and preload activities & gyms from db
   Future<void> getPreloadedData() async {
@@ -20,10 +24,12 @@ class WelcomePageViewModel extends ChangeNotifier {
         loggedIn = false;
       }
 
-      final ActGymRecord actAndGyms = await CommonRepository().getActivitiesAndGyms();
+      final InfoRecord actAndGyms = await _commonRepository.getActivitiesAndGyms();
       preloadedData.value = (
         activities: actAndGyms.activities,
-        gyms: actAndGyms.gyms, loggedIn :loggedIn
+        gyms: actAndGyms.gyms,
+        loggedIn: loggedIn,
+        userID: (await _commonRepository.getUserID())
       );
       notifyListeners();
     } catch (error) {

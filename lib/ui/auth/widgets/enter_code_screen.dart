@@ -4,10 +4,7 @@ import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:moye/widgets/gradient_overlay.dart';
 import 'package:timer_button/timer_button.dart';
 import 'package:gym_buddy/ui/auth/view_models/enter_code_view_model.dart';
-import 'package:gym_buddy/ui/auth/widgets/renew_password_screen.dart';
-import 'package:gym_buddy/ui/auth/view_models/renew_password_view_model.dart';
-import 'package:gym_buddy/data/repository/auth/renew_password_repository.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 class EnterCodePage extends StatefulWidget {
   const EnterCodePage({
@@ -37,17 +34,14 @@ class _EnterCodePageState extends State<EnterCodePage> {
 
   void _handlePageTransition() {
     if (widget.viewModel.pageTransition.value == PageTransition.stayOnPage) return;
-    Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(
-        builder: (context) => RenewPasswordPage(
-          userID: widget.viewModel.userIDRenewPass,
-          viewModel: RenewPasswordViewModel(
-            renewPasswordRepository: RenewPasswordRepository()
-          ),
-        ),
-      ),
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      Routes.renewPassRoute,
       (Route<dynamic> route) => false,
-    );
+      arguments: {
+        'userID': widget.viewModel.userIDRenewPass
+      }
+    ); 
   }
 
   @override

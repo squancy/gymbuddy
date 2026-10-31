@@ -9,7 +9,7 @@ extension FirestoreDocumentExtension on DocumentReference {
   Future<DocumentSnapshot> getCached() async {
     try {
       DocumentSnapshot ds = await get(GetOptions(source: Source.cache));
-      if (!ds.exists) return get(GetOptions(source: Source.server));
+      if (!ds.exists) return await get(GetOptions(source: Source.server));
       return ds;
     } catch (_) {
       return get(GetOptions(source: Source.server));
@@ -22,7 +22,7 @@ extension FirestoreQueryExtension on Query {
   Future<QuerySnapshot> getCached() async {
     try {
       QuerySnapshot qs = await get(GetOptions(source: Source.cache));
-      if (qs.docs.isEmpty) return get(GetOptions(source: Source.server));
+      if (qs.docs.isEmpty) return await get(GetOptions(source: Source.server));
       return qs;
     } catch (_) {
       return get(GetOptions(source: Source.server));
