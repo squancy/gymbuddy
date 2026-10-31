@@ -9,6 +9,7 @@ import 'package:gym_buddy/data/repository/auth/email_repository.dart';
 import 'package:gym_buddy/data/service/common_service.dart';
 import 'package:gym_buddy/ui/auth/widgets/signup_screen.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/routes.dart';
 
 Future<void> main() async {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -17,8 +18,21 @@ Future<void> main() async {
   final users = db.collection('users');
 
   testWidgets('Sign up test with Firestore', (tester) async {
+    // Remove the user a previous run created, so the test can be re-run
+    final leftovers = await users.where('username', isEqualTo: 'username_does_not_exist').get();
+    for (final doc in leftovers.docs) {
+      await doc.reference.delete();
+      await db.collection('user_settings').doc(doc.id).delete();
+    }
+
+    // Use the seed user's actual email rather than assuming it
+    final existingUser = await users.where('username', isEqualTo: 'test').get();
+    expect(existingUser.docs.length, 1);
+    final String existingEmail = existingUser.docs.first.data()['email'];
+
     await tester.pumpWidget(
       MaterialApp(
+        onGenerateRoute: CustomRoutes.generateRoute,
         home: SignupPage(
           viewModel:SignupViewModel(
             signupRepository: SignupRepository(
@@ -42,8 +56,13 @@ Future<void> main() async {
     }
 
     await tester.enterText(fields[0], "test");
-    await tester.enterText(fields[1], "test@example.com");
+    await tester.enterText(fields[1], existingEmail);
     await tester.enterText(fields[2], "password");
+
+    await tester.tap(find.byType(DropdownButtonFormField<String>));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Male').last);
+    await tester.pumpAndSettle();
 
     await tester.tap(signupBtn);
     await tester.pumpAndSettle(); 
@@ -79,6 +98,7 @@ Future<void> main() async {
   testWidgets("Signup page test for login navigation", (WidgetTester tester) async {
     await tester.pumpWidget(
       MaterialApp(
+        onGenerateRoute: CustomRoutes.generateRoute,
         home: SignupPage(
           viewModel:SignupViewModel(
             signupRepository: SignupRepository(
