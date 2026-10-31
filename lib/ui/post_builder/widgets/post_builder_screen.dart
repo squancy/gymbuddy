@@ -23,7 +23,7 @@ class PostBuilder extends StatelessWidget {
     timeago.setLocaleMessages('en', CustomMessages());
 
     return Column(
-      key: Key(_post['post_id']),
+      key: Key(_post['id'] ?? ''),
       children: [
         Padding(
           padding: const EdgeInsets.all(20.0),

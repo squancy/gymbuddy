@@ -41,6 +41,28 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   final x = HomePageViewModel();
+  late final HomePageContentViewModel _homePageContentViewModel;
+  late final ProfilePage _profilePage;
+
+  @override
+  void initState() {
+    super.initState();
+    _homePageContentViewModel = HomePageContentViewModel(
+      homePageContentRepository: HomePageContentRepository()
+    );
+    _profilePage = ProfilePage(
+      viewModel: ProfilePageViewModel(
+        profileRepository: ProfileRepository(),
+        commonRepository: CommonRepository(),
+        postBuilderRepository: PostBuilderRepository()
+      ),
+      viewModelField: ProfileFieldViewModel(
+        profileFieldRepository: ProfileFieldRepository()
+      ),
+      userID: widget.userID,
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Builder(
@@ -54,9 +76,7 @@ class _HomePageState extends State<HomePage> {
               body: Center(
                 child: [
                   HomePageContent(
-                    viewModel: HomePageContentViewModel(
-                      homePageContentRepository: HomePageContentRepository()
-                    ),
+                    viewModel: _homePageContentViewModel,
                   ),
                   PostPage(
                     postPageActs: widget.postPageActs,
@@ -67,18 +87,8 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                   Container(),
-                  ProfilePage(
-                    viewModel: ProfilePageViewModel(
-                      profileRepository: ProfileRepository(),
-                      commonRepository: CommonRepository(),
-                      postBuilderRepository: PostBuilderRepository()
-                    ),
-                    viewModelField: ProfileFieldViewModel(
-                      profileFieldRepository: ProfileFieldRepository()
-                    ),
-                    userID: widget.userID,
-                  )
-                ][x.selectedIndex.value], 
+                  _profilePage
+                ][x.selectedIndex.value],
               ),
               bottomNavigationBar: BottomNavbar(
                 viewModel: x

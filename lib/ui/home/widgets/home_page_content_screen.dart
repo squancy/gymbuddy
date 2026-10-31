@@ -82,7 +82,7 @@ class _HomePageContentState extends State<HomePageContent> {
             ),
           ),
           Expanded(
-            child: SingleChildScrollView( 
+            child: SingleChildScrollView(
               child: Column(
                 children: [
                   DefaultSearch(
@@ -111,7 +111,7 @@ class _HomePageContentState extends State<HomePageContent> {
                   itemCount: widget.viewModel.nearbyPosts.length,
                   itemBuilder: (context, index) => PostBuilder(
                     post: widget.viewModel.nearbyPosts[index],
-                    displayUsername: 'a'
+                    displayUsername: widget.viewModel.nearbyPosts[index]['displayUsername'] ?? ''
                   ),
                 ),
               );

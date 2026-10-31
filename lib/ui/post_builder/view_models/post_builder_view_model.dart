@@ -5,12 +5,15 @@ class PostBuilderViewModel {
   PostBuilderViewModel();
 
   String formatField(String field, Map<String, dynamic> post) {
-    if (field == 'when') {
-      return DateFormat('MM-dd hh:mm a').format(post[field].toDate()).toString();
-    } else {
-      return post[field];
-    }
+  if (post[field] == null) {
+    return '';
   }
+  if (field == 'when') {
+    return DateFormat('MM-dd hh:mm a').format(post[field].toDate()).toString();
+  } else {
+    return post[field].toString();
+  }
+}
 
   IconData getPostIcon(String field) {
     switch (field) {

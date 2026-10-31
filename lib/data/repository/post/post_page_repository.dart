@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/data/service/common_service.dart';
 
 class PostPageRepository {
   PostPageRepository();
@@ -18,13 +19,15 @@ class PostPageRepository {
     final postsDocRef = _db.collection('posts').doc(postID);
     final data = {
       'author': await CommonRepository().getUserID(),
+      'sex': await CommonRepository().getSex(),
       'content': postText,
       'day_type': dayType,
       'gym': gymID,
       'download_url_list': downloadURLs,
       'filename_list': filenames,
       'when': when,
-      'date': FieldValue.serverTimestamp()
+      'date': FieldValue.serverTimestamp(),
+      'where': await CommonService().getGeolocation()
     };
 
     await postsDocRef.set(data);
