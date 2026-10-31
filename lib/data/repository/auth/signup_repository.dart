@@ -58,6 +58,7 @@ class SignupRepository {
     required String username,
     required String email,
     required String password,
+    required String sex
   }) async {
     final users = _db.collection('users');
     final userSettings = _db.collection('user_settings');
@@ -79,6 +80,7 @@ class SignupRepository {
       'username': username,
       'email': email,
       'password': pwh,
+      'sex': sex,
       'salt': salt,
       'platform': platform,
       'geoloc': userGeoPoint?.data,

@@ -53,7 +53,7 @@ class HomePageContentRepository {
       return;
     }
 
-    final Completer<void> completer = Completer<void>();
+    // final Completer<void> completer = Completer<void>();
 
     GeoFirePoint user_GeoPoint = GeoFirePoint(GeoPoint(_lastKnownPosition!.latitude, _lastKnownPosition!.longitude));
     final collectionReference = _db.collection('gyms').doc('budapest').collection('gyms');
@@ -70,20 +70,20 @@ class HomePageContentRepository {
           print("Gyms were fetched: ${snapshots.length}");
           if (snapshots.isEmpty) {
             print("No gyms found within the radius.");
-            completer.complete();
+            // completer.complete();
             return;
           }
           _nearbyGyms = snapshots.map((doc) => doc.id).toList();
           print("Nearby gyms: $_nearbyGyms");
           await _fetchPostsForNearbyGyms();
           await _getUserDataForPostById();
-          completer.complete();
+          // completer.complete();
         }, onError: (e) {
           print("Error fetching gyms: $e");
-          completer.completeError(e);
+          // completer.completeError(e);
         });
 
-    await completer.future;
+    // await completer.future;
   }
 
   Future<void> _fetchPostsForNearbyGyms() async {

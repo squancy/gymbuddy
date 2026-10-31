@@ -105,34 +105,53 @@ class _SignupPageState extends State<SignupPage> {
                           isEmail: true,
                         ),
                       ),
-                      // Password textfield
-                        // Padding(
-                        // padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
-                        // child: ValueListenableBuilder<String>(
-                        //   valueListenable: widget.viewModel.selectedSex,
-                          
-                        //   builder: (context, value, child) {
-                        //   return DropdownButtonFormField<String>(
-                        //     decoration: InputDecoration(
-                        //     labelText: 'Sex',
-                        //     border: OutlineInputBorder(),
-                        //     ),
-                        //     value: value.isEmpty ? null : value,
-                        //     items: ['Male', 'Female']
-                        //       .map((sex) => DropdownMenuItem(
-                        //         value: sex,
-                        //         child: Text(sex),
-                        //         ))
-                        //       .toList(),
-                        //     onChanged: (selected) {
-                        //     if (selected != null) {
-                        //       widget.viewModel.selectedSex.value = selected;
-                        //     }
-                        //     },
-                        //   );
-                        //   },
-                        // ),
-                        // ),
+                      // Sex Menufield
+                      Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
+                        child: ValueListenableBuilder<String>(
+                          valueListenable: widget.viewModel.selectedSex,
+                          builder: (context, value, child) {
+                            return DropdownButtonFormField<String>(
+                              decoration: InputDecoration(
+                                filled: true,
+                                fillColor: Colors.black,
+                                labelText: 'Sex',
+                                labelStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.tertiary,
+                                ),
+                                floatingLabelStyle: TextStyle(
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(12),
+                                  borderSide: BorderSide.none,
+                                ),
+                              ),
+                              dropdownColor: Colors.black,
+                              style: const TextStyle(color: Colors.white), // kiválasztott érték színe
+                              iconEnabledColor: Colors.white,
+                              value: value.isEmpty ? null : value,
+                              items: const ['Male', 'Female']
+                                  .map(
+                                    (sex) => DropdownMenuItem<String>(
+                                      value: sex,
+                                      child: Text(
+                                        sex,
+                                        style: TextStyle(color: Colors.white, fontSize: 16), // menü opciók fehéren
+                                      ),
+                                    ),
+                                  )
+                                  .toList(),
+                              onChanged: (selected) {
+                                if (selected != null) {
+                                  widget.viewModel.selectedSex.value = selected;
+                                }
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                       // Password textfield
                       Padding(
                         padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 0),
                         child: BlackTextfield(
