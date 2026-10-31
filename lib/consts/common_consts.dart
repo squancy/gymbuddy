@@ -82,7 +82,8 @@ class ProfileConsts {
 
 class GlobalConsts {
   static const spinkit = CircularProgressIndicator.adaptive();
-  static const bool test = false;
+  // Use the local Firebase emulators: flutter run --dart-define=USE_EMULATORS=true
+  static const bool test = bool.fromEnvironment('USE_EMULATORS');
   static const String defaultProfilePicPath = 'assets/default_profile_pic.png';
   static const String inputSourcePopupText = 'Select an input source';
   static const String photoGalleryText = 'Photo gallery';
