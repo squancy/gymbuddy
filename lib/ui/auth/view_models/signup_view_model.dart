@@ -28,13 +28,15 @@ class SignupViewModel extends ChangeNotifier {
   final ValueNotifier<String> signupStatus = ValueNotifier<String>("");
   late InfoRecord actsAndGyms;
   ValueNotifier<PageTransition> pageTransition = ValueNotifier(PageTransition.stayOnPage);
+  ValueNotifier<String> selectedSex = ValueNotifier<String>('');
 
   (bool isValid, String errorMsg) isValidParams({
     required String username,
     required String email,
-    required String password
+    required String password,
+    required String sex
     }) {
-    if (username.isEmpty || email.isEmpty || password.isEmpty) {
+    if (username.isEmpty || email.isEmpty || password.isEmpty || sex.isEmpty) {
       return (false, SignupConsts.allFieldsText);
     } else if (username.length > ValidateSignupConsts.maxUsernameLength) {
       return (false, SignupConsts.usernameTooLongText);
@@ -52,6 +54,7 @@ class SignupViewModel extends ChangeNotifier {
     final String email = emailController.text.trim();
     final String password = passwordController.text;
     final String username = usernameController.text.trim();
+    final String sex = this.selectedSex.value;
 
     try {
       signupStatus.value = '';
@@ -61,7 +64,7 @@ class SignupViewModel extends ChangeNotifier {
 
       // Validate data for signup
       var (bool isValid, String errorMsg) = isValidParams(
-        username: username, email: email, password: password
+        username: username, email: email, password: password, sex: sex
       );
       if (!isValid) {
         signupStatus.value = errorMsg;
@@ -83,7 +86,8 @@ class SignupViewModel extends ChangeNotifier {
       (isValid, errorMsg, userID) = await _signupRepository.insertToDB(
         username: username,
         email: email,
-        password: password
+        password: password,
+        sex: sex
       );
       if (!isValid) {
         signupStatus.value = errorMsg;

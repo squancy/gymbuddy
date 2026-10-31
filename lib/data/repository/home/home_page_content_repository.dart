@@ -45,6 +45,7 @@ class HomePageContentRepository {
       return;
     }
 
+    // subscribeWithin is a live stream: only the first emission completes the fetch
     final Completer<void> completer = Completer<void>();
 
     GeoFirePoint user_GeoPoint = GeoFirePoint(GeoPoint(_lastKnownPosition!.latitude, _lastKnownPosition!.longitude));
@@ -62,17 +63,17 @@ class HomePageContentRepository {
           print("Gyms were fetched: ${snapshots.length}");
           if (snapshots.isEmpty) {
             print("No gyms found within the radius.");
-            completer.complete();
+            if (!completer.isCompleted) completer.complete();
             return;
           }
           _nearbyGyms = snapshots.map((doc) => doc.id).toList();
           print("Nearby gyms: $_nearbyGyms");
           await _fetchPostsForNearbyGyms();
           await _getUserDataForPostById();
-          completer.complete();
+          if (!completer.isCompleted) completer.complete();
         }, onError: (e) {
           print("Error fetching gyms: $e");
-          completer.completeError(e);
+          if (!completer.isCompleted) completer.completeError(e);
         });
 
     await completer.future;
