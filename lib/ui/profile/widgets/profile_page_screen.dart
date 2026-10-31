@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:gym_buddy/data/repository/core/common_repository.dart';
+import 'package:gym_buddy/data/repository/core/upload_image_repository.dart';
 import 'package:gym_buddy/data/repository/profile/profile_photo_repository.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_field_view_model.dart';
 import 'package:gym_buddy/ui/profile/view_models/profile_page_view_model.dart';
@@ -14,11 +16,13 @@ class ProfilePage extends StatefulWidget {
   const ProfilePage({
     required this.viewModelField,
     required this.viewModel,
+    required this.userID,
     super.key
   });
 
   final ProfileFieldViewModel viewModelField;
   final ProfilePageViewModel viewModel;
+  final String userID;
 
   @override
   State<ProfilePage> createState() => _ProfilePageState();
@@ -28,17 +32,8 @@ class _ProfilePageState extends State<ProfilePage> {
   @override
   void initState() {
     super.initState();
+    widget.viewModel.init(widget.userID);
     widget.viewModel.pageTransition.addListener(_handlePageTransition);
-    widget.viewModel.getUserDataFuture = widget.viewModel.getUserData();
-    widget.viewModelField.bottomScrollController.addListener(() {
-      if (widget.viewModelField.bottomScrollController.position.atEdge) {
-        bool isTop = widget.viewModelField.bottomScrollController.position.pixels == 0;
-        if (!isTop &&
-          widget.viewModel.lastVisibleNum < widget.viewModel.totalNumberOfPosts) {
-          widget.viewModel.setFuture();
-        }
-      }
-    });
   }
 
   void _handlePageTransition() {
@@ -46,7 +41,9 @@ class _ProfilePageState extends State<ProfilePage> {
     Navigator.of(context).pushAndRemoveUntil(
       MaterialPageRoute(
         builder: (context) => WelcomePage(
-          viewModel: WelcomePageViewModel(),
+          viewModel: WelcomePageViewModel(
+            commonRepository: CommonRepository()
+          ),
         ),
       ),
       (Route<dynamic> route) => false,
@@ -76,9 +73,10 @@ class _ProfilePageState extends State<ProfilePage> {
             final Map<String, dynamic> data = snapshot.data as Map<String, dynamic>;
             widget.viewModelField.uname = data['displayUsername'];
             widget.viewModelField.bio = data['bio'];
+            final bool viewingOwnProfile = data['loggedInUserID'] == widget.userID;
 
             return ListView(
-              controller: widget.viewModelField.bottomScrollController,
+              controller: widget.viewModel.bottomScrollController,
               children: [
                 Column(
                   children: [
@@ -90,29 +88,49 @@ class _ProfilePageState extends State<ProfilePage> {
                           Expanded(child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
+                              viewingOwnProfile ?
                               DUnameTapRegion(
                                 viewModel: widget.viewModelField
+                              )
+                              :
+                              DisplayUsernameStatic(
+                                displayUsername: widget.viewModelField.uname
                               ),
                               Text("@${data['username']}")
                             ],
                           ),),
                           Column(
-                            // Profile photo and logout button
                             children: [
+                              viewingOwnProfile ?
+                              ProfilePhotoOwn(
+                                viewModel: ProfilePhotoViewModel(
+                                  profilePhotoRepository: ProfilePhotoRepository(
+                                    uploadImageRepository: UploadImageRepository()
+                                  ),
+                                ),
+                                userID: widget.userID,
+                              )
+                              : 
                               ProfilePhoto(
                                 viewModel: ProfilePhotoViewModel(
-                                  profilePhotoRepository: ProfilePhotoRepository()
+                                  profilePhotoRepository: ProfilePhotoRepository(
+                                    uploadImageRepository: UploadImageRepository()
+                                  ),
                                 ),
+                                userID: widget.userID,
                               ),
                               SizedBox(height: 10,),
-                              GestureDetector(
-                                onTap: widget.viewModel.logout,
-                                child: Icon(
-                                  Icons.logout_rounded,
-                                  size: 20,
-                                  color: Theme.of(context).colorScheme.primary,
-                                ),
-                              )
+                              viewingOwnProfile ?
+                                GestureDetector(
+                                  onTap: widget.viewModel.logout,
+                                  child: Icon(
+                                    Icons.logout_rounded,
+                                    size: 20,
+                                    color: Theme.of(context).colorScheme.primary,
+                                  ),
+                                )
+                              :
+                              Container(),
                             ],
                           )
                         ],
@@ -120,9 +138,13 @@ class _ProfilePageState extends State<ProfilePage> {
                     )
                   ],
                 ),
-                // Bio
+                viewingOwnProfile ?
                 BioTapRegion(
                   viewModel: widget.viewModelField
+                )
+                :
+                BioStatic(
+                  bio: widget.viewModelField.bio
                 ),
                 Divider(
                   color: Colors.white12

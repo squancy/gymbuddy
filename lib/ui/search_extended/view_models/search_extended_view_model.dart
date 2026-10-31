@@ -1,0 +1,3 @@
+class SearchExtendedViewModel {
+  SearchExtendedViewModel();
+}

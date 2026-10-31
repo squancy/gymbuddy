@@ -15,7 +15,9 @@ Future<void> main() async {
         MaterialApp(
           home: WelcomePage(
             key: const Key("welcomePage1"),
-            viewModel: WelcomePageViewModel(),
+            viewModel: WelcomePageViewModel(
+              commonRepository: CommonRepository()
+            ),
           )
         )
       );
@@ -41,7 +43,9 @@ Future<void> main() async {
         MaterialApp(
           home: WelcomePage(
             key: const Key("welcomePage2"),
-            viewModel: WelcomePageViewModel(),
+            viewModel: WelcomePageViewModel(
+              commonRepository: CommonRepository()
+            ),
           )
         )
       );

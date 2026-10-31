@@ -16,40 +16,43 @@ class Bio extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return TextField(
-      key: const Key('bioField'),
-      decoration: InputDecoration(
-        border: InputBorder.none,
-        hintText: ProfileConsts.bioDefaultText,
-        hintStyle: TextStyle(
-          color: Colors.grey,
-          fontSize: 14,
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: TextField(
+        key: const Key('bioField'),
+        decoration: InputDecoration(
+          border: InputBorder.none,
+          hintText: ProfileConsts.bioDefaultText,
+          hintStyle: TextStyle(
+            color: Colors.grey,
+            fontSize: 14,
+          ),
+          counterText: '',
+          isDense: true,
+          contentPadding: EdgeInsets.zero,
         ),
-        counterText: '',
-        isDense: true,
-        contentPadding: EdgeInsets.zero,
+        autofocus: _autofocus,
+        style: TextStyle(
+          fontSize: 14,
+          letterSpacing: 0,
+          height: 1.4
+        ),
+        onChanged: (value) {
+          _viewModel.setBioText();
+        },
+        controller: _viewModel.bioController,
+        maxLines: null,
+        onEditingComplete: () {
+          _viewModel.finishBioEdit();
+        },
+        onSubmitted: (context) {
+          _viewModel.finishBioEdit();
+        },
+        onTapOutside: (event) {
+          _viewModel.finishBioEdit();
+        },
+        focusNode: _viewModel.bioFocusNode,
       ),
-      autofocus: _autofocus,
-      style: TextStyle(
-        fontSize: 14,
-        letterSpacing: 0,
-        height: 1.4
-      ),
-      onChanged: (value) {
-        _viewModel.setBioText();
-      },
-      controller: _viewModel.bioController,
-      maxLines: null,
-      onEditingComplete: () {
-        _viewModel.finishBioEdit();
-      },
-      onSubmitted: (context) {
-        _viewModel.finishBioEdit();
-      },
-      onTapOutside: (event) {
-        _viewModel.finishBioEdit();
-      },
-      focusNode: _viewModel.bioFocusNode,
     );
   }
 }
@@ -105,6 +108,26 @@ class DisplayUsername extends StatelessWidget {
   }
 }
 
+class DisplayUsernameStatic extends StatelessWidget {
+  const DisplayUsernameStatic({
+    required this.displayUsername,
+    super.key
+  });
+
+  final String displayUsername;
+
+  @override Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
+      child: Text(displayUsername, style: TextStyle(
+        fontSize: 24,
+        fontWeight: FontWeight.bold,
+        letterSpacing: 0,
+      )),
+    );
+  }
+}
+
 class DUnameTapRegion extends StatelessWidget {
   const DUnameTapRegion({
     required viewModel,
@@ -130,18 +153,32 @@ class DUnameTapRegion extends StatelessWidget {
                 viewModel: _viewModel,
               );
             } else {
-              // Username display
-              return Padding(
-                padding: const EdgeInsets.fromLTRB(0, 0, 10, 0),
-                child: Text(_viewModel.uname, style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  letterSpacing: 0,
-                )),
+              return DisplayUsernameStatic(
+                displayUsername: _viewModel.uname
               );
             }
           }),
         ),
+    );
+  }
+}
+
+class BioStatic extends StatelessWidget {
+  const BioStatic({
+    required this.bio,
+    super.key
+  });
+
+  final String bio;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(20, 0, 20, 0),
+      child: Text(
+        bio,
+        style: TextStyle(letterSpacing: 0, height: null),
+      ),
     );
   }
 }
@@ -157,35 +194,31 @@ class BioTapRegion extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.fromLTRB(20.0, 0, 20.0, 0),
-      child: Builder(
-        builder: (context) {
-          _viewModel.bioMakeEditable();
-          return TapRegion(
-            onTapOutside: _viewModel.bioTapOutside,
-            child: GestureDetector(
-              onDoubleTap: _viewModel.bioDoubleTap,
-              child: ValueListenableBuilder<bool>(
-                valueListenable: _viewModel.toggleEditBio.showEdit,
-                builder: (BuildContext context, bool value, Widget? child) {
-                  if (_viewModel.toggleEditBio.showEdit.value) {
-                    return Bio(
-                      autofocus: _viewModel.bio.isNotEmpty,
-                      viewModel: _viewModel,
-                    );
-                  } else {
-                    return Text(
-                      _viewModel.bio,
-                      style: TextStyle(letterSpacing: 0, height: null),
-                    );
-                  }
+    return Builder(
+      builder: (context) {
+        _viewModel.bioMakeEditable();
+        return TapRegion(
+          onTapOutside: _viewModel.bioTapOutside,
+          child: GestureDetector(
+            onDoubleTap: _viewModel.bioDoubleTap,
+            child: ValueListenableBuilder<bool>(
+              valueListenable: _viewModel.toggleEditBio.showEdit,
+              builder: (BuildContext context, bool value, Widget? child) {
+                if (_viewModel.toggleEditBio.showEdit.value) {
+                  return Bio(
+                    autofocus: _viewModel.bio.isNotEmpty,
+                    viewModel: _viewModel,
+                  );
+                } else {
+                  return BioStatic(
+                    bio: _viewModel.bio
+                  );
                 }
-              ),
+              }
             ),
-          );
-        },
-      ),
+          ),
+        );
+      },
     ); 
   }
 }

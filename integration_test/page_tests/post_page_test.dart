@@ -33,7 +33,7 @@ Future<void> main() async {
   final FirebaseFirestore db = FirebaseFirestore.instance;
   final random = Random();
   final numOfRandomPosts = 10;
-  final consts.ActGymRecord actsAndGyms = await commonRepo.getActivitiesAndGyms();
+  final consts.InfoRecord actsAndGyms = await commonRepo.getActivitiesAndGyms();
 
   testWidgets('Post page testing', (tester) async {
     // Necessary for being able to enterText when not in debug mode 

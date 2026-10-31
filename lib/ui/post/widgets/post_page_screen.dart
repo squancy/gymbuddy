@@ -8,7 +8,7 @@ import 'package:intl/intl.dart';
 import 'package:moye/moye.dart';
 import 'package:gym_buddy/consts/common_consts.dart';
 import 'package:gym_buddy/ui/post/view_models/post_page_view_model.dart';
-import 'package:gym_buddy/ui/core/common_ui.dart';
+import 'package:gym_buddy/ui/core/widgets/common_ui.dart';
 
 final FirebaseFirestore db = FirebaseFirestore.instance;
 final storageRef = FirebaseStorage.instance.ref();
